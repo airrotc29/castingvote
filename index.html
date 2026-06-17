@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HABITUS KOREA 전자투표</title>
+  <meta name="description" content="HABITUS KOREA 전자투표 안내, 현장 소식 및 문의 접수 홈페이지입니다." />
+
+  <!-- Open Graph (카카오톡/SNS 공유 시 표시되는 정보) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="HABITUS KOREA 전자투표" />
+  <meta property="og:description" content="HABITUS KOREA 전자투표 안내, 현장 소식 및 문의 접수." />
+  <meta property="og:image" content="assets/images/og-image.jpg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ===== 헤더 / 네비게이션 ===== -->
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a href="#top" class="brand">
+        <img src="assets/images/logo.png" alt="(주) HABITUS KOREA - 상상을 현실로" class="brand-logo" />
+      </a>
+      <nav class="nav" aria-label="주요 메뉴">
+        <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-list" id="navList">
+          <li><a href="#about">소개</a></li>
+          <li><a href="#gallery">현장 갤러리</a></li>
+          <li><a href="#resources">홍보자료</a></li>
+          <li><a href="#quote">견적서</a></li>
+          <li><a href="#contact">문의하기</a></li>
+          <li><a href="#vote" class="nav-cta">전자투표 바로가기</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== 히어로 ===== -->
+  <section class="hero" id="vote">
+    <div class="hero-overlay"></div>
+    <div class="container hero-inner">
+      <p class="hero-eyebrow">HABITUS KOREA</p>
+      <h1 class="hero-title">전자투표 안내</h1>
+      <p class="hero-desc">
+        투명하고 안전한 전자투표 시스템으로 여러분의 소중한 한 표를 행사하세요.<br />
+        아래 버튼을 눌러 전자투표 시스템으로 이동할 수 있습니다.
+      </p>
+      <div class="hero-actions">
+        <!-- TODO: 실제 전자투표 시스템 주소로 변경하세요 -->
+        <a href="https://example.com/vote" class="btn btn-primary" id="voteLink" target="_blank" rel="noopener">
+          전자투표 바로가기 ↗
+        </a>
+        <a href="#contact" class="btn btn-ghost">문의하기</a>
+      </div>
+      <p class="hero-note">※ 투표는 별도의 전자투표 시스템에서 진행됩니다.</p>
+    </div>
+  </section>
+
+  <!-- ===== 소개 ===== -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">ABOUT</span>
+        <h2 class="section-title">HABITUS KOREA 소개</h2>
+        <p class="section-lead">함께 만들어가는 투명한 의사결정, 그 중심에 HABITUS KOREA가 있습니다.</p>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🗳️</div>
+          <h3>투명한 전자투표</h3>
+          <p>안전하고 신뢰할 수 있는 전자투표 시스템을 통해 누구나 손쉽게 참여할 수 있습니다.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📸</div>
+          <h3>현장 소식</h3>
+          <p>다양한 현장 활동과 행사 사진을 통해 생생한 현장 소식을 전해드립니다.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">💬</div>
+          <h3>열린 소통</h3>
+          <p>궁금한 점이나 제안 사항은 언제든지 온라인 문의를 통해 전달해 주세요.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 현장 갤러리 ===== -->
+  <section class="section section-alt" id="gallery">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">GALLERY</span>
+        <h2 class="section-title">현장 갤러리</h2>
+        <p class="section-lead">HABITUS KOREA의 생생한 현장 모습을 사진으로 만나보세요.</p>
+      </div>
+
+      <!-- 사진을 추가하려면 assets/images 폴더에 이미지를 넣고 아래 항목을 복사해 src/캡션을 수정하세요. -->
+      <div class="gallery" id="gallery-grid">
+        <figure class="gallery-item">
+          <img src="assets/images/placeholder-1.svg" alt="현장 사진 1" loading="lazy" />
+          <figcaption>현장 사진 캡션 1</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/images/placeholder-2.svg" alt="현장 사진 2" loading="lazy" />
+          <figcaption>현장 사진 캡션 2</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/images/placeholder-3.svg" alt="현장 사진 3" loading="lazy" />
+          <figcaption>현장 사진 캡션 3</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/images/placeholder-4.svg" alt="현장 사진 4" loading="lazy" />
+          <figcaption>현장 사진 캡션 4</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/images/placeholder-5.svg" alt="현장 사진 5" loading="lazy" />
+          <figcaption>현장 사진 캡션 5</figcaption>
+        </figure>
+        <figure class="gallery-item">
+          <img src="assets/images/placeholder-6.svg" alt="현장 사진 6" loading="lazy" />
+          <figcaption>현장 사진 캡션 6</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 홍보자료 ===== -->
+  <section class="section" id="resources">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">RESOURCES</span>
+        <h2 class="section-title">홍보자료</h2>
+        <p class="section-lead">HABITUS KOREA 홍보자료를 미리 보고, 필요한 파일을 다운로드하세요.</p>
+      </div>
+
+      <!--
+        홍보자료를 추가하려면 assets/resources 폴더에 파일을 넣고 아래 항목을 복사하세요.
+        - data-file : 실제 파일 경로 (보기/다운로드 대상)
+        - data-type : 미리보기 종류 (image | pdf)
+      -->
+      <div class="resources" id="resourceGrid">
+        <article class="resource-item" data-file="assets/resources/poster-1.svg" data-type="image">
+          <div class="resource-thumb">
+            <img src="assets/resources/poster-1.svg" alt="전자투표 안내 포스터" loading="lazy" />
+            <span class="resource-badge">이미지</span>
+          </div>
+          <div class="resource-body">
+            <h3>전자투표 안내 포스터</h3>
+            <p>전자투표 참여 방법을 한눈에 정리한 포스터입니다.</p>
+            <div class="resource-actions">
+              <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
+              <a class="btn btn-sm btn-primary" href="assets/resources/poster-1.svg" download>다운로드 ↓</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="resource-item" data-file="assets/resources/brochure.svg" data-type="image">
+          <div class="resource-thumb">
+            <img src="assets/resources/brochure.svg" alt="HABITUS KOREA 소개 브로슈어" loading="lazy" />
+            <span class="resource-badge">이미지</span>
+          </div>
+          <div class="resource-body">
+            <h3>소개 브로슈어</h3>
+            <p>HABITUS KOREA의 주요 활동을 담은 소개 자료입니다.</p>
+            <div class="resource-actions">
+              <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
+              <a class="btn btn-sm btn-primary" href="assets/resources/brochure.svg" download>다운로드 ↓</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="resource-item" data-file="assets/resources/guide.svg" data-type="image">
+          <div class="resource-thumb">
+            <img src="assets/resources/guide.svg" alt="현장 활동 안내문" loading="lazy" />
+            <span class="resource-badge">이미지</span>
+          </div>
+          <div class="resource-body">
+            <h3>현장 활동 안내문</h3>
+            <p>현장 행사 및 참여 안내 사항을 정리한 자료입니다.</p>
+            <div class="resource-actions">
+              <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
+              <a class="btn btn-sm btn-primary" href="assets/resources/guide.svg" download>다운로드 ↓</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="resource-item" data-file="assets/resources/habitus-korea-ci.pdf" data-type="pdf">
+          <div class="resource-thumb">
+            <img src="assets/images/logo.png" alt="HABITUS KOREA 회사 CI" loading="lazy" style="object-fit:contain;padding:24px;background:#fff;" />
+            <span class="resource-badge">CI · PDF</span>
+          </div>
+          <div class="resource-body">
+            <h3>회사 CI (로고)</h3>
+            <p>(주)HABITUS KOREA 공식 로고입니다. 인쇄·홍보용 원본(PDF)을 받으실 수 있습니다.</p>
+            <div class="resource-actions">
+              <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
+              <a class="btn btn-sm btn-primary" href="assets/resources/habitus-korea-ci.pdf" download>다운로드 ↓</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="resource-item resource-doc">
+          <div class="resource-thumb resource-thumb-doc">
+            <span class="doc-ext">HWP</span>
+            <span class="resource-badge">문서</span>
+          </div>
+          <div class="resource-body">
+            <h3>개인정보처리 위탁계약서</h3>
+            <p>표준 개인정보처리위탁 계약서(위탁서) 양식입니다. 한글(HWP) 파일로 제공됩니다.</p>
+            <div class="resource-actions">
+              <a class="btn btn-sm btn-primary btn-block" href="assets/resources/habitus-personal-info-consignment.hwp" download>다운로드 ↓</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 홍보자료 미리보기 모달 ===== -->
+  <div class="previewer" id="previewer" aria-hidden="true">
+    <button class="previewer-close" id="previewerClose" aria-label="닫기">×</button>
+    <div class="previewer-stage" id="previewerStage"></div>
+    <a class="btn btn-primary previewer-download" id="previewerDownload" href="#" download>다운로드 ↓</a>
+  </div>
+
+  <!-- ===== 라이트박스 (사진 확대 보기) ===== -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox-close" id="lightboxClose" aria-label="닫기">×</button>
+    <img src="" alt="확대 이미지" id="lightboxImg" />
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+  </div>
+
+  <!-- ===== 견적서 ===== -->
+  <section class="section section-alt" id="quote">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">QUOTE</span>
+        <h2 class="section-title">견적서</h2>
+        <p class="section-lead">당사 견적서를 받아보시고, 비교를 원하시면 타사 견적서를 업로드해 주세요.</p>
+      </div>
+
+      <div class="quote-wrap">
+        <!-- 당사 견적서 받기 -->
+        <div class="quote-card">
+          <div class="quote-card-icon">📄</div>
+          <h3>당사 견적서 받기</h3>
+          <p>(주)HABITUS KOREA의 표준 견적서를 다운로드하실 수 있습니다. 맞춤 견적이 필요하시면 문의해 주세요.</p>
+          <div class="quote-card-actions">
+            <button type="button" class="btn btn-outline js-quote-preview" data-file="assets/resources/habitus-quote.svg" data-type="image">미리보기</button>
+            <a class="btn btn-primary" href="assets/resources/habitus-quote.svg" download>견적서 다운로드 ↓</a>
+          </div>
+        </div>
+
+        <!-- 타사 견적서 업로드 -->
+        <div class="quote-card">
+          <div class="quote-card-icon">📤</div>
+          <h3>타사 견적서 업로드</h3>
+          <p>비교 검토를 원하시면 타사 견적서를 첨부해 주세요. 검토 후 더 나은 조건으로 회신드립니다.</p>
+          <form class="upload-form" id="uploadForm">
+            <label class="upload-drop" id="uploadDrop">
+              <input type="file" id="uploadInput" name="file"
+                     accept=".pdf,.hwp,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" hidden />
+              <span class="upload-icon">⬆️</span>
+              <span class="upload-text" id="uploadText">파일을 끌어다 놓거나 클릭하여 선택</span>
+              <span class="upload-hint">PDF · HWP · 워드 · 엑셀 · 이미지 (최대 10MB)</span>
+            </label>
+            <div class="upload-fields">
+              <input type="text" id="uploadName" name="name" placeholder="담당자 이름 *" />
+              <input type="email" id="uploadEmail" name="email" placeholder="회신받을 이메일 *" />
+            </div>
+            <p class="form-hint" id="uploadHint" role="alert"></p>
+            <button type="submit" class="btn btn-primary btn-block">견적서 보내기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 문의하기 ===== -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">CONTACT</span>
+        <h2 class="section-title">문의하기</h2>
+        <p class="section-lead">궁금한 점이 있으시면 아래 양식을 작성해 주세요. 빠르게 답변드리겠습니다.</p>
+      </div>
+
+      <div class="contact-wrap">
+        <form class="contact-form" id="contactForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">이름 <span class="req">*</span></label>
+              <input type="text" id="name" name="name" placeholder="홍길동" required />
+            </div>
+            <div class="form-group">
+              <label for="email">이메일 <span class="req">*</span></label>
+              <input type="email" id="email" name="email" placeholder="example@email.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="phone">연락처</label>
+            <input type="tel" id="phone" name="phone" placeholder="010-0000-0000" />
+          </div>
+          <div class="form-group">
+            <label for="subject">제목 <span class="req">*</span></label>
+            <input type="text" id="subject" name="subject" placeholder="문의 제목" required />
+          </div>
+          <div class="form-group">
+            <label for="message">문의 내용 <span class="req">*</span></label>
+            <textarea id="message" name="message" rows="6" placeholder="문의하실 내용을 자세히 작성해 주세요." required></textarea>
+          </div>
+          <p class="form-hint" id="formHint" role="alert"></p>
+          <button type="submit" class="btn btn-primary btn-block">문의 보내기</button>
+        </form>
+
+        <aside class="contact-info">
+          <h3>연락처 정보</h3>
+          <ul>
+            <li>
+              <span class="info-label">이메일</span>
+              <a href="mailto:airrotc29@gmail.com">airrotc29@gmail.com</a>
+            </li>
+            <li>
+              <span class="info-label">운영시간</span>
+              <span>평일 09:00 – 18:00</span>
+            </li>
+          </ul>
+          <p class="contact-note">
+            문의 보내기 버튼을 누르면 작성하신 내용이 담긴 메일 작성 창이 열립니다.
+            전송을 완료하면 담당자에게 문의가 접수됩니다.
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 푸터 ===== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="assets/images/logo.png" alt="(주) HABITUS KOREA" class="footer-logo" />
+      </div>
+      <p class="footer-copy">© <span id="year"></span> HABITUS KOREA. All rights reserved.</p>
+      <a href="#top" class="footer-top">맨 위로 ↑</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
