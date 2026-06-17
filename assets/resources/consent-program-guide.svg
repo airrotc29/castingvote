@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
+  <rect width="600" height="800" fill="#f4f7fb"/>
+  <rect x="0" y="0" width="600" height="170" fill="#0f2a4a"/>
+  <text x="50%" y="80" fill="#ffffff" font-family="sans-serif" font-size="30" font-weight="900" text-anchor="middle">HABITUS KOREA</text>
+  <text x="50%" y="125" fill="#4b8bf4" font-family="sans-serif" font-size="18" letter-spacing="3" text-anchor="middle">CONSENT PROGRAM</text>
+  <text x="50%" y="320" fill="#0f2a4a" font-family="sans-serif" font-size="34" font-weight="900" text-anchor="middle">동의서 받기 프로그램</text>
+  <text x="50%" y="365" fill="#0f2a4a" font-family="sans-serif" font-size="34" font-weight="900" text-anchor="middle">안내</text>
+  <text x="50%" y="430" fill="#5b6573" font-family="sans-serif" font-size="20" text-anchor="middle">간편하게 동의서를 수집·관리하는</text>
+  <text x="50%" y="462" fill="#5b6573" font-family="sans-serif" font-size="20" text-anchor="middle">프로그램 이용 안내 자료</text>
+  <rect x="150" y="560" width="300" height="60" rx="30" fill="#1c5fc4"/>
+  <text x="50%" y="598" fill="#ffffff" font-family="sans-serif" font-size="22" font-weight="700" text-anchor="middle">자세히 보기</text>
+  <text x="50%" y="730" fill="#9aa5b1" font-family="sans-serif" font-size="14" text-anchor="middle">※ 실제 안내 자료(PDF/이미지)로 교체하여 사용하세요.</text>
+</svg>
