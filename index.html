@@ -18,6 +18,13 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <!-- ===== 관리자 모드 바 (로그인 시 표시) ===== -->
+  <div class="admin-bar" id="adminBar" hidden>
+    <span class="admin-bar-label">🔑 관리자 모드</span>
+    <span class="admin-bar-msg" id="adminBarMsg"></span>
+    <button type="button" class="admin-bar-btn" id="adminLogout">로그아웃</button>
+  </div>
+
   <!-- ===== 헤더 / 네비게이션 ===== -->
   <header class="site-header" id="top">
     <div class="container header-inner">
@@ -30,6 +37,7 @@
         </button>
         <ul class="nav-list" id="navList">
           <li><a href="#about">소개</a></li>
+          <li><a href="#posts">공지·소식</a></li>
           <li><a href="#gallery">현장 갤러리</a></li>
           <li><a href="#resources">홍보자료</a></li>
           <li><a href="#quote">견적서</a></li>
@@ -84,6 +92,22 @@
     </div>
   </section>
 
+  <!-- ===== 공지·소식 ===== -->
+  <section class="section" id="posts">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">NEWS</span>
+        <h2 class="section-title">공지·소식</h2>
+        <p class="section-lead">E-CASTING VOTE의 새로운 소식과 자료를 확인하세요.</p>
+      </div>
+      <div class="admin-toolbar admin-only">
+        <button type="button" class="btn btn-primary btn-sm" id="addPostBtn">+ 글 작성</button>
+      </div>
+      <div class="posts" id="postsList"></div>
+      <p class="gallery-empty" id="postsEmpty" hidden>아직 등록된 글이 없습니다.</p>
+    </div>
+  </section>
+
   <!-- ===== 현장 갤러리 ===== -->
   <section class="section section-alt" id="gallery">
     <div class="container">
@@ -92,8 +116,9 @@
         <h2 class="section-title">현장 갤러리</h2>
         <p class="section-lead">E-CASTING VOTE의 생생한 현장 모습을 사진으로 만나보세요.</p>
       </div>
-
-      <!-- 사진은 관리자 페이지(admin.html)에서 업로드하면 이 영역에 자동으로 표시됩니다. -->
+      <div class="admin-toolbar admin-only">
+        <button type="button" class="btn btn-primary btn-sm" id="addPhotoBtn">+ 사진 올리기</button>
+      </div>
       <div class="gallery" id="gallery-grid"></div>
       <p class="gallery-empty" id="galleryEmpty" hidden>아직 등록된 현장 사진이 없습니다.</p>
     </div>
@@ -107,12 +132,11 @@
         <h2 class="section-title">홍보자료</h2>
         <p class="section-lead">E-CASTING VOTE 홍보자료를 미리 보고, 필요한 파일을 다운로드하세요.</p>
       </div>
+      <div class="admin-toolbar admin-only">
+        <button type="button" class="btn btn-primary btn-sm" id="addResourceBtn">+ 자료 추가</button>
+        <button type="button" class="btn btn-outline btn-sm" id="addVideoBtn">+ 영상 추가</button>
+      </div>
 
-      <!--
-        홍보자료를 추가하려면 assets/resources 폴더에 파일을 넣고 아래 항목을 복사하세요.
-        - data-file : 실제 파일 경로 (보기/다운로드 대상)
-        - data-type : 미리보기 종류 (image | pdf)
-      -->
       <div class="resources" id="resourceGrid">
         <article class="resource-item" data-file="assets/resources/poster-1.svg" data-type="image">
           <div class="resource-thumb">
@@ -302,7 +326,7 @@
           <ul>
             <li>
               <span class="info-label">이메일</span>
-              <a href="mailto:airrotc29@gmail.com">airrotc29@gmail.com</a>
+              <a href="mailto:airrotc29@habitusinc.co.kr">airrotc29@habitusinc.co.kr</a>
             </li>
             <li>
               <span class="info-label">운영시간</span>
@@ -325,10 +349,94 @@
         <img src="assets/images/logo.png" alt="(주) HABITUS KOREA" class="footer-logo" />
       </div>
       <p class="footer-copy">© <span id="year"></span> E-CASTING VOTE. All rights reserved.</p>
-      <a href="#top" class="footer-top">맨 위로 ↑</a>
+      <div class="footer-links">
+        <button type="button" class="footer-admin" id="adminLoginBtn">관리자</button>
+        <a href="#top" class="footer-top">맨 위로 ↑</a>
+      </div>
     </div>
   </footer>
 
+  <!-- ===== 관리자 모달들 ===== -->
+  <!-- 로그인 -->
+  <div class="amodal" id="loginModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>관리자 로그인</h3>
+      <p class="amodal-help">
+        업로드를 위해 GitHub 액세스 토큰을 입력하세요. 토큰은 이 브라우저에만 저장되며 외부로 전송되지 않습니다.
+        <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">토큰 발급 ↗</a>
+      </p>
+      <input type="password" id="loginToken" placeholder="github_pat_... 또는 ghp_..." autocomplete="off" />
+      <label class="amodal-check"><input type="checkbox" id="loginRemember" checked /> 이 브라우저에 저장</label>
+      <p class="form-hint" id="loginStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="loginSubmit">로그인</button>
+    </div>
+  </div>
+
+  <!-- 사진 올리기 -->
+  <div class="amodal" id="photoModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>현장 사진 올리기</h3>
+      <label class="upload-drop" id="photoDrop">
+        <input type="file" id="photoInput" accept="image/*" multiple hidden />
+        <span class="upload-icon">🖼️</span>
+        <span class="upload-text" id="photoDropText">사진을 끌어다 놓거나 클릭하여 선택 (여러 장 가능)</span>
+        <span class="upload-hint">JPG · PNG · GIF · WEBP (장당 최대 10MB)</span>
+      </label>
+      <div id="photoPreview" class="admin-preview"></div>
+      <p class="form-hint" id="photoStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="photoSubmit">갤러리에 올리기</button>
+    </div>
+  </div>
+
+  <!-- 영상 추가 -->
+  <div class="amodal" id="videoAddModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>투표 영상 추가 (유튜브)</h3>
+      <input type="text" id="videoAddUrl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" />
+      <input type="text" id="videoAddTitle" placeholder="영상 제목" autocomplete="off" />
+      <p class="form-hint" id="videoAddStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="videoAddSubmit">영상 추가</button>
+      <div id="videoAdminList" class="admin-current" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <!-- 글 작성 -->
+  <div class="amodal" id="postModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>공지·소식 글 작성</h3>
+      <input type="text" id="postTitle" placeholder="제목 *" autocomplete="off" />
+      <textarea id="postBody" rows="6" placeholder="내용 *"></textarea>
+      <label class="amodal-file-label">대표 이미지 (선택)
+        <input type="file" id="postImage" accept="image/*" />
+      </label>
+      <label class="amodal-file-label">첨부 파일 (선택 · 다운로드 제공)
+        <input type="file" id="postFile" />
+      </label>
+      <p class="form-hint" id="postStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="postSubmit">글 올리기</button>
+    </div>
+  </div>
+
+  <!-- 자료 추가 -->
+  <div class="amodal" id="resourceModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>홍보자료 추가</h3>
+      <input type="text" id="resTitle" placeholder="자료 제목 *" autocomplete="off" />
+      <input type="text" id="resDesc" placeholder="간단한 설명" autocomplete="off" />
+      <label class="amodal-file-label">자료 파일 * (PDF · 이미지 · 한글 등)
+        <input type="file" id="resFile" />
+      </label>
+      <p class="form-hint" id="resStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="resSubmit">자료 올리기</button>
+    </div>
+  </div>
+
   <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
 </body>
 </html>
