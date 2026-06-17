@@ -21,16 +21,50 @@ document.getElementById('year').textContent = new Date().getFullYear();
   });
 })();
 
-// ===== 갤러리 라이트박스 =====
+// ===== 현장 갤러리 (gallery.json 동적 로드 + 라이트박스) =====
 (function () {
+  const grid = document.getElementById('gallery-grid');
+  const empty = document.getElementById('galleryEmpty');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
   const lightboxCaption = document.getElementById('lightboxCaption');
   const closeBtn = document.getElementById('lightboxClose');
-  if (!lightbox) return;
 
-  document.querySelectorAll('.gallery-item').forEach((item) => {
-    item.addEventListener('click', () => {
+  // 갤러리 데이터 로드 후 렌더링
+  if (grid) {
+    fetch('assets/data/gallery.json', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((items) => {
+        if (!Array.isArray(items) || items.length === 0) {
+          if (empty) empty.hidden = false;
+          return;
+        }
+        // 최신 사진이 위로 오도록 역순 정렬
+        items.slice().reverse().forEach((item) => {
+          const fig = document.createElement('figure');
+          fig.className = 'gallery-item';
+          const img = document.createElement('img');
+          img.src = item.file;
+          img.alt = item.caption || '현장 사진';
+          img.loading = 'lazy';
+          fig.appendChild(img);
+          if (item.caption) {
+            const cap = document.createElement('figcaption');
+            cap.textContent = item.caption;
+            fig.appendChild(cap);
+          }
+          grid.appendChild(fig);
+        });
+      })
+      .catch(() => { if (empty) empty.hidden = false; });
+  }
+
+  // 라이트박스 (이벤트 위임 — 동적으로 추가된 항목도 동작)
+  if (!lightbox) return;
+  if (grid) {
+    grid.addEventListener('click', (e) => {
+      const item = e.target.closest('.gallery-item');
+      if (!item) return;
       const img = item.querySelector('img');
       const caption = item.querySelector('figcaption');
       lightboxImg.src = img.src;
@@ -39,7 +73,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
       lightbox.classList.add('open');
       lightbox.setAttribute('aria-hidden', 'false');
     });
-  });
+  }
 
   function close() {
     lightbox.classList.remove('open');

@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HABITUS KOREA 전자투표</title>
-  <meta name="description" content="HABITUS KOREA 전자투표 안내, 현장 소식 및 문의 접수 홈페이지입니다." />
+  <title>(주) HABITUS KOREA</title>
+  <meta name="description" content="(주) HABITUS KOREA 현장 소식, 홍보자료 및 문의 접수 홈페이지입니다." />
 
   <!-- Open Graph (카카오톡/SNS 공유 시 표시되는 정보) -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="HABITUS KOREA 전자투표" />
-  <meta property="og:description" content="HABITUS KOREA 전자투표 안내, 현장 소식 및 문의 접수." />
+  <meta property="og:title" content="(주) HABITUS KOREA" />
+  <meta property="og:description" content="(주) HABITUS KOREA 현장 소식, 홍보자료 및 문의 접수." />
   <meta property="og:image" content="assets/images/og-image.jpg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -33,31 +33,26 @@
           <li><a href="#gallery">현장 갤러리</a></li>
           <li><a href="#resources">홍보자료</a></li>
           <li><a href="#quote">견적서</a></li>
-          <li><a href="#contact">문의하기</a></li>
-          <li><a href="#vote" class="nav-cta">전자투표 바로가기</a></li>
+          <li><a href="#contact" class="nav-cta">문의하기</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
   <!-- ===== 히어로 ===== -->
-  <section class="hero" id="vote">
+  <section class="hero" id="home">
     <div class="hero-overlay"></div>
     <div class="container hero-inner">
-      <p class="hero-eyebrow">HABITUS KOREA</p>
-      <h1 class="hero-title">전자투표 안내</h1>
+      <p class="hero-eyebrow">(주) HABITUS KOREA</p>
+      <h1 class="hero-title">상상을 현실로</h1>
       <p class="hero-desc">
-        투명하고 안전한 전자투표 시스템으로 여러분의 소중한 한 표를 행사하세요.<br />
-        아래 버튼을 눌러 전자투표 시스템으로 이동할 수 있습니다.
+        HABITUS KOREA의 생생한 현장 소식과 홍보자료를 만나보세요.<br />
+        궁금한 점은 언제든 문의해 주시면 정성껏 안내해 드리겠습니다.
       </p>
       <div class="hero-actions">
-        <!-- TODO: 실제 전자투표 시스템 주소로 변경하세요 -->
-        <a href="https://example.com/vote" class="btn btn-primary" id="voteLink" target="_blank" rel="noopener">
-          전자투표 바로가기 ↗
-        </a>
+        <a href="#gallery" class="btn btn-primary">현장 갤러리 보기</a>
         <a href="#contact" class="btn btn-ghost">문의하기</a>
       </div>
-      <p class="hero-note">※ 투표는 별도의 전자투표 시스템에서 진행됩니다.</p>
     </div>
   </section>
 
@@ -98,33 +93,9 @@
         <p class="section-lead">HABITUS KOREA의 생생한 현장 모습을 사진으로 만나보세요.</p>
       </div>
 
-      <!-- 사진을 추가하려면 assets/images 폴더에 이미지를 넣고 아래 항목을 복사해 src/캡션을 수정하세요. -->
-      <div class="gallery" id="gallery-grid">
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-1.svg" alt="현장 사진 1" loading="lazy" />
-          <figcaption>현장 사진 캡션 1</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-2.svg" alt="현장 사진 2" loading="lazy" />
-          <figcaption>현장 사진 캡션 2</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-3.svg" alt="현장 사진 3" loading="lazy" />
-          <figcaption>현장 사진 캡션 3</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-4.svg" alt="현장 사진 4" loading="lazy" />
-          <figcaption>현장 사진 캡션 4</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-5.svg" alt="현장 사진 5" loading="lazy" />
-          <figcaption>현장 사진 캡션 5</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-6.svg" alt="현장 사진 6" loading="lazy" />
-          <figcaption>현장 사진 캡션 6</figcaption>
-        </figure>
-      </div>
+      <!-- 사진은 관리자 페이지(admin.html)에서 업로드하면 이 영역에 자동으로 표시됩니다. -->
+      <div class="gallery" id="gallery-grid"></div>
+      <p class="gallery-empty" id="galleryEmpty" hidden>아직 등록된 현장 사진이 없습니다.</p>
     </div>
   </section>
 

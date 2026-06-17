@@ -289,6 +289,8 @@ a { color: inherit; text-decoration: none; }
 }
 .previewer-download { z-index: 1; }
 
+.gallery-empty { text-align: center; color: var(--text-soft); font-size: 16px; padding: 40px 0; }
+
 /* ===== 라이트박스 ===== */
 .lightbox {
   position: fixed; inset: 0; z-index: 200;
@@ -389,4 +391,58 @@ a { color: inherit; text-decoration: none; }
   .form-row, .upload-fields { grid-template-columns: 1fr; }
   .section { padding: 64px 0; }
   .contact-form, .contact-info { padding: 26px; }
+}
+
+/* ===== 관리자 페이지 ===== */
+.admin-body { background: var(--bg-alt); }
+.admin-narrow { max-width: 760px; }
+.admin-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+}
+.admin-card h3 {
+  font-size: 18px;
+  color: var(--navy);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-help { font-size: 14px; color: var(--text-soft); margin-bottom: 16px; line-height: 1.7; }
+.admin-help a { color: var(--blue); font-weight: 700; }
+.admin-field { display: flex; flex-direction: column; gap: 10px; }
+.admin-field input[type="password"] {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+}
+.admin-field input:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
+.admin-check { font-size: 14px; color: var(--text-soft); display: flex; align-items: center; gap: 6px; }
+
+.admin-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+.admin-preview-item { position: relative; background: var(--bg-alt); border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.admin-preview-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.admin-preview-item .admin-cap { width: 100%; border: none; border-top: 1px solid var(--line); padding: 8px 10px; font-size: 13px; font-family: inherit; }
+.admin-preview-item .admin-cap:focus { outline: none; background: #f0f6ff; }
+.admin-preview-del {
+  position: absolute; top: 6px; right: 6px; z-index: 1;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; cursor: pointer;
+  background: rgba(10,31,56,.8); color: #fff; font-size: 18px; line-height: 1;
+}
+
+.admin-current { display: flex; flex-direction: column; gap: 12px; color: var(--text-soft); font-size: 14px; }
+.admin-current-item { display: flex; align-items: center; gap: 14px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; }
+.admin-current-item img { width: 64px; height: 48px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+.admin-current-item span { flex: 1; color: var(--text); font-size: 14px; }
+
+@media (max-width: 640px) {
+  .admin-preview { grid-template-columns: repeat(2, 1fr); }
 }
