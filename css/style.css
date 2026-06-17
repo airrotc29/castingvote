@@ -70,7 +70,8 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid var(--line);
 }
 .header-inner { display: flex; align-items: center; justify-content: space-between; height: 70px; }
-.brand { display: flex; align-items: baseline; gap: 6px; font-weight: 900; }
+.brand { display: flex; align-items: center; font-weight: 900; }
+.brand-logo { height: 38px; width: auto; }
 .brand-mark { font-size: 22px; color: var(--navy); letter-spacing: 1px; }
 .brand-sub { font-size: 13px; color: var(--blue); letter-spacing: 3px; font-weight: 700; }
 
@@ -191,6 +192,73 @@ a { color: inherit; text-decoration: none; }
 .resource-actions { display: flex; gap: 10px; }
 .resource-actions .btn { flex: 1; }
 
+/* 문서형 자료 썸네일 (HWP 등) */
+.resource-thumb-doc {
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #e9f1fc, #f4f7fb);
+}
+.doc-ext {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--blue);
+  letter-spacing: 2px;
+  border: 3px solid var(--blue-light);
+  padding: 14px 22px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* ===== 견적서 ===== */
+.quote-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+.quote-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 36px;
+  box-shadow: var(--shadow);
+}
+.quote-card-icon { font-size: 40px; margin-bottom: 14px; }
+.quote-card h3 { font-size: 22px; color: var(--navy); margin-bottom: 12px; }
+.quote-card > p { color: var(--text-soft); font-size: 15px; margin-bottom: 24px; }
+.quote-card-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.quote-card-actions .btn { flex: 1; }
+
+/* 업로드 폼 */
+.upload-form { margin-top: 4px; }
+.upload-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  border: 2px dashed var(--blue-light);
+  border-radius: 12px;
+  padding: 30px 18px;
+  cursor: pointer;
+  background: var(--bg-alt);
+  transition: background .15s, border-color .15s;
+}
+.upload-drop:hover, .upload-drop.dragover { background: rgba(75,139,244,.1); border-color: var(--blue); }
+.upload-icon { font-size: 30px; }
+.upload-text { font-weight: 700; color: var(--navy); font-size: 15px; }
+.upload-text.has-file { color: var(--blue); }
+.upload-hint { font-size: 13px; color: var(--text-soft); }
+.upload-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0 4px; }
+.upload-fields input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+}
+.upload-fields input:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
+
 /* ===== 홍보자료 미리보기 모달 ===== */
 .previewer {
   position: fixed; inset: 0; z-index: 200;
@@ -290,6 +358,7 @@ a { color: inherit; text-decoration: none; }
 .site-footer { background: var(--navy-deep); color: rgba(255,255,255,.75); padding: 36px 0; }
 .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
 .footer-brand .brand-mark { color: #fff; }
+.footer-logo { height: 34px; width: auto; filter: brightness(0) invert(1); opacity: .9; }
 .footer-copy { font-size: 14px; }
 .footer-top { font-size: 14px; font-weight: 700; color: var(--blue-light); }
 .footer-top:hover { color: #fff; }
@@ -297,7 +366,7 @@ a { color: inherit; text-decoration: none; }
 /* ===== 반응형 ===== */
 @media (max-width: 860px) {
   .cards, .gallery, .resources { grid-template-columns: repeat(2, 1fr); }
-  .contact-wrap { grid-template-columns: 1fr; }
+  .contact-wrap, .quote-wrap { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .nav-toggle { display: flex; }
@@ -317,7 +386,7 @@ a { color: inherit; text-decoration: none; }
   .nav-list li { padding: 6px 0; }
   .nav-cta { text-align: center; }
   .cards, .gallery, .resources { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
+  .form-row, .upload-fields { grid-template-columns: 1fr; }
   .section { padding: 64px 0; }
   .contact-form, .contact-info { padding: 26px; }
 }

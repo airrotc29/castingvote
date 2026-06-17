@@ -10,7 +10,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="HABITUS KOREA 전자투표" />
   <meta property="og:description" content="HABITUS KOREA 전자투표 안내, 현장 소식 및 문의 접수." />
-  <meta property="og:image" content="assets/images/og-image.svg" />
+  <meta property="og:image" content="assets/images/og-image.jpg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,8 +22,7 @@
   <header class="site-header" id="top">
     <div class="container header-inner">
       <a href="#top" class="brand">
-        <span class="brand-mark">HABITUS</span>
-        <span class="brand-sub">KOREA</span>
+        <img src="assets/images/logo.png" alt="(주) HABITUS KOREA - 상상을 현실로" class="brand-logo" />
       </a>
       <nav class="nav" aria-label="주요 메뉴">
         <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false">
@@ -33,6 +32,7 @@
           <li><a href="#about">소개</a></li>
           <li><a href="#gallery">현장 갤러리</a></li>
           <li><a href="#resources">홍보자료</a></li>
+          <li><a href="#quote">견적서</a></li>
           <li><a href="#contact">문의하기</a></li>
           <li><a href="#vote" class="nav-cta">전자투표 바로가기</a></li>
         </ul>
@@ -187,6 +187,35 @@
             </div>
           </div>
         </article>
+
+        <article class="resource-item" data-file="assets/resources/habitus-korea-ci.pdf" data-type="pdf">
+          <div class="resource-thumb">
+            <img src="assets/images/logo.png" alt="HABITUS KOREA 회사 CI" loading="lazy" style="object-fit:contain;padding:24px;background:#fff;" />
+            <span class="resource-badge">CI · PDF</span>
+          </div>
+          <div class="resource-body">
+            <h3>회사 CI (로고)</h3>
+            <p>(주)HABITUS KOREA 공식 로고입니다. 인쇄·홍보용 원본(PDF)을 받으실 수 있습니다.</p>
+            <div class="resource-actions">
+              <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
+              <a class="btn btn-sm btn-primary" href="assets/resources/habitus-korea-ci.pdf" download>다운로드 ↓</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="resource-item resource-doc">
+          <div class="resource-thumb resource-thumb-doc">
+            <span class="doc-ext">HWP</span>
+            <span class="resource-badge">문서</span>
+          </div>
+          <div class="resource-body">
+            <h3>개인정보처리 위탁계약서</h3>
+            <p>표준 개인정보처리위탁 계약서(위탁서) 양식입니다. 한글(HWP) 파일로 제공됩니다.</p>
+            <div class="resource-actions">
+              <a class="btn btn-sm btn-primary btn-block" href="assets/resources/habitus-personal-info-consignment.hwp" download>다운로드 ↓</a>
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -204,6 +233,52 @@
     <img src="" alt="확대 이미지" id="lightboxImg" />
     <p class="lightbox-caption" id="lightboxCaption"></p>
   </div>
+
+  <!-- ===== 견적서 ===== -->
+  <section class="section section-alt" id="quote">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">QUOTE</span>
+        <h2 class="section-title">견적서</h2>
+        <p class="section-lead">당사 견적서를 받아보시고, 비교를 원하시면 타사 견적서를 업로드해 주세요.</p>
+      </div>
+
+      <div class="quote-wrap">
+        <!-- 당사 견적서 받기 -->
+        <div class="quote-card">
+          <div class="quote-card-icon">📄</div>
+          <h3>당사 견적서 받기</h3>
+          <p>(주)HABITUS KOREA의 표준 견적서를 다운로드하실 수 있습니다. 맞춤 견적이 필요하시면 문의해 주세요.</p>
+          <div class="quote-card-actions">
+            <button type="button" class="btn btn-outline js-quote-preview" data-file="assets/resources/habitus-quote.svg" data-type="image">미리보기</button>
+            <a class="btn btn-primary" href="assets/resources/habitus-quote.svg" download>견적서 다운로드 ↓</a>
+          </div>
+        </div>
+
+        <!-- 타사 견적서 업로드 -->
+        <div class="quote-card">
+          <div class="quote-card-icon">📤</div>
+          <h3>타사 견적서 업로드</h3>
+          <p>비교 검토를 원하시면 타사 견적서를 첨부해 주세요. 검토 후 더 나은 조건으로 회신드립니다.</p>
+          <form class="upload-form" id="uploadForm">
+            <label class="upload-drop" id="uploadDrop">
+              <input type="file" id="uploadInput" name="file"
+                     accept=".pdf,.hwp,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" hidden />
+              <span class="upload-icon">⬆️</span>
+              <span class="upload-text" id="uploadText">파일을 끌어다 놓거나 클릭하여 선택</span>
+              <span class="upload-hint">PDF · HWP · 워드 · 엑셀 · 이미지 (최대 10MB)</span>
+            </label>
+            <div class="upload-fields">
+              <input type="text" id="uploadName" name="name" placeholder="담당자 이름 *" />
+              <input type="email" id="uploadEmail" name="email" placeholder="회신받을 이메일 *" />
+            </div>
+            <p class="form-hint" id="uploadHint" role="alert"></p>
+            <button type="submit" class="btn btn-primary btn-block">견적서 보내기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ===== 문의하기 ===== -->
   <section class="section" id="contact">
@@ -267,8 +342,7 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <span class="brand-mark">HABITUS</span>
-        <span class="brand-sub">KOREA</span>
+        <img src="assets/images/logo.png" alt="(주) HABITUS KOREA" class="footer-logo" />
       </div>
       <p class="footer-copy">© <span id="year"></span> HABITUS KOREA. All rights reserved.</p>
       <a href="#top" class="footer-top">맨 위로 ↑</a>

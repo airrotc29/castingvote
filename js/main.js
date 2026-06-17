@@ -50,7 +50,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
 })();
 
-// ===== 홍보자료 미리보기 모달 =====
+// ===== 미리보기 모달 (홍보자료 · 견적서 공용) =====
 (function () {
   const previewer = document.getElementById('previewer');
   const stage = document.getElementById('previewerStage');
@@ -58,29 +58,37 @@ document.getElementById('year').textContent = new Date().getFullYear();
   const downloadBtn = document.getElementById('previewerDownload');
   if (!previewer) return;
 
+  function open(file, type, title) {
+    stage.innerHTML = '';
+    if (type === 'pdf') {
+      const frame = document.createElement('iframe');
+      frame.src = file;
+      frame.title = title || '';
+      stage.appendChild(frame);
+    } else {
+      const img = document.createElement('img');
+      img.src = file;
+      img.alt = title || '';
+      stage.appendChild(img);
+    }
+    downloadBtn.href = file;
+    previewer.classList.add('open');
+    previewer.setAttribute('aria-hidden', 'false');
+  }
+
+  // 홍보자료 카드 미리보기
   document.querySelectorAll('.resource-item .js-preview').forEach((btn) => {
     btn.addEventListener('click', () => {
       const item = btn.closest('.resource-item');
-      const file = item.getAttribute('data-file');
-      const type = item.getAttribute('data-type') || 'image';
       const title = item.querySelector('h3') ? item.querySelector('h3').textContent : '';
+      open(item.getAttribute('data-file'), item.getAttribute('data-type') || 'image', title);
+    });
+  });
 
-      stage.innerHTML = '';
-      if (type === 'pdf') {
-        const frame = document.createElement('iframe');
-        frame.src = file;
-        frame.title = title;
-        stage.appendChild(frame);
-      } else {
-        const img = document.createElement('img');
-        img.src = file;
-        img.alt = title;
-        stage.appendChild(img);
-      }
-
-      downloadBtn.href = file;
-      previewer.classList.add('open');
-      previewer.setAttribute('aria-hidden', 'false');
+  // 견적서 미리보기 (버튼 자체에 data 속성)
+  document.querySelectorAll('.js-quote-preview').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      open(btn.getAttribute('data-file'), btn.getAttribute('data-type') || 'image', '당사 견적서');
     });
   });
 
@@ -92,6 +100,121 @@ document.getElementById('year').textContent = new Date().getFullYear();
   closeBtn.addEventListener('click', close);
   previewer.addEventListener('click', (e) => { if (e.target === previewer) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+})();
+
+// ===== 타사 견적서 업로드 =====
+(function () {
+  const form = document.getElementById('uploadForm');
+  if (!form) return;
+
+  const drop = document.getElementById('uploadDrop');
+  const input = document.getElementById('uploadInput');
+  const text = document.getElementById('uploadText');
+  const hint = document.getElementById('uploadHint');
+  const nameEl = document.getElementById('uploadName');
+  const emailEl = document.getElementById('uploadEmail');
+
+  // 실제 파일 업로드를 사용하려면 아래에 폼 처리 엔드포인트(예: Formspree)를 입력하세요.
+  // 비워두면 메일 클라이언트(mailto)로 안내하는 방식으로 동작합니다.
+  const UPLOAD_ENDPOINT = '';
+  const TO_EMAIL = 'airrotc29@gmail.com';
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
+  let selected = null;
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+  }
+
+  function setFile(file) {
+    if (!file) return;
+    if (file.size > MAX_SIZE) {
+      hint.className = 'form-hint error';
+      hint.textContent = '파일 용량이 너무 큽니다. (최대 10MB)';
+      return;
+    }
+    selected = file;
+    text.textContent = file.name + ' (' + formatSize(file.size) + ')';
+    text.classList.add('has-file');
+    hint.className = 'form-hint';
+    hint.textContent = '';
+  }
+
+  input.addEventListener('change', () => setFile(input.files[0]));
+
+  ['dragenter', 'dragover'].forEach((ev) =>
+    drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('dragover'); })
+  );
+  ['dragleave', 'drop'].forEach((ev) =>
+    drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('dragover'); })
+  );
+  drop.addEventListener('drop', (e) => {
+    const file = e.dataTransfer.files[0];
+    if (file) { input.files = e.dataTransfer.files; setFile(file); }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hint.className = 'form-hint';
+    hint.textContent = '';
+
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
+
+    if (!selected) {
+      hint.className = 'form-hint error';
+      hint.textContent = '업로드할 견적서 파일을 선택해 주세요.';
+      return;
+    }
+    if (!name || !email) {
+      hint.className = 'form-hint error';
+      hint.textContent = '담당자 이름과 이메일을 입력해 주세요.';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      hint.className = 'form-hint error';
+      hint.textContent = '올바른 이메일 주소를 입력해 주세요.';
+      return;
+    }
+
+    // 엔드포인트가 설정된 경우: 실제 파일 업로드
+    if (UPLOAD_ENDPOINT) {
+      try {
+        const fd = new FormData();
+        fd.append('name', name);
+        fd.append('email', email);
+        fd.append('file', selected);
+        const res = await fetch(UPLOAD_ENDPOINT, { method: 'POST', body: fd, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error('upload failed');
+        hint.className = 'form-hint success';
+        hint.textContent = '견적서가 정상적으로 접수되었습니다. 빠르게 회신드리겠습니다.';
+        form.reset();
+        text.textContent = '파일을 끌어다 놓거나 클릭하여 선택';
+        text.classList.remove('has-file');
+        selected = null;
+      } catch (err) {
+        hint.className = 'form-hint error';
+        hint.textContent = '업로드 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+      }
+      return;
+    }
+
+    // 엔드포인트 미설정: 메일 클라이언트로 안내 (파일은 직접 첨부)
+    const body =
+      `담당자: ${name}\n` +
+      `이메일: ${email}\n` +
+      `첨부 예정 파일: ${selected.name}\n` +
+      `------------------------------\n` +
+      `※ 메일에 위 견적서 파일을 첨부하여 전송해 주세요.\n`;
+    window.location.href =
+      `mailto:${TO_EMAIL}` +
+      `?subject=${encodeURIComponent('[HABITUS KOREA 타사 견적서] ' + name)}` +
+      `&body=${encodeURIComponent(body)}`;
+    hint.className = 'form-hint success';
+    hint.textContent = '메일 작성 창이 열립니다. 선택한 파일을 첨부하여 전송해 주세요.';
+  });
 })();
 
 // ===== 문의 폼 (mailto 전송) =====
