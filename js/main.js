@@ -21,16 +21,53 @@ document.getElementById('year').textContent = new Date().getFullYear();
   });
 })();
 
-// ===== 갤러리 라이트박스 =====
+// ===== 공용 렌더 네임스페이스 (admin.js에서도 호출) =====
+window.HK = window.HK || {};
+
+function hkDelBtn(kind, id) {
+  return `<button type="button" class="admin-del admin-only" data-kind="${kind}" data-id="${String(id).replace(/"/g, '&quot;')}">삭제</button>`;
+}
+function hkEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+// ===== 현장 갤러리 =====
 (function () {
+  const grid = document.getElementById('gallery-grid');
+  const empty = document.getElementById('galleryEmpty');
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightboxImg');
   const lightboxCaption = document.getElementById('lightboxCaption');
   const closeBtn = document.getElementById('lightboxClose');
-  if (!lightbox) return;
+  if (!grid) return;
 
-  document.querySelectorAll('.gallery-item').forEach((item) => {
-    item.addEventListener('click', () => {
+  function render(items) {
+    grid.innerHTML = '';
+    const arr = Array.isArray(items) ? items : [];
+    if (arr.length === 0) { if (empty) empty.hidden = false; return; }
+    if (empty) empty.hidden = true;
+    arr.slice().reverse().forEach((item) => {
+      const fig = document.createElement('figure');
+      fig.className = 'gallery-item';
+      fig.innerHTML =
+        `<img src="${hkEsc(item.file)}" alt="${hkEsc(item.caption || '현장 사진')}" loading="lazy" />` +
+        (item.caption ? `<figcaption>${hkEsc(item.caption)}</figcaption>` : '') +
+        hkDelBtn('gallery', item.file);
+      grid.appendChild(fig);
+    });
+  }
+
+  window.HK.renderGallery = function (items) {
+    if (items) return render(items);
+    fetch('assets/data/gallery.json', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : [])).then(render).catch(() => render([]));
+  };
+  window.HK.renderGallery();
+
+  // 라이트박스 (삭제 버튼 클릭은 제외)
+  if (lightbox) {
+    grid.addEventListener('click', (e) => {
+      if (e.target.closest('.admin-del')) return;
+      const item = e.target.closest('.gallery-item');
+      if (!item) return;
       const img = item.querySelector('img');
       const caption = item.querySelector('figcaption');
       lightboxImg.src = img.src;
@@ -39,15 +76,196 @@ document.getElementById('year').textContent = new Date().getFullYear();
       lightbox.classList.add('open');
       lightbox.setAttribute('aria-hidden', 'false');
     });
-  });
-
-  function close() {
-    lightbox.classList.remove('open');
-    lightbox.setAttribute('aria-hidden', 'true');
+    const close = () => { lightbox.classList.remove('open'); lightbox.setAttribute('aria-hidden', 'true'); };
+    closeBtn.addEventListener('click', close);
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   }
-  closeBtn.addEventListener('click', close);
-  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) close(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+})();
+
+// ===== 공지·소식 =====
+(function () {
+  const list = document.getElementById('postsList');
+  const empty = document.getElementById('postsEmpty');
+  if (!list) return;
+
+  function render(items) {
+    list.innerHTML = '';
+    const arr = Array.isArray(items) ? items : [];
+    if (arr.length === 0) { if (empty) empty.hidden = false; return; }
+    if (empty) empty.hidden = true;
+    arr.slice().reverse().forEach((p) => {
+      const art = document.createElement('article');
+      art.className = 'post-item';
+      let html = '';
+      if (p.image) html += `<div class="post-thumb"><img src="${hkEsc(p.image)}" alt="${hkEsc(p.title)}" loading="lazy" /></div>`;
+      html += '<div class="post-body">';
+      html += `<div class="post-meta">${hkEsc(p.date || '')}</div>`;
+      html += `<h3>${hkEsc(p.title)}</h3>`;
+      html += `<p class="post-text">${hkEsc(p.body).replace(/\n/g, '<br />')}</p>`;
+      if (p.file) html += `<a class="btn btn-sm btn-primary" href="${hkEsc(p.file)}" download>${hkEsc(p.fileName || '첨부파일')} 다운로드 ↓</a>`;
+      html += hkDelBtn('post', p.id);
+      html += '</div>';
+      art.innerHTML = html;
+      list.appendChild(art);
+    });
+  }
+
+  window.HK.renderPosts = function (items) {
+    if (items) return render(items);
+    fetch('assets/data/posts.json', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : [])).then(render).catch(() => render([]));
+  };
+  window.HK.renderPosts();
+})();
+
+// ===== 홍보자료 (관리자가 추가한 동적 자료) =====
+(function () {
+  const grid = document.getElementById('resourceGrid');
+  if (!grid) return;
+
+  function render(items) {
+    grid.querySelectorAll('.resource-dynamic').forEach((n) => n.remove());
+    const arr = Array.isArray(items) ? items : [];
+    arr.slice().reverse().forEach((it) => {
+      const isPdf = it.type === 'pdf';
+      const isImg = it.type === 'image';
+      const art = document.createElement('article');
+      art.className = 'resource-item resource-dynamic';
+      art.setAttribute('data-file', it.file);
+      art.setAttribute('data-type', it.type || 'file');
+      let thumb;
+      if (isImg) thumb = `<div class="resource-thumb"><img src="${hkEsc(it.file)}" alt="${hkEsc(it.title)}" loading="lazy" /><span class="resource-badge">이미지</span></div>`;
+      else thumb = `<div class="resource-thumb resource-thumb-doc"><span class="doc-ext">${hkEsc((it.ext || 'FILE').toUpperCase())}</span><span class="resource-badge">자료</span></div>`;
+      const preview = (isImg || isPdf) ? `<button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>` : '';
+      art.innerHTML =
+        thumb +
+        '<div class="resource-body">' +
+        `<h3>${hkEsc(it.title)}</h3>` +
+        `<p>${hkEsc(it.desc || '')}</p>` +
+        '<div class="resource-actions">' +
+        preview +
+        `<a class="btn btn-sm btn-primary" href="${hkEsc(it.file)}" download>다운로드 ↓</a>` +
+        '</div>' + hkDelBtn('resource', it.file) +
+        '</div>';
+      grid.appendChild(art);
+    });
+    if (window.HK.bindPreview) window.HK.bindPreview();
+  }
+
+  window.HK.renderResources = function (items) {
+    if (items) return render(items);
+    fetch('assets/data/resources.json', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : [])).then(render).catch(() => render([]));
+  };
+  window.HK.renderResources();
+})();
+
+// ===== 투표 영상 (videos.json + 유튜브 임베드) =====
+(function () {
+  const card = document.getElementById('videoCard');
+  const modal = document.getElementById('videoModal');
+  if (!card || !modal) return;
+
+  const openBtn = card.querySelector('.js-video-open');
+  const closeBtn = document.getElementById('videoModalClose');
+  const player = document.getElementById('videoPlayer');
+  const titleEl = document.getElementById('videoTitle');
+  const listEl = document.getElementById('videoList');
+  const cardDesc = document.getElementById('videoCardDesc');
+
+  let videos = [];
+
+  // 다양한 유튜브 URL에서 영상 ID 추출
+  function youtubeId(url) {
+    if (!url) return '';
+    const m = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
+    if (m) return m[1];
+    if (/^[\w-]{11}$/.test(url)) return url; // 이미 ID인 경우
+    return '';
+  }
+
+  function thumb(id) {
+    return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+  }
+
+  function play(video) {
+    const id = youtubeId(video.url);
+    player.innerHTML =
+      `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" ` +
+      `title="${(video.title || '투표 영상').replace(/"/g, '')}" frameborder="0" ` +
+      `allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ` +
+      `allowfullscreen></iframe>`;
+    titleEl.textContent = video.title || '';
+    listEl.querySelectorAll('.videomodal-thumb').forEach((t) => t.classList.remove('active'));
+    const active = listEl.querySelector(`[data-url="${video.url}"]`);
+    if (active) active.classList.add('active');
+  }
+
+  function renderList() {
+    listEl.innerHTML = '';
+    videos.forEach((v) => {
+      const id = youtubeId(v.url);
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'videomodal-thumb';
+      item.dataset.url = v.url;
+      item.innerHTML =
+        `<img src="${thumb(id)}" alt="${(v.title || '영상').replace(/"/g, '')}" loading="lazy" />` +
+        `<span>${v.title || '제목 없음'}</span>`;
+      item.addEventListener('click', () => play(v));
+      listEl.appendChild(item);
+    });
+  }
+
+  function openModal() {
+    if (videos.length === 0) {
+      player.innerHTML = '<p class="videomodal-empty">아직 등록된 영상이 없습니다.</p>';
+      titleEl.textContent = '';
+      listEl.innerHTML = '';
+    } else {
+      renderList();
+      play(videos[0]);
+    }
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    player.innerHTML = ''; // 재생 중지
+  }
+
+  // 영상 목록 로드 → 카드 썸네일/설명 갱신
+  function applyData(data) {
+    videos = Array.isArray(data) ? data.slice().reverse() : [];
+    const t = document.getElementById('videoCardThumb');
+    if (videos.length > 0) {
+      const id = youtubeId(videos[0].url);
+      t.style.backgroundImage = `url(${thumb(id)})`;
+      t.classList.add('has-thumb');
+      if (cardDesc) cardDesc.textContent = `총 ${videos.length}개의 영상을 확인하세요.`;
+    } else {
+      t.style.backgroundImage = '';
+      t.classList.remove('has-thumb');
+      if (cardDesc) cardDesc.textContent = '전자투표 안내 및 현장 영상을 확인하세요.';
+    }
+  }
+  function load(data) {
+    if (data) return applyData(data);
+    fetch('assets/data/videos.json', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : [])).then(applyData).catch(() => {});
+  }
+  load();
+  window.HK.refreshVideos = load;
+  window.HK.youtubeId = youtubeId;
+
+  openBtn.addEventListener('click', openModal);
+  card.querySelector('.resource-thumb').addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 })();
 
 // ===== 미리보기 모달 (홍보자료 · 견적서 공용) =====
@@ -76,20 +294,17 @@ document.getElementById('year').textContent = new Date().getFullYear();
     previewer.setAttribute('aria-hidden', 'false');
   }
 
-  // 홍보자료 카드 미리보기
-  document.querySelectorAll('.resource-item .js-preview').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.resource-item');
+  // 미리보기 (이벤트 위임 — 동적으로 추가된 자료도 동작)
+  document.addEventListener('click', (e) => {
+    const resBtn = e.target.closest('.resource-item .js-preview');
+    if (resBtn) {
+      const item = resBtn.closest('.resource-item');
       const title = item.querySelector('h3') ? item.querySelector('h3').textContent : '';
       open(item.getAttribute('data-file'), item.getAttribute('data-type') || 'image', title);
-    });
-  });
-
-  // 견적서 미리보기 (버튼 자체에 data 속성)
-  document.querySelectorAll('.js-quote-preview').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      open(btn.getAttribute('data-file'), btn.getAttribute('data-type') || 'image', '당사 견적서');
-    });
+      return;
+    }
+    const qBtn = e.target.closest('.js-quote-preview');
+    if (qBtn) open(qBtn.getAttribute('data-file'), qBtn.getAttribute('data-type') || 'image', '당사 견적서');
   });
 
   function close() {
@@ -117,7 +332,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
   // 실제 파일 업로드를 사용하려면 아래에 폼 처리 엔드포인트(예: Formspree)를 입력하세요.
   // 비워두면 메일 클라이언트(mailto)로 안내하는 방식으로 동작합니다.
   const UPLOAD_ENDPOINT = '';
-  const TO_EMAIL = 'airrotc29@gmail.com';
+  const TO_EMAIL = 'airrotc29@habitusinc.co.kr';
   const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
   let selected = null;
@@ -224,7 +439,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
   if (!form) return;
 
   // 문의가 접수될 이메일 주소
-  const TO_EMAIL = 'airrotc29@gmail.com';
+  const TO_EMAIL = 'airrotc29@habitusinc.co.kr';
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();

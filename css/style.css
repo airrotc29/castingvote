@@ -289,6 +289,8 @@ a { color: inherit; text-decoration: none; }
 }
 .previewer-download { z-index: 1; }
 
+.gallery-empty { text-align: center; color: var(--text-soft); font-size: 16px; padding: 40px 0; }
+
 /* ===== 라이트박스 ===== */
 .lightbox {
   position: fixed; inset: 0; z-index: 200;
@@ -389,4 +391,220 @@ a { color: inherit; text-decoration: none; }
   .form-row, .upload-fields { grid-template-columns: 1fr; }
   .section { padding: 64px 0; }
   .contact-form, .contact-info { padding: 26px; }
+}
+
+/* ===== 관리자 페이지 ===== */
+.admin-body { background: var(--bg-alt); }
+.admin-narrow { max-width: 760px; }
+.admin-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  margin-bottom: 22px;
+}
+.admin-card h3 {
+  font-size: 18px;
+  color: var(--navy);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-help { font-size: 14px; color: var(--text-soft); margin-bottom: 16px; line-height: 1.7; }
+.admin-help a { color: var(--blue); font-weight: 700; }
+.admin-field { display: flex; flex-direction: column; gap: 10px; }
+.admin-field input[type="password"],
+.admin-field input[type="text"] {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+}
+.admin-field input:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
+.admin-check { font-size: 14px; color: var(--text-soft); display: flex; align-items: center; gap: 6px; }
+
+.admin-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+.admin-preview-item { position: relative; background: var(--bg-alt); border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.admin-preview-item img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.admin-preview-item .admin-cap { width: 100%; border: none; border-top: 1px solid var(--line); padding: 8px 10px; font-size: 13px; font-family: inherit; }
+.admin-preview-item .admin-cap:focus { outline: none; background: #f0f6ff; }
+.admin-preview-del {
+  position: absolute; top: 6px; right: 6px; z-index: 1;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; cursor: pointer;
+  background: rgba(10,31,56,.8); color: #fff; font-size: 18px; line-height: 1;
+}
+
+.admin-current { display: flex; flex-direction: column; gap: 12px; color: var(--text-soft); font-size: 14px; }
+.admin-current-item { display: flex; align-items: center; gap: 14px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; }
+.admin-current-item img { width: 64px; height: 48px; object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+.admin-current-item span { flex: 1; color: var(--text); font-size: 14px; }
+
+@media (max-width: 640px) {
+  .admin-preview { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== 투표 영상 카드 ===== */
+.resource-thumb-video {
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--navy), var(--blue));
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+.resource-thumb-video.has-thumb { position: relative; }
+.resource-thumb-video.has-thumb::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: rgba(10,31,56,.45);
+}
+.video-play {
+  position: relative;
+  z-index: 1;
+  width: 64px; height: 64px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.92);
+  color: var(--blue);
+  border-radius: 50%;
+  font-size: 24px;
+  padding-left: 4px;
+  box-shadow: var(--shadow);
+}
+
+/* ===== 투표 영상 모달 ===== */
+.videomodal {
+  position: fixed; inset: 0; z-index: 200;
+  display: none;
+  align-items: center; justify-content: center;
+  background: rgba(7, 18, 33, .94);
+  padding: 24px;
+}
+.videomodal.open { display: flex; }
+.videomodal-inner { width: 100%; max-width: 900px; }
+.videomodal-player {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.videomodal-player iframe { width: 100%; height: 100%; border: 0; }
+.videomodal-empty { color: #fff; text-align: center; padding-top: 42%; transform: translateY(-50%); }
+.videomodal-title { color: #fff; font-size: 17px; font-weight: 700; margin: 16px 4px 12px; }
+.videomodal-close {
+  position: absolute; top: 20px; right: 26px;
+  background: none; border: none; color: #fff;
+  font-size: 42px; cursor: pointer; line-height: 1;
+}
+.videomodal-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 26vh; overflow-y: auto; }
+.videomodal-thumb {
+  border: 2px solid transparent;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: left;
+}
+.videomodal-thumb img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+.videomodal-thumb span { display: block; color: #cdd6e4; font-size: 12px; padding: 6px 6px 8px; }
+.videomodal-thumb.active { border-color: var(--blue-light); }
+.videomodal-thumb.active span { color: #fff; }
+
+@media (max-width: 640px) {
+  .videomodal-list { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== 통합 관리자 모드 ===== */
+.admin-only { display: none; }
+body.admin-on .admin-only { display: inline-flex; }
+body.admin-on .admin-toolbar.admin-only { display: flex; }
+
+.admin-bar {
+  position: sticky; top: 0; z-index: 130;
+  display: flex; align-items: center; gap: 14px;
+  background: #0a1f38; color: #fff;
+  padding: 8px 18px; font-size: 14px;
+}
+.admin-bar-label { font-weight: 700; color: var(--blue-light); }
+.admin-bar-msg { flex: 1; color: rgba(255,255,255,.8); }
+.admin-bar-btn {
+  background: rgba(255,255,255,.15); color: #fff; border: none;
+  padding: 6px 14px; border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 13px;
+}
+.admin-bar-btn:hover { background: rgba(255,255,255,.28); }
+
+.footer-links { display: flex; align-items: center; gap: 18px; }
+.footer-admin { background: none; border: none; color: rgba(255,255,255,.45); font-size: 13px; cursor: pointer; }
+.footer-admin:hover { color: var(--blue-light); }
+
+.admin-toolbar { display: none; gap: 10px; margin: -24px 0 28px; }
+
+/* 삭제 버튼 (각 항목 위) */
+.admin-del {
+  position: absolute; top: 8px; right: 8px; z-index: 3;
+  background: rgba(226,72,77,.92); color: #fff; border: none;
+  padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.admin-del:hover { background: #c5363b; }
+.gallery-item, .resource-item, .post-item { position: relative; }
+.post-item .admin-del { top: 14px; right: 14px; }
+
+/* ===== 공지·소식 ===== */
+.posts { display: flex; flex-direction: column; gap: 20px; }
+.post-item {
+  display: flex; gap: 22px;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow);
+}
+.post-thumb { flex-shrink: 0; width: 220px; }
+.post-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.post-body { padding: 24px 26px; flex: 1; }
+.post-meta { font-size: 13px; color: var(--blue); font-weight: 700; margin-bottom: 6px; }
+.post-body h3 { font-size: 20px; color: var(--navy); margin-bottom: 12px; }
+.post-text { color: var(--text-soft); font-size: 15px; line-height: 1.7; margin-bottom: 16px; }
+@media (max-width: 640px) {
+  .post-item { flex-direction: column; }
+  .post-thumb { width: 100%; aspect-ratio: 16/9; }
+}
+
+/* ===== 관리자 모달 (amodal) ===== */
+.amodal {
+  position: fixed; inset: 0; z-index: 210;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(7,18,33,.6); padding: 20px;
+}
+.amodal.open { display: flex; }
+.amodal-box {
+  position: relative;
+  width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto;
+  background: #fff; border-radius: var(--radius); padding: 32px;
+  box-shadow: var(--shadow-lg);
+}
+.amodal-box h3 { font-size: 20px; color: var(--navy); margin-bottom: 16px; }
+.amodal-help { font-size: 13px; color: var(--text-soft); line-height: 1.7; margin-bottom: 14px; }
+.amodal-help a { color: var(--blue); font-weight: 700; }
+.amodal-box input[type="text"],
+.amodal-box input[type="password"],
+.amodal-box textarea {
+  width: 100%; padding: 12px 14px; margin-bottom: 12px;
+  border: 1px solid var(--line); border-radius: 10px; font-size: 15px; font-family: inherit;
+}
+.amodal-box input:focus, .amodal-box textarea:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
+.amodal-box textarea { resize: vertical; }
+.amodal-check { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-soft); margin-bottom: 12px; }
+.amodal-file-label { display: block; font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 14px; }
+.amodal-file-label input { display: block; margin-top: 6px; font-weight: 400; }
+.amodal-close {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none; font-size: 30px; line-height: 1; cursor: pointer; color: var(--text-soft);
 }
