@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HABITUS KOREA 전자투표</title>
-  <meta name="description" content="HABITUS KOREA 전자투표 안내, 현장 소식 및 문의 접수 홈페이지입니다." />
+  <title>E-CASTING VOTE</title>
+  <meta name="description" content="E-CASTING VOTE 현장 소식, 홍보자료 및 문의 접수 홈페이지입니다." />
 
   <!-- Open Graph (카카오톡/SNS 공유 시 표시되는 정보) -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="HABITUS KOREA 전자투표" />
-  <meta property="og:description" content="HABITUS KOREA 전자투표 안내, 현장 소식 및 문의 접수." />
+  <meta property="og:title" content="E-CASTING VOTE" />
+  <meta property="og:description" content="E-CASTING VOTE 현장 소식, 홍보자료 및 문의 접수." />
   <meta property="og:image" content="assets/images/og-image.jpg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -18,6 +18,13 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <!-- ===== 관리자 모드 바 (로그인 시 표시) ===== -->
+  <div class="admin-bar" id="adminBar" hidden>
+    <span class="admin-bar-label">🔑 관리자 모드</span>
+    <span class="admin-bar-msg" id="adminBarMsg"></span>
+    <button type="button" class="admin-bar-btn" id="adminLogout">로그아웃</button>
+  </div>
+
   <!-- ===== 헤더 / 네비게이션 ===== -->
   <header class="site-header" id="top">
     <div class="container header-inner">
@@ -30,34 +37,30 @@
         </button>
         <ul class="nav-list" id="navList">
           <li><a href="#about">소개</a></li>
+          <li><a href="#posts">공지·소식</a></li>
           <li><a href="#gallery">현장 갤러리</a></li>
           <li><a href="#resources">홍보자료</a></li>
           <li><a href="#quote">견적서</a></li>
-          <li><a href="#contact">문의하기</a></li>
-          <li><a href="#vote" class="nav-cta">전자투표 바로가기</a></li>
+          <li><a href="#contact" class="nav-cta">문의하기</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
   <!-- ===== 히어로 ===== -->
-  <section class="hero" id="vote">
+  <section class="hero" id="home">
     <div class="hero-overlay"></div>
     <div class="container hero-inner">
-      <p class="hero-eyebrow">HABITUS KOREA</p>
-      <h1 class="hero-title">전자투표 안내</h1>
+      <p class="hero-eyebrow">E-CASTING VOTE</p>
+      <h1 class="hero-title">상상을 현실로</h1>
       <p class="hero-desc">
-        투명하고 안전한 전자투표 시스템으로 여러분의 소중한 한 표를 행사하세요.<br />
-        아래 버튼을 눌러 전자투표 시스템으로 이동할 수 있습니다.
+        E-CASTING VOTE의 생생한 현장 소식과 홍보자료를 만나보세요.<br />
+        궁금한 점은 언제든 문의해 주시면 정성껏 안내해 드리겠습니다.
       </p>
       <div class="hero-actions">
-        <!-- TODO: 실제 전자투표 시스템 주소로 변경하세요 -->
-        <a href="https://example.com/vote" class="btn btn-primary" id="voteLink" target="_blank" rel="noopener">
-          전자투표 바로가기 ↗
-        </a>
+        <a href="#gallery" class="btn btn-primary">현장 갤러리 보기</a>
         <a href="#contact" class="btn btn-ghost">문의하기</a>
       </div>
-      <p class="hero-note">※ 투표는 별도의 전자투표 시스템에서 진행됩니다.</p>
     </div>
   </section>
 
@@ -66,8 +69,8 @@
     <div class="container">
       <div class="section-head">
         <span class="section-tag">ABOUT</span>
-        <h2 class="section-title">HABITUS KOREA 소개</h2>
-        <p class="section-lead">함께 만들어가는 투명한 의사결정, 그 중심에 HABITUS KOREA가 있습니다.</p>
+        <h2 class="section-title">E-CASTING VOTE 소개</h2>
+        <p class="section-lead">함께 만들어가는 투명한 의사결정, 그 중심에 E-CASTING VOTE가 있습니다.</p>
       </div>
       <div class="cards">
         <div class="card">
@@ -89,42 +92,35 @@
     </div>
   </section>
 
+  <!-- ===== 공지·소식 ===== -->
+  <section class="section" id="posts">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">NEWS</span>
+        <h2 class="section-title">공지·소식</h2>
+        <p class="section-lead">E-CASTING VOTE의 새로운 소식과 자료를 확인하세요.</p>
+      </div>
+      <div class="admin-toolbar admin-only">
+        <button type="button" class="btn btn-primary btn-sm" id="addPostBtn">+ 글 작성</button>
+      </div>
+      <div class="posts" id="postsList"></div>
+      <p class="gallery-empty" id="postsEmpty" hidden>아직 등록된 글이 없습니다.</p>
+    </div>
+  </section>
+
   <!-- ===== 현장 갤러리 ===== -->
   <section class="section section-alt" id="gallery">
     <div class="container">
       <div class="section-head">
         <span class="section-tag">GALLERY</span>
         <h2 class="section-title">현장 갤러리</h2>
-        <p class="section-lead">HABITUS KOREA의 생생한 현장 모습을 사진으로 만나보세요.</p>
+        <p class="section-lead">E-CASTING VOTE의 생생한 현장 모습을 사진으로 만나보세요.</p>
       </div>
-
-      <!-- 사진을 추가하려면 assets/images 폴더에 이미지를 넣고 아래 항목을 복사해 src/캡션을 수정하세요. -->
-      <div class="gallery" id="gallery-grid">
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-1.svg" alt="현장 사진 1" loading="lazy" />
-          <figcaption>현장 사진 캡션 1</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-2.svg" alt="현장 사진 2" loading="lazy" />
-          <figcaption>현장 사진 캡션 2</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-3.svg" alt="현장 사진 3" loading="lazy" />
-          <figcaption>현장 사진 캡션 3</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-4.svg" alt="현장 사진 4" loading="lazy" />
-          <figcaption>현장 사진 캡션 4</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-5.svg" alt="현장 사진 5" loading="lazy" />
-          <figcaption>현장 사진 캡션 5</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <img src="assets/images/placeholder-6.svg" alt="현장 사진 6" loading="lazy" />
-          <figcaption>현장 사진 캡션 6</figcaption>
-        </figure>
+      <div class="admin-toolbar admin-only">
+        <button type="button" class="btn btn-primary btn-sm" id="addPhotoBtn">+ 사진 올리기</button>
       </div>
+      <div class="gallery" id="gallery-grid"></div>
+      <p class="gallery-empty" id="galleryEmpty" hidden>아직 등록된 현장 사진이 없습니다.</p>
     </div>
   </section>
 
@@ -134,14 +130,13 @@
       <div class="section-head">
         <span class="section-tag">RESOURCES</span>
         <h2 class="section-title">홍보자료</h2>
-        <p class="section-lead">HABITUS KOREA 홍보자료를 미리 보고, 필요한 파일을 다운로드하세요.</p>
+        <p class="section-lead">E-CASTING VOTE 홍보자료를 미리 보고, 필요한 파일을 다운로드하세요.</p>
+      </div>
+      <div class="admin-toolbar admin-only">
+        <button type="button" class="btn btn-primary btn-sm" id="addResourceBtn">+ 자료 추가</button>
+        <button type="button" class="btn btn-outline btn-sm" id="addVideoBtn">+ 영상 추가</button>
       </div>
 
-      <!--
-        홍보자료를 추가하려면 assets/resources 폴더에 파일을 넣고 아래 항목을 복사하세요.
-        - data-file : 실제 파일 경로 (보기/다운로드 대상)
-        - data-type : 미리보기 종류 (image | pdf)
-      -->
       <div class="resources" id="resourceGrid">
         <article class="resource-item" data-file="assets/resources/poster-1.svg" data-type="image">
           <div class="resource-thumb">
@@ -158,32 +153,31 @@
           </div>
         </article>
 
-        <article class="resource-item" data-file="assets/resources/brochure.svg" data-type="image">
+        <article class="resource-item" data-file="assets/resources/consent-program-guide.svg" data-type="image">
           <div class="resource-thumb">
-            <img src="assets/resources/brochure.svg" alt="HABITUS KOREA 소개 브로슈어" loading="lazy" />
-            <span class="resource-badge">이미지</span>
+            <img src="assets/resources/consent-program-guide.svg" alt="동의서 받기 프로그램 안내" loading="lazy" />
+            <span class="resource-badge">안내</span>
           </div>
           <div class="resource-body">
-            <h3>소개 브로슈어</h3>
-            <p>HABITUS KOREA의 주요 활동을 담은 소개 자료입니다.</p>
+            <h3>동의서 받기 프로그램 안내</h3>
+            <p>동의서를 간편하게 수집·관리하는 프로그램 이용 안내 자료입니다.</p>
             <div class="resource-actions">
               <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
-              <a class="btn btn-sm btn-primary" href="assets/resources/brochure.svg" download>다운로드 ↓</a>
+              <a class="btn btn-sm btn-primary" href="assets/resources/consent-program-guide.svg" download>다운로드 ↓</a>
             </div>
           </div>
         </article>
 
-        <article class="resource-item" data-file="assets/resources/guide.svg" data-type="image">
-          <div class="resource-thumb">
-            <img src="assets/resources/guide.svg" alt="현장 활동 안내문" loading="lazy" />
-            <span class="resource-badge">이미지</span>
+        <article class="resource-item resource-video" id="videoCard">
+          <div class="resource-thumb resource-thumb-video" id="videoCardThumb">
+            <span class="video-play">▶</span>
+            <span class="resource-badge">영상</span>
           </div>
           <div class="resource-body">
-            <h3>현장 활동 안내문</h3>
-            <p>현장 행사 및 참여 안내 사항을 정리한 자료입니다.</p>
+            <h3>투표 영상</h3>
+            <p id="videoCardDesc">전자투표 안내 및 현장 영상을 확인하세요.</p>
             <div class="resource-actions">
-              <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
-              <a class="btn btn-sm btn-primary" href="assets/resources/guide.svg" download>다운로드 ↓</a>
+              <button type="button" class="btn btn-sm btn-primary btn-block js-video-open">영상 보기 ▶</button>
             </div>
           </div>
         </article>
@@ -227,6 +221,16 @@
     <a class="btn btn-primary previewer-download" id="previewerDownload" href="#" download>다운로드 ↓</a>
   </div>
 
+  <!-- ===== 투표 영상 모달 ===== -->
+  <div class="videomodal" id="videoModal" aria-hidden="true">
+    <button class="videomodal-close" id="videoModalClose" aria-label="닫기">×</button>
+    <div class="videomodal-inner">
+      <div class="videomodal-player" id="videoPlayer"></div>
+      <p class="videomodal-title" id="videoTitle"></p>
+      <div class="videomodal-list" id="videoList"></div>
+    </div>
+  </div>
+
   <!-- ===== 라이트박스 (사진 확대 보기) ===== -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <button class="lightbox-close" id="lightboxClose" aria-label="닫기">×</button>
@@ -248,7 +252,7 @@
         <div class="quote-card">
           <div class="quote-card-icon">📄</div>
           <h3>당사 견적서 받기</h3>
-          <p>(주)HABITUS KOREA의 표준 견적서를 다운로드하실 수 있습니다. 맞춤 견적이 필요하시면 문의해 주세요.</p>
+          <p>(주)E-CASTING VOTE의 표준 견적서를 다운로드하실 수 있습니다. 맞춤 견적이 필요하시면 문의해 주세요.</p>
           <div class="quote-card-actions">
             <button type="button" class="btn btn-outline js-quote-preview" data-file="assets/resources/habitus-quote.svg" data-type="image">미리보기</button>
             <a class="btn btn-primary" href="assets/resources/habitus-quote.svg" download>견적서 다운로드 ↓</a>
@@ -322,7 +326,7 @@
           <ul>
             <li>
               <span class="info-label">이메일</span>
-              <a href="mailto:airrotc29@gmail.com">airrotc29@gmail.com</a>
+              <a href="mailto:airrotc29@habitusinc.co.kr">airrotc29@habitusinc.co.kr</a>
             </li>
             <li>
               <span class="info-label">운영시간</span>
@@ -344,11 +348,95 @@
       <div class="footer-brand">
         <img src="assets/images/logo.png" alt="(주) HABITUS KOREA" class="footer-logo" />
       </div>
-      <p class="footer-copy">© <span id="year"></span> HABITUS KOREA. All rights reserved.</p>
-      <a href="#top" class="footer-top">맨 위로 ↑</a>
+      <p class="footer-copy">© <span id="year"></span> E-CASTING VOTE. All rights reserved.</p>
+      <div class="footer-links">
+        <button type="button" class="footer-admin" id="adminLoginBtn">관리자</button>
+        <a href="#top" class="footer-top">맨 위로 ↑</a>
+      </div>
     </div>
   </footer>
 
+  <!-- ===== 관리자 모달들 ===== -->
+  <!-- 로그인 -->
+  <div class="amodal" id="loginModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>관리자 로그인</h3>
+      <p class="amodal-help">
+        업로드를 위해 GitHub 액세스 토큰을 입력하세요. 토큰은 이 브라우저에만 저장되며 외부로 전송되지 않습니다.
+        <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">토큰 발급 ↗</a>
+      </p>
+      <input type="password" id="loginToken" placeholder="github_pat_... 또는 ghp_..." autocomplete="off" />
+      <label class="amodal-check"><input type="checkbox" id="loginRemember" checked /> 이 브라우저에 저장</label>
+      <p class="form-hint" id="loginStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="loginSubmit">로그인</button>
+    </div>
+  </div>
+
+  <!-- 사진 올리기 -->
+  <div class="amodal" id="photoModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>현장 사진 올리기</h3>
+      <label class="upload-drop" id="photoDrop">
+        <input type="file" id="photoInput" accept="image/*" multiple hidden />
+        <span class="upload-icon">🖼️</span>
+        <span class="upload-text" id="photoDropText">사진을 끌어다 놓거나 클릭하여 선택 (여러 장 가능)</span>
+        <span class="upload-hint">JPG · PNG · GIF · WEBP (장당 최대 10MB)</span>
+      </label>
+      <div id="photoPreview" class="admin-preview"></div>
+      <p class="form-hint" id="photoStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="photoSubmit">갤러리에 올리기</button>
+    </div>
+  </div>
+
+  <!-- 영상 추가 -->
+  <div class="amodal" id="videoAddModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>투표 영상 추가 (유튜브)</h3>
+      <input type="text" id="videoAddUrl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" />
+      <input type="text" id="videoAddTitle" placeholder="영상 제목" autocomplete="off" />
+      <p class="form-hint" id="videoAddStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="videoAddSubmit">영상 추가</button>
+      <div id="videoAdminList" class="admin-current" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <!-- 글 작성 -->
+  <div class="amodal" id="postModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>공지·소식 글 작성</h3>
+      <input type="text" id="postTitle" placeholder="제목 *" autocomplete="off" />
+      <textarea id="postBody" rows="6" placeholder="내용 *"></textarea>
+      <label class="amodal-file-label">대표 이미지 (선택)
+        <input type="file" id="postImage" accept="image/*" />
+      </label>
+      <label class="amodal-file-label">첨부 파일 (선택 · 다운로드 제공)
+        <input type="file" id="postFile" />
+      </label>
+      <p class="form-hint" id="postStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="postSubmit">글 올리기</button>
+    </div>
+  </div>
+
+  <!-- 자료 추가 -->
+  <div class="amodal" id="resourceModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>홍보자료 추가</h3>
+      <input type="text" id="resTitle" placeholder="자료 제목 *" autocomplete="off" />
+      <input type="text" id="resDesc" placeholder="간단한 설명" autocomplete="off" />
+      <label class="amodal-file-label">자료 파일 * (PDF · 이미지 · 한글 등)
+        <input type="file" id="resFile" />
+      </label>
+      <p class="form-hint" id="resStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="resSubmit">자료 올리기</button>
+    </div>
+  </div>
+
   <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
 </body>
 </html>
