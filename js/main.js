@@ -84,6 +84,104 @@ document.getElementById('year').textContent = new Date().getFullYear();
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
 })();
 
+// ===== 투표 영상 (videos.json + 유튜브 임베드) =====
+(function () {
+  const card = document.getElementById('videoCard');
+  const modal = document.getElementById('videoModal');
+  if (!card || !modal) return;
+
+  const openBtn = card.querySelector('.js-video-open');
+  const closeBtn = document.getElementById('videoModalClose');
+  const player = document.getElementById('videoPlayer');
+  const titleEl = document.getElementById('videoTitle');
+  const listEl = document.getElementById('videoList');
+  const cardDesc = document.getElementById('videoCardDesc');
+
+  let videos = [];
+
+  // 다양한 유튜브 URL에서 영상 ID 추출
+  function youtubeId(url) {
+    if (!url) return '';
+    const m = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
+    if (m) return m[1];
+    if (/^[\w-]{11}$/.test(url)) return url; // 이미 ID인 경우
+    return '';
+  }
+
+  function thumb(id) {
+    return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+  }
+
+  function play(video) {
+    const id = youtubeId(video.url);
+    player.innerHTML =
+      `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" ` +
+      `title="${(video.title || '투표 영상').replace(/"/g, '')}" frameborder="0" ` +
+      `allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ` +
+      `allowfullscreen></iframe>`;
+    titleEl.textContent = video.title || '';
+    listEl.querySelectorAll('.videomodal-thumb').forEach((t) => t.classList.remove('active'));
+    const active = listEl.querySelector(`[data-url="${video.url}"]`);
+    if (active) active.classList.add('active');
+  }
+
+  function renderList() {
+    listEl.innerHTML = '';
+    videos.forEach((v) => {
+      const id = youtubeId(v.url);
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'videomodal-thumb';
+      item.dataset.url = v.url;
+      item.innerHTML =
+        `<img src="${thumb(id)}" alt="${(v.title || '영상').replace(/"/g, '')}" loading="lazy" />` +
+        `<span>${v.title || '제목 없음'}</span>`;
+      item.addEventListener('click', () => play(v));
+      listEl.appendChild(item);
+    });
+  }
+
+  function openModal() {
+    if (videos.length === 0) {
+      player.innerHTML = '<p class="videomodal-empty">아직 등록된 영상이 없습니다.</p>';
+      titleEl.textContent = '';
+      listEl.innerHTML = '';
+    } else {
+      renderList();
+      play(videos[0]);
+    }
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    player.innerHTML = ''; // 재생 중지
+  }
+
+  // 영상 목록 로드 → 카드 썸네일/설명 갱신
+  fetch('assets/data/videos.json', { cache: 'no-store' })
+    .then((res) => (res.ok ? res.json() : []))
+    .then((data) => {
+      videos = Array.isArray(data) ? data.slice().reverse() : [];
+      if (videos.length > 0) {
+        const id = youtubeId(videos[0].url);
+        const t = document.getElementById('videoCardThumb');
+        t.style.backgroundImage = `url(${thumb(id)})`;
+        t.classList.add('has-thumb');
+        if (cardDesc) cardDesc.textContent = `총 ${videos.length}개의 영상을 확인하세요.`;
+      }
+    })
+    .catch(() => {});
+
+  openBtn.addEventListener('click', openModal);
+  card.querySelector('.resource-thumb').addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+})();
+
 // ===== 미리보기 모달 (홍보자료 · 견적서 공용) =====
 (function () {
   const previewer = document.getElementById('previewer');

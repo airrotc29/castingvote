@@ -69,6 +69,19 @@
         <h3>현재 갤러리 사진 <button class="btn btn-sm btn-outline" id="refreshBtn" type="button">새로고침</button></h3>
         <div id="currentList" class="admin-current">불러오는 중…</div>
       </div>
+
+      <!-- 투표 영상 관리 -->
+      <div class="admin-card">
+        <h3>투표 영상 관리 (유튜브)</h3>
+        <p class="admin-help">유튜브 영상 주소를 붙여넣고 추가하면 홈페이지 "투표 영상"에 표시됩니다.</p>
+        <div class="admin-field">
+          <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" />
+          <input type="text" id="videoTitleInput" placeholder="영상 제목 (예: 전자투표 안내 영상)" autocomplete="off" />
+        </div>
+        <p class="form-hint" id="videoStatus" role="alert"></p>
+        <button class="btn btn-primary btn-block" id="videoAddBtn" type="button">영상 추가</button>
+        <div id="videoCurrentList" class="admin-current" style="margin-top:18px;">불러오는 중…</div>
+      </div>
     </div>
   </main>
 

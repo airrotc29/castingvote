@@ -144,17 +144,16 @@
           </div>
         </article>
 
-        <article class="resource-item" data-file="assets/resources/guide.svg" data-type="image">
-          <div class="resource-thumb">
-            <img src="assets/resources/guide.svg" alt="현장 활동 안내문" loading="lazy" />
-            <span class="resource-badge">이미지</span>
+        <article class="resource-item resource-video" id="videoCard">
+          <div class="resource-thumb resource-thumb-video" id="videoCardThumb">
+            <span class="video-play">▶</span>
+            <span class="resource-badge">영상</span>
           </div>
           <div class="resource-body">
-            <h3>현장 활동 안내문</h3>
-            <p>현장 행사 및 참여 안내 사항을 정리한 자료입니다.</p>
+            <h3>투표 영상</h3>
+            <p id="videoCardDesc">전자투표 안내 및 현장 영상을 확인하세요.</p>
             <div class="resource-actions">
-              <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
-              <a class="btn btn-sm btn-primary" href="assets/resources/guide.svg" download>다운로드 ↓</a>
+              <button type="button" class="btn btn-sm btn-primary btn-block js-video-open">영상 보기 ▶</button>
             </div>
           </div>
         </article>
@@ -196,6 +195,16 @@
     <button class="previewer-close" id="previewerClose" aria-label="닫기">×</button>
     <div class="previewer-stage" id="previewerStage"></div>
     <a class="btn btn-primary previewer-download" id="previewerDownload" href="#" download>다운로드 ↓</a>
+  </div>
+
+  <!-- ===== 투표 영상 모달 ===== -->
+  <div class="videomodal" id="videoModal" aria-hidden="true">
+    <button class="videomodal-close" id="videoModalClose" aria-label="닫기">×</button>
+    <div class="videomodal-inner">
+      <div class="videomodal-player" id="videoPlayer"></div>
+      <p class="videomodal-title" id="videoTitle"></p>
+      <div class="videomodal-list" id="videoList"></div>
+    </div>
   </div>
 
   <!-- ===== 라이트박스 (사진 확대 보기) ===== -->

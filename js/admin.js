@@ -266,3 +266,103 @@ async function removePhoto(file) {
 refreshBtn.addEventListener('click', loadCurrent);
 if (token()) loadCurrent();
 else currentList.textContent = '토큰을 입력하면 현재 사진 목록을 볼 수 있습니다.';
+
+// ===== 투표 영상 관리 (videos.json) =====
+const VIDEOS_MANIFEST = 'assets/data/videos.json';
+const videoUrlEl = $('videoUrl');
+const videoTitleInput = $('videoTitleInput');
+const videoStatusEl = $('videoStatus');
+const videoAddBtn = $('videoAddBtn');
+const videoCurrentList = $('videoCurrentList');
+
+function setVideoStatus(msg, type) {
+  videoStatusEl.className = 'form-hint' + (type ? ' ' + type : '');
+  videoStatusEl.textContent = msg;
+}
+
+function extractYoutubeId(url) {
+  if (!url) return '';
+  const m = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
+  if (m) return m[1];
+  if (/^[\w-]{11}$/.test(url.trim())) return url.trim();
+  return '';
+}
+
+async function loadVideos() {
+  const data = await getContent(VIDEOS_MANIFEST);
+  if (!data) return { items: [], sha: null };
+  let items = [];
+  try { items = JSON.parse(base64ToUtf8(data.content)); } catch (e) { items = []; }
+  if (!Array.isArray(items)) items = [];
+  return { items, sha: data.sha };
+}
+
+videoAddBtn.addEventListener('click', async () => {
+  if (!token()) { setVideoStatus('GitHub 토큰을 먼저 입력해 주세요.', 'error'); return; }
+  const url = videoUrlEl.value.trim();
+  const title = videoTitleInput.value.trim();
+  const id = extractYoutubeId(url);
+  if (!id) { setVideoStatus('올바른 유튜브 주소가 아닙니다.', 'error'); return; }
+
+  videoAddBtn.disabled = true;
+  try {
+    setVideoStatus('영상 추가 중…', '');
+    const { items, sha } = await loadVideos();
+    items.push({ url: 'https://youtu.be/' + id, title: title || '제목 없는 영상' });
+    await putContent(VIDEOS_MANIFEST, utf8ToBase64(JSON.stringify(items, null, 2)), '투표 영상 추가', sha);
+    setVideoStatus('추가됐습니다! (사이트 반영까지 1~2분)', 'success');
+    videoUrlEl.value = '';
+    videoTitleInput.value = '';
+    loadVideoList();
+  } catch (e) {
+    setVideoStatus('오류: ' + e.message, 'error');
+  } finally {
+    videoAddBtn.disabled = false;
+  }
+});
+
+async function loadVideoList() {
+  videoCurrentList.textContent = '불러오는 중…';
+  if (!token()) { videoCurrentList.textContent = '토큰을 입력하면 영상 목록을 볼 수 있습니다.'; return; }
+  try {
+    const { items } = await loadVideos();
+    if (items.length === 0) { videoCurrentList.textContent = '아직 등록된 영상이 없습니다.'; return; }
+    videoCurrentList.innerHTML = '';
+    items.slice().reverse().forEach((v) => {
+      const id = extractYoutubeId(v.url);
+      const row = document.createElement('div');
+      row.className = 'admin-current-item';
+      const img = document.createElement('img');
+      img.src = `https://img.youtube.com/vi/${id}/default.jpg`;
+      const span = document.createElement('span');
+      span.textContent = v.title || '(제목 없음)';
+      const del = document.createElement('button');
+      del.className = 'btn btn-sm btn-outline';
+      del.textContent = '삭제';
+      del.addEventListener('click', () => removeVideo(v.url));
+      row.appendChild(img);
+      row.appendChild(span);
+      row.appendChild(del);
+      videoCurrentList.appendChild(row);
+    });
+  } catch (e) {
+    videoCurrentList.textContent = '목록을 불러오지 못했습니다: ' + e.message;
+  }
+}
+
+async function removeVideo(url) {
+  if (!confirm('이 영상을 목록에서 삭제할까요?')) return;
+  try {
+    setVideoStatus('삭제 중…', '');
+    const { items, sha } = await loadVideos();
+    const next = items.filter((it) => it.url !== url);
+    await putContent(VIDEOS_MANIFEST, utf8ToBase64(JSON.stringify(next, null, 2)), '투표 영상 삭제', sha);
+    setVideoStatus('삭제됐습니다. (사이트 반영까지 1~2분)', 'success');
+    loadVideoList();
+  } catch (e) {
+    setVideoStatus('삭제 오류: ' + e.message, 'error');
+  }
+}
+
+if (token()) loadVideoList();
+else videoCurrentList.textContent = '토큰을 입력하면 영상 목록을 볼 수 있습니다.';
