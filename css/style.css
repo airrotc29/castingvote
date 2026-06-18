@@ -608,3 +608,7 @@ body.admin-on .admin-toolbar.admin-only { display: flex; }
   position: absolute; top: 14px; right: 16px;
   background: none; border: none; font-size: 30px; line-height: 1; cursor: pointer; color: var(--text-soft);
 }
+
+/* 앵커 이동 시 상단 고정 헤더에 제목이 가리지 않도록 보정 */
+section[id], [id="top"] { scroll-margin-top: 84px; }
+a.card { cursor: pointer; }
