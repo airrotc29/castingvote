@@ -40,7 +40,10 @@
 
   // ---------- GitHub Contents API ----------
   async function getContent(path) {
-    const res = await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`, { headers: headers() });
+    // 캐시 우회를 위해 고유 쿼리 파라미터 추가 (오래된 sha로 인한 409 방지)
+    const res = await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}&_cb=${Date.now()}`, {
+      headers: Object.assign({}, headers(), { 'Cache-Control': 'no-cache' }),
+    });
     if (res.status === 404) return null;
     if (!res.ok) throw new Error('읽기 실패 (' + res.status + ')');
     return res.json();
@@ -72,6 +75,23 @@
   }
   async function saveJson(path, items, message, sha) {
     return putContent(path, utf8ToB64(JSON.stringify(items, null, 2)), message, sha);
+  }
+  // 최신 내용을 다시 읽어 변형 후 저장. 409(충돌) 시 재시도.
+  async function mutateJson(path, mutator, message) {
+    let lastErr;
+    for (let i = 0; i < 4; i++) {
+      const { items, sha } = await loadJson(path);
+      const next = mutator(items.slice());
+      try {
+        await saveJson(path, next, message, sha);
+        return next;
+      } catch (e) {
+        lastErr = e;
+        if (String(e.message).includes('(409)')) { await new Promise((r) => setTimeout(r, 700)); continue; }
+        throw e;
+      }
+    }
+    throw lastErr;
   }
 
   // ---------- 유틸 ----------
@@ -194,17 +214,16 @@
     const btn = $('photoSubmit'); btn.disabled = true;
     const caps = Array.from(document.querySelectorAll('#photoPreview .admin-cap'));
     try {
-      const { items, sha } = await loadJson('assets/data/gallery.json');
-      const next = items.slice();
+      const added = [];
       for (let i = 0; i < photoFiles.length; i++) {
         hint($('photoStatus'), `업로드 중… (${i + 1}/${photoFiles.length})`, '');
         const f = photoFiles[i];
         const path = `assets/images/gallery/${Date.now()}-${i}-${safeName(f.name)}`;
         await putContent(path, await readBase64(f), '사진 업로드');
         const cap = caps.find((c) => Number(c.dataset.idx) === i);
-        next.push({ file: path, caption: cap ? cap.value.trim() : '' });
+        added.push({ file: path, caption: cap ? cap.value.trim() : '' });
       }
-      await saveJson('assets/data/gallery.json', next, '갤러리 갱신', sha);
+      const next = await mutateJson('assets/data/gallery.json', (items) => items.concat(added), '갤러리 갱신');
       hint($('photoStatus'), `완료! ${photoFiles.length}장 추가됨 (반영까지 1~2분)`, 'success');
       window.HK.renderGallery(next);
       photoFiles = []; renderPhotoPreview();
@@ -243,12 +262,11 @@
     if (!id) { hint($('videoAddStatus'), '올바른 유튜브 주소가 아닙니다.', 'error'); return; }
     const btn = $('videoAddSubmit'); btn.disabled = true;
     try {
-      const { items, sha } = await loadJson('assets/data/videos.json');
-      items.push({ url: 'https://youtu.be/' + id, title: title || '제목 없는 영상' });
-      await saveJson('assets/data/videos.json', items, '영상 추가', sha);
+      const next = await mutateJson('assets/data/videos.json',
+        (items) => items.concat([{ url: 'https://youtu.be/' + id, title: title || '제목 없는 영상' }]), '영상 추가');
       hint($('videoAddStatus'), '추가됐습니다! (반영까지 1~2분)', 'success');
       $('videoAddUrl').value = ''; $('videoAddTitle').value = '';
-      window.HK.refreshVideos(items);
+      window.HK.refreshVideos(next);
       renderVideoAdminList();
     } catch (e) { hint($('videoAddStatus'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
@@ -257,9 +275,7 @@
   async function deleteVideo(url) {
     if (!confirm('이 영상을 삭제할까요?')) return;
     try {
-      const { items, sha } = await loadJson('assets/data/videos.json');
-      const next = items.filter((v) => v.url !== url);
-      await saveJson('assets/data/videos.json', next, '영상 삭제', sha);
+      const next = await mutateJson('assets/data/videos.json', (items) => items.filter((v) => v.url !== url), '영상 삭제');
       window.HK.refreshVideos(next);
       renderVideoAdminList();
     } catch (e) { alert('삭제 오류: ' + e.message); }
@@ -295,11 +311,9 @@
         post.file = p; post.fileName = attFile.name;
       }
       hint($('postStatus'), '글 저장 중…', '');
-      const { items, sha } = await loadJson('assets/data/posts.json');
-      items.push(post);
-      await saveJson('assets/data/posts.json', items, '공지 글 추가', sha);
+      const next = await mutateJson('assets/data/posts.json', (items) => items.concat([post]), '공지 글 추가');
       hint($('postStatus'), '글이 등록됐습니다! (반영까지 1~2분)', 'success');
-      window.HK.renderPosts(items);
+      window.HK.renderPosts(next);
     } catch (e) { hint($('postStatus'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });
@@ -322,11 +336,10 @@
       const ext = extOf(file.name);
       const path = `assets/resources/uploads/${Date.now()}-${safeName(file.name)}`;
       await putContent(path, await readBase64(file), '홍보자료 업로드');
-      const { items, sha } = await loadJson('assets/data/resources.json');
-      items.push({ file: path, type: typeOfExt(ext), ext, title, desc });
-      await saveJson('assets/data/resources.json', items, '홍보자료 추가', sha);
+      const next = await mutateJson('assets/data/resources.json',
+        (items) => items.concat([{ file: path, type: typeOfExt(ext), ext, title, desc }]), '홍보자료 추가');
       hint($('resStatus'), '자료가 추가됐습니다! (반영까지 1~2분)', 'success');
-      window.HK.renderResources(items);
+      window.HK.renderResources(next);
     } catch (e) { hint($('resStatus'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });
@@ -340,22 +353,19 @@
     if (!confirm('정말 삭제할까요?')) return;
     try {
       if (kind === 'gallery') {
-        const { items, sha } = await loadJson('assets/data/gallery.json');
-        const next = items.filter((it) => it.file !== id);
-        await saveJson('assets/data/gallery.json', next, '사진 삭제', sha);
+        const next = await mutateJson('assets/data/gallery.json', (items) => items.filter((it) => it.file !== id), '사진 삭제');
         await tryDeleteFile(id);
         window.HK.renderGallery(next);
       } else if (kind === 'post') {
-        const { items, sha } = await loadJson('assets/data/posts.json');
-        const target = items.find((p) => p.id === id);
-        const next = items.filter((p) => p.id !== id);
-        await saveJson('assets/data/posts.json', next, '공지 삭제', sha);
+        let target = null;
+        const next = await mutateJson('assets/data/posts.json', (items) => {
+          target = items.find((p) => p.id === id);
+          return items.filter((p) => p.id !== id);
+        }, '공지 삭제');
         if (target) { await tryDeleteFile(target.image); await tryDeleteFile(target.file); }
         window.HK.renderPosts(next);
       } else if (kind === 'resource') {
-        const { items, sha } = await loadJson('assets/data/resources.json');
-        const next = items.filter((it) => it.file !== id);
-        await saveJson('assets/data/resources.json', next, '홍보자료 삭제', sha);
+        const next = await mutateJson('assets/data/resources.json', (items) => items.filter((it) => it.file !== id), '홍보자료 삭제');
         await tryDeleteFile(id);
         window.HK.renderResources(next);
       }
