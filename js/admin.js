@@ -42,7 +42,7 @@
   async function getContent(path) {
     // 캐시 우회를 위해 고유 쿼리 파라미터 추가 (오래된 sha로 인한 409 방지)
     const res = await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}&_cb=${Date.now()}`, {
-      headers: Object.assign({}, headers(), { 'Cache-Control': 'no-cache' }),
+      headers: headers(),
     });
     if (res.status === 404) return null;
     if (!res.ok) throw new Error('읽기 실패 (' + res.status + ')');
