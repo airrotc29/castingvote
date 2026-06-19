@@ -25,7 +25,11 @@ document.getElementById('year').textContent = new Date().getFullYear();
 window.HK = window.HK || {};
 
 function hkDelBtn(kind, id) {
-  return `<button type="button" class="admin-del admin-only" data-kind="${kind}" data-id="${String(id).replace(/"/g, '&quot;')}">삭제</button>`;
+  const i = String(id).replace(/"/g, '&quot;');
+  return `<div class="admin-ctrls admin-only">` +
+    `<button type="button" class="admin-edit" data-kind="${kind}" data-id="${i}">수정</button>` +
+    `<button type="button" class="admin-del" data-kind="${kind}" data-id="${i}">삭제</button>` +
+    `</div>`;
 }
 function hkEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 

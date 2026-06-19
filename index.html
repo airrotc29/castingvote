@@ -377,7 +377,7 @@
   <div class="amodal" id="postModal" aria-hidden="true">
     <div class="amodal-box">
       <button type="button" class="amodal-close" data-close>×</button>
-      <h3>공지·소식 글 작성</h3>
+      <h3 id="postModalTitle">공지·소식 글 작성</h3>
       <input type="text" id="postTitle" placeholder="제목 *" autocomplete="off" />
       <textarea id="postBody" rows="6" placeholder="내용 *"></textarea>
       <label class="amodal-file-label">대표 이미지 (선택)
@@ -403,6 +403,29 @@
       </label>
       <p class="form-hint" id="resStatus" role="alert"></p>
       <button type="button" class="btn btn-primary btn-block" id="resSubmit">자료 올리기</button>
+    </div>
+  </div>
+
+  <!-- 갤러리 사진 설명 수정 -->
+  <div class="amodal" id="galleryEditModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>사진 설명 수정</h3>
+      <input type="text" id="galleryEditCaption" placeholder="사진 설명" autocomplete="off" />
+      <p class="form-hint" id="galleryEditStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="galleryEditSubmit">저장</button>
+    </div>
+  </div>
+
+  <!-- 홍보자료 정보 수정 -->
+  <div class="amodal" id="resourceEditModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>자료 정보 수정</h3>
+      <input type="text" id="resourceEditTitle" placeholder="자료 제목 *" autocomplete="off" />
+      <input type="text" id="resourceEditDesc" placeholder="간단한 설명" autocomplete="off" />
+      <p class="form-hint" id="resourceEditStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="resourceEditSubmit">저장</button>
     </div>
   </div>
 

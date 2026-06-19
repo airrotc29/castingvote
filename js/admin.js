@@ -281,8 +281,13 @@
     } catch (e) { alert('삭제 오류: ' + e.message); }
   }
 
-  // ---------- 공지·소식 글 ----------
+  // ---------- 공지·소식 글 (작성/수정) ----------
+  let editPostId = null;
+
   $('addPostBtn') && $('addPostBtn').addEventListener('click', () => {
+    editPostId = null;
+    $('postModalTitle').textContent = '공지·소식 글 작성';
+    $('postSubmit').textContent = '글 올리기';
     $('postTitle').value = ''; $('postBody').value = ''; $('postImage').value = ''; $('postFile').value = '';
     hint($('postStatus'), '', ''); openModal('postModal');
   });
@@ -295,24 +300,39 @@
     const attFile = $('postFile').files[0];
     const btn = $('postSubmit'); btn.disabled = true;
     try {
-      const post = { id: 'p' + Date.now(), title, body, date: today(), image: null, file: null, fileName: null };
+      let image = null, file = null, fileName = null;
       if (imgFile) {
         if (imgFile.size > MAX_SIZE) throw new Error('이미지가 10MB를 초과합니다.');
         hint($('postStatus'), '이미지 업로드 중…', '');
-        const p = `assets/images/posts/${Date.now()}-${safeName(imgFile.name)}`;
-        await putContent(p, await readBase64(imgFile), '공지 이미지 업로드');
-        post.image = p;
+        image = `assets/images/posts/${Date.now()}-${safeName(imgFile.name)}`;
+        await putContent(image, await readBase64(imgFile), '공지 이미지 업로드');
       }
       if (attFile) {
         if (attFile.size > MAX_SIZE) throw new Error('첨부파일이 10MB를 초과합니다.');
         hint($('postStatus'), '첨부파일 업로드 중…', '');
-        const p = `assets/resources/posts/${Date.now()}-${safeName(attFile.name)}`;
-        await putContent(p, await readBase64(attFile), '공지 첨부파일 업로드');
-        post.file = p; post.fileName = attFile.name;
+        file = `assets/resources/posts/${Date.now()}-${safeName(attFile.name)}`;
+        await putContent(file, await readBase64(attFile), '공지 첨부파일 업로드');
+        fileName = attFile.name;
       }
       hint($('postStatus'), '글 저장 중…', '');
-      const next = await mutateJson('assets/data/posts.json', (items) => items.concat([post]), '공지 글 추가');
-      hint($('postStatus'), '글이 등록됐습니다! (반영까지 1~2분)', 'success');
+      let next;
+      if (editPostId) {
+        // 수정: 제목/내용은 교체, 이미지·첨부는 새로 올린 경우에만 교체
+        next = await mutateJson('assets/data/posts.json', (items) => items.map((p) => {
+          if (p.id !== editPostId) return p;
+          return {
+            ...p, title, body,
+            image: image || p.image,
+            file: file || p.file,
+            fileName: fileName || p.fileName,
+          };
+        }), '공지 글 수정');
+        hint($('postStatus'), '글이 수정됐습니다! (반영까지 1~2분)', 'success');
+      } else {
+        const post = { id: 'p' + Date.now(), title, body, date: today(), image, file, fileName };
+        next = await mutateJson('assets/data/posts.json', (items) => items.concat([post]), '공지 글 추가');
+        hint($('postStatus'), '글이 등록됐습니다! (반영까지 1~2분)', 'success');
+      }
       window.HK.renderPosts(next);
     } catch (e) { hint($('postStatus'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
@@ -376,4 +396,72 @@
     if (!path) return;
     try { const meta = await getContent(path); if (meta) await deleteContent(path, meta.sha, '파일 삭제: ' + path); } catch (e) { /* 무시 */ }
   }
+
+  // ---------- 수정 (이벤트 위임) ----------
+  let editGalleryId = null;
+  let editResourceId = null;
+
+  document.addEventListener('click', async (e) => {
+    const ed = e.target.closest('.admin-edit');
+    if (!ed || !document.body.classList.contains('admin-on')) return;
+    e.preventDefault();
+    const kind = ed.dataset.kind, id = ed.dataset.id;
+    try {
+      if (kind === 'gallery') {
+        const { items } = await loadJson('assets/data/gallery.json');
+        const it = items.find((x) => x.file === id);
+        editGalleryId = id;
+        $('galleryEditCaption').value = it ? (it.caption || '') : '';
+        hint($('galleryEditStatus'), '', ''); openModal('galleryEditModal');
+      } else if (kind === 'resource') {
+        const { items } = await loadJson('assets/data/resources.json');
+        const it = items.find((x) => x.file === id);
+        editResourceId = id;
+        $('resourceEditTitle').value = it ? (it.title || '') : '';
+        $('resourceEditDesc').value = it ? (it.desc || '') : '';
+        hint($('resourceEditStatus'), '', ''); openModal('resourceEditModal');
+      } else if (kind === 'post') {
+        const { items } = await loadJson('assets/data/posts.json');
+        const p = items.find((x) => x.id === id);
+        editPostId = id;
+        $('postModalTitle').textContent = '공지·소식 글 수정';
+        $('postSubmit').textContent = '수정 저장';
+        $('postTitle').value = p ? p.title : '';
+        $('postBody').value = p ? p.body : '';
+        $('postImage').value = ''; $('postFile').value = '';
+        hint($('postStatus'), p && (p.image || p.file) ? '이미지·첨부는 새로 선택할 때만 교체됩니다.' : '', '');
+        openModal('postModal');
+      }
+    } catch (err) { alert('불러오기 오류: ' + err.message); }
+  });
+
+  // 갤러리 사진 설명 저장
+  $('galleryEditSubmit') && $('galleryEditSubmit').addEventListener('click', async () => {
+    if (!editGalleryId) return;
+    const caption = $('galleryEditCaption').value.trim();
+    const btn = $('galleryEditSubmit'); btn.disabled = true;
+    try {
+      const next = await mutateJson('assets/data/gallery.json',
+        (items) => items.map((it) => (it.file === editGalleryId ? { ...it, caption } : it)), '사진 설명 수정');
+      hint($('galleryEditStatus'), '저장됐습니다! (반영까지 1~2분)', 'success');
+      window.HK.renderGallery(next);
+    } catch (e) { hint($('galleryEditStatus'), '오류: ' + e.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
+
+  // 홍보자료 정보 저장
+  $('resourceEditSubmit') && $('resourceEditSubmit').addEventListener('click', async () => {
+    if (!editResourceId) return;
+    const title = $('resourceEditTitle').value.trim();
+    const desc = $('resourceEditDesc').value.trim();
+    if (!title) { hint($('resourceEditStatus'), '제목을 입력해 주세요.', 'error'); return; }
+    const btn = $('resourceEditSubmit'); btn.disabled = true;
+    try {
+      const next = await mutateJson('assets/data/resources.json',
+        (items) => items.map((it) => (it.file === editResourceId ? { ...it, title, desc } : it)), '홍보자료 정보 수정');
+      hint($('resourceEditStatus'), '저장됐습니다! (반영까지 1~2분)', 'success');
+      window.HK.renderResources(next);
+    } catch (e) { hint($('resourceEditStatus'), '오류: ' + e.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
 })();
