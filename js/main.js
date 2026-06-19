@@ -29,6 +29,49 @@ function hkDelBtn(kind, id) {
 }
 function hkEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
+// PDF.js 지연 로드 (PDF 첫 페이지 미리보기 썸네일용)
+let _pdfjsPromise = null;
+function loadPdfJs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if (_pdfjsPromise) return _pdfjsPromise;
+  _pdfjsPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = () => {
+      try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; } catch (e) {}
+      resolve(window.pdfjsLib);
+    };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return _pdfjsPromise;
+}
+
+// 화면에 있는 .pdf-thumb 캔버스에 PDF 첫 페이지를 그림
+function renderPdfThumbs() {
+  const canvases = document.querySelectorAll('canvas.pdf-thumb:not([data-rendered])');
+  if (canvases.length === 0) return;
+  loadPdfJs().then((pdfjsLib) => {
+    canvases.forEach((canvas) => {
+      const url = canvas.getAttribute('data-pdf');
+      if (!url) return;
+      canvas.setAttribute('data-rendered', '1');
+      pdfjsLib.getDocument(url).promise
+        .then((pdf) => pdf.getPage(1))
+        .then((page) => {
+          const vp0 = page.getViewport({ scale: 1 });
+          const targetW = 360;
+          const scale = targetW / vp0.width;
+          const viewport = page.getViewport({ scale });
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          return page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        })
+        .catch(() => { canvas.removeAttribute('data-rendered'); });
+    });
+  }).catch(() => {});
+}
+
 // ===== 현장 갤러리 =====
 (function () {
   const grid = document.getElementById('gallery-grid');
@@ -136,6 +179,7 @@ function hkEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').rep
       art.setAttribute('data-type', it.type || 'file');
       let thumb;
       if (isImg) thumb = `<div class="resource-thumb"><img src="${hkEsc(it.file)}" alt="${hkEsc(it.title)}" loading="lazy" /><span class="resource-badge">이미지</span></div>`;
+      else if (isPdf) thumb = `<div class="resource-thumb resource-thumb-pdf"><canvas class="pdf-thumb" data-pdf="${hkEsc(it.file)}"></canvas><span class="resource-badge">PDF</span></div>`;
       else thumb = `<div class="resource-thumb resource-thumb-doc"><span class="doc-ext">${hkEsc((it.ext || 'FILE').toUpperCase())}</span><span class="resource-badge">자료</span></div>`;
       const preview = (isImg || isPdf) ? `<button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>` : '';
       art.innerHTML =
@@ -151,6 +195,7 @@ function hkEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').rep
       grid.appendChild(art);
     });
     if (window.HK.bindPreview) window.HK.bindPreview();
+    renderPdfThumbs();
   }
 
   window.HK.renderResources = function (items) {
