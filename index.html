@@ -518,7 +518,17 @@
     </div>
   </div>
 
-  <script src="js/main.js?v=3"></script>
-  <script src="js/admin.js?v=3"></script>
+  <script>
+    // 캐시 회피: 접속할 때마다 고유 주소로 스크립트를 불러옴 (항상 최신)
+    (function () {
+      var t = Date.now();
+      ['js/main.js', 'js/admin.js'].forEach(function (src) {
+        var s = document.createElement('script');
+        s.src = src + '?t=' + t;
+        s.async = false; // main.js → admin.js 순서 보장
+        document.body.appendChild(s);
+      });
+    })();
+  </script>
 </body>
 </html>
