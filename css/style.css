@@ -612,3 +612,13 @@ body.admin-on .admin-toolbar.admin-only { display: flex; }
 /* 앵커 이동 시 상단 고정 헤더에 제목이 가리지 않도록 보정 */
 section[id], [id="top"] { scroll-margin-top: 84px; }
 a.card { cursor: pointer; }
+
+/* PDF 첫 페이지 미리보기 썸네일 */
+.resource-thumb-pdf {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background: var(--bg-alt);
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow: hidden;
+}
+.resource-thumb-pdf .pdf-thumb { width: 100%; height: auto; display: block; }
