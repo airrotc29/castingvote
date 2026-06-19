@@ -171,8 +171,9 @@ function renderPdfThumbs() {
     grid.querySelectorAll('.resource-dynamic').forEach((n) => n.remove());
     const arr = Array.isArray(items) ? items : [];
     arr.slice().reverse().forEach((it) => {
-      const isPdf = it.type === 'pdf';
-      const isImg = it.type === 'image';
+      const lc = String(it.file || '').toLowerCase();
+      const isPdf = it.type === 'pdf' || lc.endsWith('.pdf');
+      const isImg = it.type === 'image' || /\.(jpe?g|png|gif|webp|svg)$/.test(lc);
       const art = document.createElement('article');
       art.className = 'resource-item resource-dynamic';
       art.setAttribute('data-file', it.file);
