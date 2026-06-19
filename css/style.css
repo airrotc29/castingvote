@@ -660,3 +660,32 @@ a.card { cursor: pointer; }
 .pricing-note { margin-top: 26px; text-align: center; font-size: 14px; color: var(--text-soft); font-weight: 500; }
 
 @media (max-width: 860px) { .pricing { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; } }
+
+/* ===== 홍보자료 가로형(landscape) 카드 ===== */
+.resources { grid-template-columns: repeat(2, 1fr); }
+.resource-item { flex-direction: row; align-items: stretch; }
+.resource-thumb,
+.resource-thumb-doc,
+.resource-thumb-video,
+.resource-thumb-pdf {
+  width: 150px;
+  min-width: 150px;
+  aspect-ratio: auto;
+  height: auto;
+}
+.resource-thumb img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+.resource-thumb-pdf { align-items: center; }
+.resource-thumb-pdf .pdf-thumb { width: 100%; height: auto; }
+.resource-body { padding: 18px 20px; }
+.resource-body p { margin-bottom: 14px; }
+@media (max-width: 720px) {
+  .resources { grid-template-columns: 1fr; }
+}
+@media (max-width: 420px) {
+  .resource-thumb, .resource-thumb-doc, .resource-thumb-video, .resource-thumb-pdf { width: 120px; min-width: 120px; }
+}
