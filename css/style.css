@@ -685,10 +685,21 @@ a.card { cursor: pointer; }
 .resource-body { padding: 18px 20px; }
 .resource-body p { margin-bottom: 14px; }
 @media (max-width: 720px) {
+  /* 모바일: 카드를 세로로 쌓고 썸네일을 가로(landscape)로 — 균형있는 비율 */
   .resources { grid-template-columns: 1fr; }
-}
-@media (max-width: 420px) {
-  .resource-thumb, .resource-thumb-doc, .resource-thumb-video, .resource-thumb-pdf { width: 120px; min-width: 120px; }
+  .resource-item { flex-direction: column; align-items: stretch; }
+  .resource-thumb,
+  .resource-thumb-doc,
+  .resource-thumb-video,
+  .resource-thumb-pdf {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
+  .resource-thumb img { height: 100%; }
+  .resource-thumb-pdf .pdf-thumb { height: auto; }
+  .resource-body { padding: 20px 22px; }
 }
 
 /* ===== 관리자 수정/삭제 버튼 묶음 ===== */
