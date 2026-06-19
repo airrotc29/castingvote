@@ -318,6 +318,85 @@ function renderPdfThumbs() {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 })();
 
+// ===== 투표 진행율 조회 챗봇 =====
+(function () {
+  // ▼▼▼ 투표 시스템 API 설정 (실제 값으로 변경) ▼▼▼
+  // 예: 'https://votesys.example.com/api/progress?building={building}'
+  // {building} 자리에 입력한 건물명이 들어갑니다.
+  var API_URL = '';
+  // 응답(JSON)에서 값을 읽을 필드 이름
+  var FIELD = { rate: 'rate', voted: 'voted', total: 'total' };
+  // ▲▲▲ 여기까지 ▲▲▲
+
+  var win = document.getElementById('chatWindow');
+  var form = document.getElementById('chatForm');
+  var input = document.getElementById('chatInput');
+  if (!form || !win) return;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function add(role, html) {
+    var d = document.createElement('div');
+    d.className = 'chat-msg ' + role;
+    d.innerHTML = '<div class="bubble">' + html + '</div>';
+    win.appendChild(d);
+    win.scrollTop = win.scrollHeight;
+    return d;
+  }
+
+  function resultHtml(name, rate, voted, total) {
+    rate = Math.max(0, Math.min(100, Math.round(rate)));
+    var extra = (voted != null && total != null)
+      ? '<div class="chat-sub">' + voted + ' / ' + total + '명 참여</div>' : '';
+    return '<strong>' + esc(name) + '</strong> 투표 진행율' +
+      '<div class="progress-bar"><span style="width:' + rate + '%"></span></div>' +
+      '<div class="chat-rate">' + rate + '%</div>' + extra;
+  }
+
+  function demo(name) {
+    var seed = 0; for (var i = 0; i < name.length; i++) seed += name.charCodeAt(i);
+    var rate = 30 + (seed % 65);
+    var total = 100 + (seed % 400);
+    return { rate: rate, total: total, voted: Math.round(total * rate / 100) };
+  }
+
+  async function query(name) {
+    if (!API_URL) {
+      var d = demo(name);
+      add('bot', resultHtml(name, d.rate, d.voted, d.total) +
+        '<div class="chat-note">※ 예시 데이터입니다 (투표 시스템 연결 전)</div>');
+      return;
+    }
+    var loading = add('bot', '조회 중…');
+    var bubble = loading.querySelector('.bubble');
+    try {
+      var url = API_URL.replace('{building}', encodeURIComponent(name));
+      var res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('서버 응답 오류 (' + res.status + ')');
+      var data = await res.json();
+      var obj = Array.isArray(data) ? data[0] : (data.data || data.result || data);
+      if (!obj) { bubble.innerHTML = '"' + esc(name) + '" 건물의 데이터를 찾지 못했습니다.'; return; }
+      var rate = Number(obj[FIELD.rate]);
+      var voted = obj[FIELD.voted] != null ? Number(obj[FIELD.voted]) : null;
+      var total = obj[FIELD.total] != null ? Number(obj[FIELD.total]) : null;
+      if (isNaN(rate) && voted != null && total) rate = voted / total * 100;
+      if (isNaN(rate)) { bubble.innerHTML = '진행율 정보를 해석하지 못했습니다.'; return; }
+      bubble.innerHTML = resultHtml(name, rate, voted, total);
+    } catch (e) {
+      bubble.innerHTML = '조회 중 오류가 발생했습니다.<div class="chat-note">' + esc(e.message) + '</div>';
+    }
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = input.value.trim();
+    if (!name) return;
+    add('user', esc(name));
+    input.value = '';
+    query(name);
+  });
+})();
+
 // ===== 미리보기 모달 (홍보자료 · 견적서 공용) =====
 (function () {
   const previewer = document.getElementById('previewer');

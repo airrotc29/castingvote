@@ -37,6 +37,7 @@
         </button>
         <ul class="nav-list" id="navList">
           <li><a href="#about">소개</a></li>
+          <li><a href="#progress">진행율 조회</a></li>
           <li><a href="#posts">공지·소식</a></li>
           <li><a href="#gallery">현장 갤러리</a></li>
           <li><a href="#resources">홍보자료</a></li>
@@ -87,6 +88,28 @@
           <h3>열린 소통</h3>
           <p>궁금한 점이나 제안 사항은 언제든지 온라인 문의를 통해 전달해 주세요.</p>
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 투표 진행율 조회 챗봇 ===== -->
+  <section class="section section-alt" id="progress">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">LIVE</span>
+        <h2 class="section-title">투표 진행율 조회</h2>
+        <p class="section-lead">건물명을 입력하면 현재 투표 진행율을 알려드립니다.</p>
+      </div>
+      <div class="chatbot">
+        <div class="chat-window" id="chatWindow">
+          <div class="chat-msg bot">
+            <div class="bubble">안녕하세요! 조회하실 <b>건물명</b>을 입력해 주세요. 예) ○○아파트</div>
+          </div>
+        </div>
+        <form class="chat-input" id="chatForm">
+          <input type="text" id="chatInput" placeholder="건물명을 입력하세요" autocomplete="off" />
+          <button type="submit" class="btn btn-primary">조회</button>
+        </form>
       </div>
     </div>
   </section>
