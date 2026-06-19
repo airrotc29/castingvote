@@ -360,28 +360,63 @@ function renderPdfThumbs() {
     return { rate: rate, total: total, voted: Math.round(total * rate / 100) };
   }
 
-  async function query(name) {
-    if (!API_URL) {
+  // 진행율 데이터 파일 (투표 시스템에서 내보낸 현황을 변환해 올림)
+  var DATA_URL = 'assets/data/progress.json';
+  var _cache = null;
+  function norm(s) { return String(s == null ? '' : s).replace(/\s+/g, '').toLowerCase(); }
+  async function loadData() {
+    if (_cache) return _cache;
+    try { var r = await fetch(DATA_URL, { cache: 'no-store' }); _cache = r.ok ? await r.json() : []; }
+    catch (e) { _cache = []; }
+    if (!Array.isArray(_cache)) _cache = [];
+    return _cache;
+  }
+
+  async function queryApi(name, bubble) {
+    var url = API_URL.replace('{building}', encodeURIComponent(name));
+    var res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error('서버 응답 오류 (' + res.status + ')');
+    var data = await res.json();
+    var obj = Array.isArray(data) ? data[0] : (data.data || data.result || data);
+    if (!obj) { bubble.innerHTML = '"' + esc(name) + '" 건물의 데이터를 찾지 못했습니다.'; return; }
+    var rate = Number(obj[FIELD.rate]);
+    var voted = obj[FIELD.voted] != null ? Number(obj[FIELD.voted]) : null;
+    var total = obj[FIELD.total] != null ? Number(obj[FIELD.total]) : null;
+    if (isNaN(rate) && voted != null && total) rate = voted / total * 100;
+    if (isNaN(rate)) { bubble.innerHTML = '진행율 정보를 해석하지 못했습니다.'; return; }
+    bubble.innerHTML = resultHtml(name, rate, voted, total);
+  }
+
+  async function queryFile(name, bubble) {
+    var list = await loadData();
+    if (list.length === 0) {
       var d = demo(name);
-      add('bot', resultHtml(name, d.rate, d.voted, d.total) +
-        '<div class="chat-note">※ 예시 데이터입니다 (투표 시스템 연결 전)</div>');
+      bubble.innerHTML = resultHtml(name, d.rate, d.voted, d.total) +
+        '<div class="chat-note">※ 예시 데이터입니다 (진행율 파일 등록 전)</div>';
       return;
     }
+    var key = norm(name);
+    var item = list.find(function (x) { return norm(x.name) === key; }) ||
+      list.find(function (x) { return norm(x.name).indexOf(key) >= 0 || (key && key.indexOf(norm(x.name)) >= 0); });
+    if (!item) {
+      bubble.innerHTML = '"' + esc(name) + '" 건물의 진행율 정보를 찾지 못했습니다.' +
+        '<div class="chat-note">건물명을 정확히 입력했는지 확인해 주세요.</div>';
+      return;
+    }
+    var voted = item.voted != null ? Number(item.voted) : null;
+    var total = item.total != null ? Number(item.total) : null;
+    var rate = item.rate != null ? Number(item.rate) : (voted != null && total ? voted / total * 100 : NaN);
+    if (isNaN(rate)) { bubble.innerHTML = '진행율 정보를 해석하지 못했습니다.'; return; }
+    bubble.innerHTML = resultHtml(name, rate, voted, total) +
+      (item.updated ? '<div class="chat-note">기준: ' + esc(item.updated) + '</div>' : '');
+  }
+
+  async function query(name) {
     var loading = add('bot', '조회 중…');
     var bubble = loading.querySelector('.bubble');
     try {
-      var url = API_URL.replace('{building}', encodeURIComponent(name));
-      var res = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error('서버 응답 오류 (' + res.status + ')');
-      var data = await res.json();
-      var obj = Array.isArray(data) ? data[0] : (data.data || data.result || data);
-      if (!obj) { bubble.innerHTML = '"' + esc(name) + '" 건물의 데이터를 찾지 못했습니다.'; return; }
-      var rate = Number(obj[FIELD.rate]);
-      var voted = obj[FIELD.voted] != null ? Number(obj[FIELD.voted]) : null;
-      var total = obj[FIELD.total] != null ? Number(obj[FIELD.total]) : null;
-      if (isNaN(rate) && voted != null && total) rate = voted / total * 100;
-      if (isNaN(rate)) { bubble.innerHTML = '진행율 정보를 해석하지 못했습니다.'; return; }
-      bubble.innerHTML = resultHtml(name, rate, voted, total);
+      if (API_URL) await queryApi(name, bubble);
+      else await queryFile(name, bubble);
     } catch (e) {
       bubble.innerHTML = '조회 중 오류가 발생했습니다.<div class="chat-note">' + esc(e.message) + '</div>';
     }
