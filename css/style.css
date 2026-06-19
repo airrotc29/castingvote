@@ -739,3 +739,20 @@ body.admin-on .admin-ctrls.admin-only { display: flex; }
 .chat-input input { flex: 1; padding: 12px 15px; border: 1px solid var(--line); border-radius: 999px; font-size: 15px; font-family: inherit; }
 .chat-input input:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
 .chat-input .btn { padding: 12px 22px; }
+
+/* ===== 챗봇 안건별 집계 ===== */
+.chat-msg.bot .bubble { max-width: 92%; }
+.agenda-block { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+.agenda-head { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.agenda { margin-bottom: 14px; }
+.agenda-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+.agenda-opt { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12px; }
+.ao-label { color: var(--text-soft); }
+.ao-bar { height: 8px; background: #eef1f5; border-radius: 999px; overflow: hidden; }
+.ao-bar i { display: block; height: 100%; border-radius: 999px; transition: width .5s ease; }
+.ao-val { color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ao-yes .ao-bar i { background: var(--blue); }
+.ao-yes .ao-label { color: var(--blue); font-weight: 700; }
+.ao-no .ao-bar i { background: #e2484d; }
+.ao-no .ao-label { color: #e2484d; font-weight: 700; }
+.ao-none .ao-bar i { background: #b8c1cc; }

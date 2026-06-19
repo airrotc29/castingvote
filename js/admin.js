@@ -496,6 +496,30 @@
     return null;
   }
 
+  function parseAgendas(rows) {
+    var hi = -1;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && String(rows[i][0]).trim() === '안건순번') { hi = i; break; }
+    }
+    if (hi < 0) return [];
+    var map = {}, order = [];
+    for (var j = hi + 1; j < rows.length; j++) {
+      var r = rows[j];
+      if (!r) continue;
+      var no = r[0], title = r[1], opt = r[2];
+      if (no == null || opt == null || String(opt).trim() === '') continue;
+      var key = String(no);
+      if (!map[key]) { map[key] = { no: Number(no) || no, title: String(title || '').trim(), options: [] }; order.push(key); }
+      map[key].options.push({
+        label: String(opt).trim(),
+        count: r[5] != null ? Number(r[5]) : null,   // 합계_명
+        pct: r[6] != null ? Number(r[6]) : null,      // 투표자수기준_전체대비(%)
+        areaPct: r[10] != null ? Number(r[10]) : null // 면적기준_전체대비(%)
+      });
+    }
+    return order.map(function (k) { return map[k]; });
+  }
+
   function parseReport(rows) {
     var nameRow = findCell(rows, '건물명');
     var titleRow = findCell(rows, '투표명');
@@ -510,6 +534,7 @@
       voted: rt.voted, total: rt.total, rate: Math.round(rt.rate * 10) / 10,
       status: statusRow ? String(statusRow[1]).trim() : '',
       updated: updRow ? String(updRow[1]).trim() : '',
+      agendas: parseAgendas(rows),
     };
   }
 
