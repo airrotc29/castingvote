@@ -267,21 +267,22 @@ a { color: inherit; text-decoration: none; }
   align-items: center; justify-content: center;
   gap: 18px;
   background: rgba(7, 18, 33, .92);
-  padding: 24px;
+  padding: 14px;
+  gap: 10px;
 }
 .previewer.open { display: flex; }
-.previewer-stage { width: 100%; max-width: 820px; max-height: 78vh; display: flex; justify-content: center; }
+.previewer-stage { width: 100%; max-width: 1400px; max-height: 88vh; display: flex; justify-content: center; }
 .previewer-stage img,
 .previewer-stage iframe {
   width: 100%;
-  max-height: 78vh;
+  max-height: 88vh;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #fff;
   box-shadow: var(--shadow-lg);
   object-fit: contain;
 }
-.previewer-stage iframe { height: 78vh; }
+.previewer-stage iframe { height: 88vh; }
 .previewer-close {
   position: absolute; top: 20px; right: 26px;
   background: none; border: none; color: #fff;
@@ -689,3 +690,17 @@ a.card { cursor: pointer; }
 @media (max-width: 420px) {
   .resource-thumb, .resource-thumb-doc, .resource-thumb-video, .resource-thumb-pdf { width: 120px; min-width: 120px; }
 }
+
+/* ===== 관리자 수정/삭제 버튼 묶음 ===== */
+.admin-ctrls { position: absolute; top: 8px; right: 8px; z-index: 3; gap: 6px; }
+body.admin-on .admin-ctrls.admin-only { display: flex; }
+.admin-edit, .admin-del {
+  position: static; top: auto; right: auto;
+  border: none; padding: 5px 11px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; cursor: pointer; color: #fff;
+}
+.admin-edit { background: rgba(28,95,196,.92); }
+.admin-edit:hover { background: #1850a8; }
+.admin-del { background: rgba(226,72,77,.92); }
+.admin-del:hover { background: #c5363b; }
+.post-item .admin-ctrls { top: 14px; right: 14px; }
