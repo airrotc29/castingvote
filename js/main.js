@@ -396,8 +396,14 @@ function renderPdfThumbs() {
       return;
     }
     var key = norm(name);
-    var item = list.find(function (x) { return norm(x.name) === key; }) ||
-      list.find(function (x) { return norm(x.name).indexOf(key) >= 0 || (key && key.indexOf(norm(x.name)) >= 0); });
+    function hit(x) {
+      var n = norm(x.name), t = norm(x.voteTitle);
+      if (n === key || t === key) return true;
+      if (n && (n.indexOf(key) >= 0 || key.indexOf(n) >= 0)) return true;
+      if (t && t.indexOf(key) >= 0) return true;
+      return false;
+    }
+    var item = list.find(function (x) { return norm(x.name) === key; }) || list.find(hit);
     if (!item) {
       bubble.innerHTML = '"' + esc(name) + '" 건물의 진행율 정보를 찾지 못했습니다.' +
         '<div class="chat-note">건물명을 정확히 입력했는지 확인해 주세요.</div>';
@@ -407,8 +413,11 @@ function renderPdfThumbs() {
     var total = item.total != null ? Number(item.total) : null;
     var rate = item.rate != null ? Number(item.rate) : (voted != null && total ? voted / total * 100 : NaN);
     if (isNaN(rate)) { bubble.innerHTML = '진행율 정보를 해석하지 못했습니다.'; return; }
-    bubble.innerHTML = resultHtml(name, rate, voted, total) +
-      (item.updated ? '<div class="chat-note">기준: ' + esc(item.updated) + '</div>' : '');
+    var meta = '';
+    if (item.status) meta += '상태: ' + esc(item.status) + ' · ';
+    if (item.updated) meta += '기준: ' + esc(item.updated);
+    bubble.innerHTML = resultHtml(item.name || name, rate, voted, total) +
+      (meta ? '<div class="chat-note">' + meta + '</div>' : '');
   }
 
   async function query(name) {

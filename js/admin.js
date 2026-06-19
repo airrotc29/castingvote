@@ -464,4 +464,108 @@
     } catch (e) { hint($('resourceEditStatus'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });
+
+  // ---------- 투표 진행율 엑셀 업로드 ----------
+  function nameKey(s) { return String(s == null ? '' : s).replace(/\s+/g, '').toLowerCase(); }
+
+  function loadXlsxLib() {
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload = function () { resolve(window.XLSX); };
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  function findCell(rows, label) {
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && String(rows[i][0]).trim() === label) return rows[i];
+    }
+    return null;
+  }
+  function findRate(rows) {
+    // '투표자 수 기준' 행 중 숫자 값이 있는 행 (참여율 요약 표)
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (r && String(r[0]).indexOf('투표자 수 기준') >= 0 && typeof r[1] === 'number') {
+        return { rate: r[1], voted: Number(r[2]), total: Number(r[3]) };
+      }
+    }
+    return null;
+  }
+
+  function parseReport(rows) {
+    var nameRow = findCell(rows, '건물명');
+    var titleRow = findCell(rows, '투표명');
+    var updRow = findCell(rows, '엑셀 생성 일시 (KST)');
+    var statusRow = findCell(rows, '상태');
+    var rt = findRate(rows);
+    if (!nameRow || !nameRow[1]) throw new Error("'건물명'을 찾지 못했습니다. (개요·집계 시트인지 확인)");
+    if (!rt) throw new Error("'참여율 요약'을 찾지 못했습니다.");
+    return {
+      name: String(nameRow[1]).trim(),
+      voteTitle: titleRow ? String(titleRow[1]).trim() : '',
+      voted: rt.voted, total: rt.total, rate: Math.round(rt.rate * 10) / 10,
+      status: statusRow ? String(statusRow[1]).trim() : '',
+      updated: updRow ? String(updRow[1]).trim() : '',
+    };
+  }
+
+  $('addProgressBtn') && $('addProgressBtn').addEventListener('click', function () {
+    hint($('progressStatus'), '', ''); $('progressFile').value = '';
+    openModal('progressModal'); renderProgressList();
+  });
+
+  $('progressFile') && $('progressFile').addEventListener('change', async function () {
+    var file = this.files[0];
+    if (!file) return;
+    hint($('progressStatus'), '엑셀을 읽는 중…', '');
+    try {
+      var XLSX = await loadXlsxLib();
+      var buf = await file.arrayBuffer();
+      var wb = XLSX.read(buf, { type: 'array' });
+      var ws = wb.Sheets['개요_및_집계'] || wb.Sheets[wb.SheetNames[0]];
+      var rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true });
+      var entry = parseReport(rows);
+      hint($('progressStatus'), '"' + entry.name + '" 저장 중…', '');
+      var next = await mutateJson('assets/data/progress.json', function (items) {
+        var idx = items.findIndex(function (x) { return nameKey(x.name) === nameKey(entry.name); });
+        if (idx >= 0) items[idx] = entry; else items.push(entry);
+        return items;
+      }, '진행율 갱신: ' + entry.name);
+      hint($('progressStatus'), '완료! ' + entry.name + ' — ' + entry.voted + '/' + entry.total + '명 (' + entry.rate + '%) (반영까지 1~2분)', 'success');
+      renderProgressList(next);
+    } catch (e) {
+      hint($('progressStatus'), '오류: ' + e.message, 'error');
+    }
+  });
+
+  async function renderProgressList(list) {
+    var box = $('progressList');
+    if (!box) return;
+    box.textContent = '불러오는 중…';
+    try {
+      if (!list) list = (await loadJson('assets/data/progress.json')).items;
+      if (!list || list.length === 0) { box.textContent = '아직 등록된 진행율이 없습니다.'; return; }
+      box.innerHTML = '';
+      list.slice().reverse().forEach(function (it) {
+        var row = document.createElement('div');
+        row.className = 'admin-current-item';
+        row.innerHTML = '<span><b>' + (it.name || '') + '</b> — ' + (it.voted != null ? it.voted + '/' + it.total + '명 ' : '') + '(' + (it.rate != null ? it.rate : '?') + '%)</span>';
+        var del = document.createElement('button');
+        del.className = 'btn btn-sm btn-outline'; del.textContent = '삭제';
+        del.addEventListener('click', async function () {
+          if (!confirm('"' + it.name + '" 진행율을 삭제할까요?')) return;
+          try {
+            var next = await mutateJson('assets/data/progress.json', function (items) { return items.filter(function (x) { return nameKey(x.name) !== nameKey(it.name); }); }, '진행율 삭제: ' + it.name);
+            renderProgressList(next);
+          } catch (e) { alert('삭제 오류: ' + e.message); }
+        });
+        row.appendChild(del);
+        box.appendChild(row);
+      });
+    } catch (e) { box.textContent = '목록 오류: ' + e.message; }
+  }
 })();
