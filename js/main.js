@@ -211,6 +211,26 @@ function renderPdfThumbs() {
   window.HK.renderResources();
 })();
 
+// ===== 위탁계약서 파일 (docs.json) =====
+(function () {
+  var link = document.getElementById('consignmentLink');
+  var extEl = document.getElementById('consignmentExt');
+  if (!link) return;
+  function apply(docs) {
+    var c = docs && docs.consignment;
+    if (c && c.file) {
+      link.href = c.file;
+      if (extEl && c.ext) extEl.textContent = String(c.ext).toUpperCase();
+    }
+  }
+  window.HK.renderConsignment = function (docs) {
+    if (docs) return apply(docs);
+    fetch('assets/data/docs.json', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : {}; }).then(apply).catch(function () {});
+  };
+  window.HK.renderConsignment();
+})();
+
 // ===== 투표 영상 (videos.json + 유튜브 임베드) =====
 (function () {
   const card = document.getElementById('videoCard');
@@ -240,15 +260,20 @@ function renderPdfThumbs() {
   }
 
   function play(video) {
-    const id = youtubeId(video.url);
-    player.innerHTML =
-      `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" ` +
-      `title="${(video.title || '투표 영상').replace(/"/g, '')}" frameborder="0" ` +
-      `allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ` +
-      `allowfullscreen></iframe>`;
+    if (video.file) {
+      player.innerHTML = '<video src="' + String(video.file).replace(/"/g, '&quot;') + '" controls autoplay playsinline style="width:100%;height:100%;background:#000"></video>';
+    } else {
+      const id = youtubeId(video.url);
+      player.innerHTML =
+        `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" ` +
+        `title="${(video.title || '투표 영상').replace(/"/g, '')}" frameborder="0" ` +
+        `allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ` +
+        `allowfullscreen></iframe>`;
+    }
     titleEl.textContent = video.title || '';
     listEl.querySelectorAll('.videomodal-thumb').forEach((t) => t.classList.remove('active'));
-    const active = listEl.querySelector(`[data-url="${video.url}"]`);
+    const key = video.url || video.file;
+    const active = listEl.querySelector('[data-key="' + (key || '').replace(/"/g, '&quot;') + '"]');
     if (active) active.classList.add('active');
   }
 
@@ -259,10 +284,11 @@ function renderPdfThumbs() {
       const item = document.createElement('button');
       item.type = 'button';
       item.className = 'videomodal-thumb';
-      item.dataset.url = v.url;
-      item.innerHTML =
-        `<img src="${thumb(id)}" alt="${(v.title || '영상').replace(/"/g, '')}" loading="lazy" />` +
-        `<span>${v.title || '제목 없음'}</span>`;
+      item.dataset.key = v.url || v.file || '';
+      const thumbHtml = id
+        ? `<img src="${thumb(id)}" alt="${(v.title || '영상').replace(/"/g, '')}" loading="lazy" />`
+        : `<span class="vthumb-file">▶</span>`;
+      item.innerHTML = thumbHtml + `<span>${v.title || '제목 없음'}</span>`;
       item.addEventListener('click', () => play(v));
       listEl.appendChild(item);
     });
@@ -293,8 +319,8 @@ function renderPdfThumbs() {
     const t = document.getElementById('videoCardThumb');
     if (videos.length > 0) {
       const id = youtubeId(videos[0].url);
-      t.style.backgroundImage = `url(${thumb(id)})`;
-      t.classList.add('has-thumb');
+      if (id) { t.style.backgroundImage = `url(${thumb(id)})`; t.classList.add('has-thumb'); }
+      else { t.style.backgroundImage = ''; t.classList.remove('has-thumb'); }
       if (cardDesc) cardDesc.textContent = `총 ${videos.length}개의 영상을 확인하세요.`;
     } else {
       t.style.backgroundImage = '';

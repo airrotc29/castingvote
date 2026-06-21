@@ -245,10 +245,11 @@
         const id = window.HK.youtubeId ? window.HK.youtubeId(v.url) : '';
         const row = document.createElement('div');
         row.className = 'admin-current-item';
-        row.innerHTML = `<img src="https://img.youtube.com/vi/${id}/default.jpg" /><span>${v.title || '(제목 없음)'}</span>`;
+        var thumb = id ? '<img src="https://img.youtube.com/vi/' + id + '/default.jpg" />' : '<img src="data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2264%22 height=%2248%22%3E%3Crect width=%2264%22 height=%2248%22 fill=%22%230f2a4a%22/%3E%3Ctext x=%2232%22 y=%2230%22 fill=%22white%22 font-size=%2220%22 text-anchor=%22middle%22%3E%E2%96%B6%3C/text%3E%3C/svg%3E" />';
+        row.innerHTML = thumb + '<span>' + (v.title || '(제목 없음)') + (v.file ? ' (파일)' : '') + '</span>';
         const del = document.createElement('button');
         del.className = 'btn btn-sm btn-outline'; del.textContent = '삭제';
-        del.addEventListener('click', () => deleteVideo(v.url));
+        del.addEventListener('click', () => deleteVideo(v.url || v.file, v));
         row.appendChild(del);
         box.appendChild(row);
       });
@@ -258,28 +259,79 @@
   $('videoAddSubmit') && $('videoAddSubmit').addEventListener('click', async () => {
     const url = $('videoAddUrl').value.trim();
     const title = $('videoAddTitle').value.trim();
+    const vf = $('videoAddFile') ? $('videoAddFile').files[0] : null;
     const id = window.HK.youtubeId ? window.HK.youtubeId(url) : '';
-    if (!id) { hint($('videoAddStatus'), '올바른 유튜브 주소가 아닙니다.', 'error'); return; }
+    if (!id && !vf) { hint($('videoAddStatus'), '유튜브 주소를 넣거나 동영상 파일을 선택해 주세요.', 'error'); return; }
+    if (vf && vf.size > MAX_SIZE) { hint($('videoAddStatus'), '동영상 파일이 10MB를 초과합니다.', 'error'); return; }
     const btn = $('videoAddSubmit'); btn.disabled = true;
     try {
-      const next = await mutateJson('assets/data/videos.json',
-        (items) => items.concat([{ url: 'https://youtu.be/' + id, title: title || '제목 없는 영상' }]), '영상 추가');
+      var entry;
+      if (vf) {
+        hint($('videoAddStatus'), '동영상 업로드 중…', '');
+        var path = 'assets/videos/' + Date.now() + '-' + safeName(vf.name);
+        await putContent(path, await readBase64(vf), '동영상 업로드');
+        entry = { file: path, title: title || vf.name };
+      } else {
+        entry = { url: 'https://youtu.be/' + id, title: title || '제목 없는 영상' };
+      }
+      const next = await mutateJson('assets/data/videos.json', (items) => items.concat([entry]), '영상 추가');
       hint($('videoAddStatus'), '추가됐습니다! (반영까지 1~2분)', 'success');
-      $('videoAddUrl').value = ''; $('videoAddTitle').value = '';
+      $('videoAddUrl').value = ''; $('videoAddTitle').value = ''; if ($('videoAddFile')) $('videoAddFile').value = '';
       window.HK.refreshVideos(next);
       renderVideoAdminList();
     } catch (e) { hint($('videoAddStatus'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });
 
-  async function deleteVideo(url) {
+  async function deleteVideo(key, v) {
     if (!confirm('이 영상을 삭제할까요?')) return;
     try {
-      const next = await mutateJson('assets/data/videos.json', (items) => items.filter((v) => v.url !== url), '영상 삭제');
+      const next = await mutateJson('assets/data/videos.json', (items) => items.filter((x) => (x.url || x.file) !== key), '영상 삭제');
+      if (v && v.file) await tryDeleteFile(v.file);
       window.HK.refreshVideos(next);
       renderVideoAdminList();
     } catch (e) { alert('삭제 오류: ' + e.message); }
   }
+
+  // ---------- 위탁계약서 파일 교체 (docs.json — 객체) ----------
+  async function getDocs() {
+    var data = await getContent('assets/data/docs.json');
+    if (!data) return { obj: {}, sha: null };
+    var obj = {};
+    try { obj = JSON.parse(b64ToUtf8(data.content)); } catch (e) { obj = {}; }
+    if (typeof obj !== 'object' || Array.isArray(obj) || obj === null) obj = {};
+    return { obj: obj, sha: data.sha };
+  }
+  async function mutateDocs(mutator, msg) {
+    var lastErr;
+    for (var i = 0; i < 4; i++) {
+      var d = await getDocs();
+      var next = mutator(d.obj);
+      try { await putContent('assets/data/docs.json', utf8ToB64(JSON.stringify(next, null, 2)), msg, d.sha); return next; }
+      catch (e) { lastErr = e; if (String(e.message).indexOf('(409)') >= 0) { await new Promise(function (r) { setTimeout(r, 700); }); continue; } throw e; }
+    }
+    throw lastErr;
+  }
+
+  $('consignmentReplace') && $('consignmentReplace').addEventListener('click', function () {
+    if (!TOKEN) { alert('관리자 로그인이 필요합니다.'); return; }
+    var inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.hwp,.hwpx,.pdf,.doc,.docx';
+    inp.addEventListener('change', async function () {
+      var f = inp.files[0]; if (!f) return;
+      if (f.size > MAX_SIZE) { alert('파일이 10MB를 초과합니다.'); return; }
+      try {
+        var ext = extOf(f.name);
+        var path = 'assets/resources/uploads/' + Date.now() + '-' + safeName(f.name);
+        await putContent(path, await readBase64(f), '위탁계약서 파일 교체');
+        var next = await mutateDocs(function (obj) { obj.consignment = { file: path, ext: ext, fileName: f.name }; return obj; }, '위탁계약서 갱신');
+        if (window.HK.renderConsignment) window.HK.renderConsignment(next);
+        alert('위탁계약서 파일이 교체됐습니다. (반영까지 1~2분)');
+      } catch (e) { alert('오류: ' + e.message); }
+    });
+    inp.click();
+  });
 
   // ---------- 공지·소식 글 (작성/수정) ----------
   let editPostId = null;

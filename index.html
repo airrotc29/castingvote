@@ -191,16 +191,17 @@
           </div>
         </article>
 
-        <article class="resource-item resource-doc">
+        <article class="resource-item resource-doc" id="consignmentCard">
           <div class="resource-thumb resource-thumb-doc">
-            <span class="doc-ext">HWP</span>
+            <span class="doc-ext" id="consignmentExt">HWP</span>
             <span class="resource-badge">문서</span>
           </div>
           <div class="resource-body">
             <h3>개인정보처리 위탁계약서</h3>
-            <p>표준 개인정보처리위탁 계약서(위탁서) 양식입니다. 한글(HWP) 파일로 제공됩니다.</p>
-            <div class="resource-actions">
-              <a class="btn btn-sm btn-primary btn-block" href="assets/resources/habitus-personal-info-consignment.hwp" download>다운로드 ↓</a>
+            <p>표준 개인정보처리위탁 계약서(위탁서) 양식입니다.</p>
+            <div class="resource-actions" style="flex-direction:column;gap:8px;">
+              <a class="btn btn-sm btn-primary btn-block" id="consignmentLink" href="assets/resources/habitus-personal-info-consignment.hwp" download>다운로드 ↓</a>
+              <button type="button" class="btn btn-sm btn-outline btn-block admin-only" id="consignmentReplace">파일 교체</button>
             </div>
           </div>
         </article>
@@ -238,21 +239,10 @@
       <div class="section-head">
         <span class="section-tag">QUOTE</span>
         <h2 class="section-title">견적서</h2>
-        <p class="section-lead">당사 견적서를 받아보시고, 비교를 원하시면 타사 견적서를 업로드해 주세요.</p>
+        <p class="section-lead">비교를 원하시면 타사 견적서를 업로드해 주세요. 검토 후 회신드립니다.</p>
       </div>
 
       <div class="quote-wrap">
-        <!-- 당사 견적서 받기 -->
-        <div class="quote-card">
-          <div class="quote-card-icon">📄</div>
-          <h3>당사 견적서 받기</h3>
-          <p>(주)E-CASTING VOTE의 표준 견적서를 다운로드하실 수 있습니다. 맞춤 견적이 필요하시면 문의해 주세요.</p>
-          <div class="quote-card-actions">
-            <button type="button" class="btn btn-outline js-quote-preview" data-file="assets/resources/habitus-quote.svg" data-type="image">미리보기</button>
-            <a class="btn btn-primary" href="assets/resources/habitus-quote.svg" download>견적서 다운로드 ↓</a>
-          </div>
-        </div>
-
         <!-- 타사 견적서 업로드 -->
         <div class="quote-card">
           <div class="quote-card-icon">📤</div>
@@ -389,7 +379,11 @@
     <div class="amodal-box">
       <button type="button" class="amodal-close" data-close>×</button>
       <h3>투표 영상 추가 (유튜브)</h3>
-      <input type="text" id="videoAddUrl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off" />
+      <input type="text" id="videoAddUrl" placeholder="유튜브 주소 https://youtu.be/..." autocomplete="off" />
+      <div class="amodal-or">또는</div>
+      <label class="amodal-file-label">동영상 파일 업로드 (.mp4 · 최대 10MB)
+        <input type="file" id="videoAddFile" accept="video/*" />
+      </label>
       <input type="text" id="videoAddTitle" placeholder="영상 제목" autocomplete="off" />
       <p class="form-hint" id="videoAddStatus" role="alert"></p>
       <button type="button" class="btn btn-primary btn-block" id="videoAddSubmit">영상 추가</button>
