@@ -562,6 +562,7 @@
       }, '진행율 갱신: ' + entry.name);
       hint($('progressStatus'), '완료! ' + entry.name + ' — ' + entry.voted + '/' + entry.total + '명 (' + entry.rate + '%) (반영까지 1~2분)', 'success');
       renderProgressList(next);
+      if (window.HK.renderProgress) window.HK.renderProgress(next);
     } catch (e) {
       hint($('progressStatus'), '오류: ' + e.message, 'error');
     }
@@ -586,6 +587,7 @@
           try {
             var next = await mutateJson('assets/data/progress.json', function (items) { return items.filter(function (x) { return nameKey(x.name) !== nameKey(it.name); }); }, '진행율 삭제: ' + it.name);
             renderProgressList(next);
+            if (window.HK.renderProgress) window.HK.renderProgress(next);
           } catch (e) { alert('삭제 오류: ' + e.message); }
         });
         row.appendChild(del);

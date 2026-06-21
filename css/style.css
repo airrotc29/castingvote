@@ -756,3 +756,29 @@ body.admin-on .admin-ctrls.admin-only { display: flex; }
 .ao-no .ao-bar i { background: #e2484d; }
 .ao-no .ao-label { color: #e2484d; font-weight: 700; }
 .ao-none .ao-bar i { background: #b8c1cc; }
+
+/* ===== 투표 진행율 카드 목록 ===== */
+.progress-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 860px; margin: 0 auto; }
+.prog-card {
+  text-align: left; cursor: pointer;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 22px 24px; box-shadow: var(--shadow);
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+.prog-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.prog-name { font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.prog-status { font-size: 11px; font-weight: 700; color: #fff; background: var(--blue); padding: 2px 8px; border-radius: 999px; }
+.prog-bar { height: 12px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+.prog-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--blue-light)); border-radius: 999px; transition: width .5s ease; }
+.prog-rate { font-size: 24px; font-weight: 900; color: var(--blue); margin-top: 10px; display: flex; align-items: baseline; gap: 8px; }
+.prog-rate small { font-size: 13px; font-weight: 500; color: var(--text-soft); }
+.prog-more { margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--blue); }
+
+/* 진행율 세부 모달 본문 */
+.pd-title { font-size: 22px; color: var(--navy); margin-bottom: 4px; }
+.pd-sub { font-size: 14px; color: var(--text-soft); margin-bottom: 16px; }
+.pd-rate { font-size: 40px; font-weight: 900; color: var(--blue); line-height: 1; margin-bottom: 12px; }
+.pd-meta { font-size: 14px; color: var(--text); margin-top: 8px; }
+#progressDetail .amodal-box { max-width: 560px; }
+
+@media (max-width: 640px) { .progress-list { grid-template-columns: 1fr; } }
