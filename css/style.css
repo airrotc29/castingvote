@@ -715,3 +715,44 @@ body.admin-on .admin-ctrls.admin-only { display: flex; }
 .admin-del { background: rgba(226,72,77,.92); }
 .admin-del:hover { background: #c5363b; }
 .post-item .admin-ctrls { top: 14px; right: 14px; }
+
+/* ===== 투표 진행율 챗봇 ===== */
+.chatbot {
+  max-width: 640px; margin: 0 auto;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+}
+.chat-window { padding: 22px; min-height: 240px; max-height: 420px; overflow-y: auto; background: var(--bg-alt); }
+.chat-msg { display: flex; margin-bottom: 14px; }
+.chat-msg.user { justify-content: flex-end; }
+.chat-msg .bubble {
+  max-width: 80%; padding: 13px 16px; border-radius: 14px; font-size: 15px; line-height: 1.6;
+}
+.chat-msg.bot .bubble { background: #fff; border: 1px solid var(--line); color: var(--text); border-top-left-radius: 4px; }
+.chat-msg.user .bubble { background: linear-gradient(135deg, var(--blue), var(--blue-light)); color: #fff; border-top-right-radius: 4px; }
+.chat-rate { font-size: 26px; font-weight: 900; color: var(--blue); margin-top: 6px; }
+.chat-sub { font-size: 13px; color: var(--text-soft); margin-top: 2px; }
+.chat-note { font-size: 12px; color: var(--text-soft); margin-top: 8px; }
+.progress-bar { height: 12px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-top: 10px; }
+.progress-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--blue-light)); border-radius: 999px; transition: width .5s ease; }
+.chat-input { display: flex; gap: 10px; padding: 16px; border-top: 1px solid var(--line); background: #fff; }
+.chat-input input { flex: 1; padding: 12px 15px; border: 1px solid var(--line); border-radius: 999px; font-size: 15px; font-family: inherit; }
+.chat-input input:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
+.chat-input .btn { padding: 12px 22px; }
+
+/* ===== 챗봇 안건별 집계 ===== */
+.chat-msg.bot .bubble { max-width: 92%; }
+.agenda-block { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+.agenda-head { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.agenda { margin-bottom: 14px; }
+.agenda-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+.agenda-opt { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12px; }
+.ao-label { color: var(--text-soft); }
+.ao-bar { height: 8px; background: #eef1f5; border-radius: 999px; overflow: hidden; }
+.ao-bar i { display: block; height: 100%; border-radius: 999px; transition: width .5s ease; }
+.ao-val { color: var(--text); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ao-yes .ao-bar i { background: var(--blue); }
+.ao-yes .ao-label { color: var(--blue); font-weight: 700; }
+.ao-no .ao-bar i { background: #e2484d; }
+.ao-no .ao-label { color: #e2484d; font-weight: 700; }
+.ao-none .ao-bar i { background: #b8c1cc; }
