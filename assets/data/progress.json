@@ -57,5 +57,88 @@
         ]
       }
     ]
+  },
+  {
+    "name": "훼미리타운 제에이동",
+    "voteTitle": "훼미리타운 A동 관리단 총회 안내 및 전자투표",
+    "voted": 45,
+    "total": 78,
+    "rate": 57.7,
+    "status": "진행중",
+    "updated": "2026. 06. 22. 08:10:44",
+    "agendas": [
+      {
+        "no": 1,
+        "title": "관리단대표(관리인) 선출의 건 (후보자 정0곤)",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 42,
+            "pct": 53.8,
+            "areaPct": 59.4
+          },
+          {
+            "label": "반대",
+            "count": 3,
+            "pct": 3.8,
+            "areaPct": 3.9
+          },
+          {
+            "label": "미투표",
+            "count": 33,
+            "pct": 42.3,
+            "areaPct": 36.6
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "관리위원 선출의 건 (후보자 김0애)",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 41,
+            "pct": 52.6,
+            "areaPct": 58.3
+          },
+          {
+            "label": "반대",
+            "count": 4,
+            "pct": 5.1,
+            "areaPct": 5
+          },
+          {
+            "label": "미투표",
+            "count": 33,
+            "pct": 42.3,
+            "areaPct": 36.6
+          }
+        ]
+      },
+      {
+        "no": 3,
+        "title": "관리위원 선출의 건 (후보자 김0덕)",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 43,
+            "pct": 55.1,
+            "areaPct": 60.8
+          },
+          {
+            "label": "반대",
+            "count": 2,
+            "pct": 2.6,
+            "areaPct": 2.6
+          },
+          {
+            "label": "미투표",
+            "count": 33,
+            "pct": 42.3,
+            "areaPct": 36.6
+          }
+        ]
+      }
+    ]
   }
 ]
