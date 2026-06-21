@@ -97,25 +97,24 @@
     <div class="container">
       <div class="section-head">
         <span class="section-tag">LIVE</span>
-        <h2 class="section-title">투표 진행율 조회</h2>
-        <p class="section-lead">건물명을 입력하면 현재 투표 진행율을 알려드립니다.</p>
+        <h2 class="section-title">투표 진행율</h2>
+        <p class="section-lead">건물별 투표 진행 현황입니다. 항목을 누르면 안건별 세부 결과를 볼 수 있습니다.</p>
       </div>
       <div class="admin-toolbar admin-only">
         <button type="button" class="btn btn-primary btn-sm" id="addProgressBtn">+ 진행율 엑셀 올리기</button>
       </div>
-      <div class="chatbot">
-        <div class="chat-window" id="chatWindow">
-          <div class="chat-msg bot">
-            <div class="bubble">안녕하세요! 조회하실 <b>건물명</b>을 입력해 주세요. 예) ○○아파트</div>
-          </div>
-        </div>
-        <form class="chat-input" id="chatForm">
-          <input type="text" id="chatInput" placeholder="건물명을 입력하세요" autocomplete="off" />
-          <button type="submit" class="btn btn-primary">조회</button>
-        </form>
-      </div>
+      <div class="progress-list" id="progressGrid"></div>
+      <p class="gallery-empty" id="progressEmpty" hidden>아직 등록된 투표 진행 현황이 없습니다.</p>
     </div>
   </section>
+
+  <!-- 투표 진행율 세부 모달 -->
+  <div class="amodal" id="progressDetail" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" id="progressDetailClose">×</button>
+      <div id="progressDetailBody"></div>
+    </div>
+  </div>
 
   <!-- ===== 공지·소식 ===== -->
   <section class="section" id="posts">
