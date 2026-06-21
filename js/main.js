@@ -353,6 +353,28 @@ function renderPdfThumbs() {
       '<div class="chat-rate">' + rate + '%</div>' + extra;
   }
 
+  function agendasHtml(ags) {
+    if (!ags || !ags.length) return '';
+    var h = '<div class="agenda-block"><div class="agenda-head">안건별 집계</div>';
+    ags.forEach(function (a) {
+      h += '<div class="agenda"><div class="agenda-title">[' + esc(a.no) + '] ' + esc(a.title) + '</div>';
+      (a.options || []).forEach(function (o) {
+        var pct = o.pct != null ? Number(o.pct) : 0;
+        var w = Math.max(0, Math.min(100, pct));
+        var lab = String(o.label || '');
+        var cls = lab.indexOf('찬성') >= 0 ? 'ao-yes' : (lab.indexOf('반대') >= 0 ? 'ao-no' : 'ao-none');
+        h += '<div class="agenda-opt ' + cls + '">' +
+          '<span class="ao-label">' + esc(lab) + '</span>' +
+          '<span class="ao-bar"><i style="width:' + w + '%"></i></span>' +
+          '<span class="ao-val">' + (o.count != null ? esc(o.count) + '명' : '') + (o.pct != null ? ' (' + esc(o.pct) + '%)' : '') + '</span>' +
+          '</div>';
+      });
+      h += '</div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
   function demo(name) {
     var seed = 0; for (var i = 0; i < name.length; i++) seed += name.charCodeAt(i);
     var rate = 30 + (seed % 65);
@@ -417,7 +439,8 @@ function renderPdfThumbs() {
     if (item.status) meta += '상태: ' + esc(item.status) + ' · ';
     if (item.updated) meta += '기준: ' + esc(item.updated);
     bubble.innerHTML = resultHtml(item.name || name, rate, voted, total) +
-      (meta ? '<div class="chat-note">' + meta + '</div>' : '');
+      (meta ? '<div class="chat-note">' + meta + '</div>' : '') +
+      agendasHtml(item.agendas);
   }
 
   async function query(name) {
