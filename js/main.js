@@ -170,6 +170,7 @@ function renderPdfThumbs() {
 (function () {
   const grid = document.getElementById('resourceGrid');
   if (!grid) return;
+  const anchor = document.getElementById('resDynAnchor');
 
   function render(items) {
     grid.querySelectorAll('.resource-dynamic').forEach((n) => n.remove());
@@ -197,7 +198,8 @@ function renderPdfThumbs() {
         `<a class="btn btn-sm btn-primary" href="${hkEsc(it.file)}" download>다운로드 ↓</a>` +
         '</div>' + hkDelBtn('resource', it.file) +
         '</div>';
-      grid.appendChild(art);
+      if (anchor && anchor.parentNode === grid) grid.insertBefore(art, anchor);
+      else grid.appendChild(art);
     });
     if (window.HK.bindPreview) window.HK.bindPreview();
     renderPdfThumbs();
