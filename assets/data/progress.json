@@ -81,5 +81,64 @@
         ]
       }
     ]
+  },
+  {
+    "name": "훼미리타운 제비동",
+    "voteTitle": "훼미리타운 B동 관리단 총회 안내 및 전자투표",
+    "voted": 45,
+    "total": 72,
+    "rate": 62.5,
+    "status": "진행중",
+    "updated": "2026. 06. 22. 08:10:31",
+    "agendas": [
+      {
+        "no": 1,
+        "title": "관리단대표(관리인) 선출의 건 (후보자 정평곤)",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 38,
+            "pct": 52.8,
+            "areaPct": 57.2
+          },
+          {
+            "label": "반대",
+            "count": 7,
+            "pct": 9.7,
+            "areaPct": 8
+          },
+          {
+            "label": "미투표",
+            "count": 27,
+            "pct": 37.5,
+            "areaPct": 34.8
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "관리위원 선출의 건 (후보자 김석진)",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 41,
+            "pct": 56.9,
+            "areaPct": 57.3
+          },
+          {
+            "label": "반대",
+            "count": 4,
+            "pct": 5.6,
+            "areaPct": 7.9
+          },
+          {
+            "label": "미투표",
+            "count": 27,
+            "pct": 37.5,
+            "areaPct": 34.8
+          }
+        ]
+      }
+    ]
   }
 ]
