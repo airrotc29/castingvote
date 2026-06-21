@@ -368,10 +368,16 @@ function renderPdfThumbs() {
       card.type = 'button';
       card.className = 'prog-card';
       card.innerHTML =
-        '<div class="prog-name">' + esc(it.name) + (it.status ? '<span class="prog-status">' + esc(it.status) + '</span>' : '') + '</div>' +
+        '<div class="prog-top">' +
+          '<span class="prog-name">' + esc(it.name) + '</span>' +
+          (it.status ? '<span class="prog-status">' + esc(it.status) + '</span>' : '') +
+        '</div>' +
         '<div class="prog-bar"><span style="width:' + Math.max(0, Math.min(100, r)) + '%"></span></div>' +
-        '<div class="prog-rate">' + r + '%<small>' + (it.voted != null ? esc(it.voted) + ' / ' + esc(it.total) + '명' : '') + '</small></div>' +
-        '<div class="prog-more">세부 보기 ›</div>';
+        '<div class="prog-bottom">' +
+          '<span class="prog-rate-num">' + r + '%</span>' +
+          (it.voted != null ? '<span class="prog-count">' + esc(it.voted) + ' / ' + esc(it.total) + '명</span>' : '') +
+          '<span class="prog-more">세부 보기 ›</span>' +
+        '</div>';
       card.addEventListener('click', function () { openDetail(it); });
       grid.appendChild(card);
     });
