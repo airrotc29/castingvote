@@ -160,6 +160,7 @@
       if (window.HK.renderGallery) window.HK.renderGallery();
       if (window.HK.renderPosts) window.HK.renderPosts();
       if (window.HK.renderResources) window.HK.renderResources();
+      if (window.HK.renderReports) window.HK.renderReports();
     } catch (e) {
       hint($('loginStatus'), '오류: ' + e.message, 'error');
     }
@@ -172,10 +173,11 @@
     if (window.HK.renderGallery) window.HK.renderGallery();
     if (window.HK.renderPosts) window.HK.renderPosts();
     if (window.HK.renderResources) window.HK.renderResources();
+    if (window.HK.renderReports) window.HK.renderReports();
   });
 
   // 저장된 토큰이 있으면 자동 로그인
-  if (TOKEN) verifyToken(TOKEN).then((ok) => { if (ok) setAdminMode(true); });
+  if (TOKEN) verifyToken(TOKEN).then((ok) => { if (ok) { setAdminMode(true); if (window.HK.renderReports) window.HK.renderReports(); } });
 
   // ---------- 사진 올리기 ----------
   let photoFiles = [];

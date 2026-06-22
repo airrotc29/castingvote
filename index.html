@@ -37,6 +37,7 @@
         </button>
         <ul class="nav-list" id="navList">
           <li><a href="#about">소개</a></li>
+          <li><a href="#report">관리단 보고</a></li>
           <li><a href="#progress">진행율 조회</a></li>
           <li><a href="#posts">공지·소식</a></li>
           <li><a href="#gallery">현장 갤러리</a></li>
@@ -90,6 +91,69 @@
       </div>
     </div>
   </section>
+
+  <!-- ===== 관리단 구성 보고 / 본사 소통 (에이스 종합관리) ===== -->
+  <section class="section section-alt" id="report">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">에이스 종합관리</span>
+        <h2 class="section-title">관리단 구성 보고</h2>
+        <p class="section-lead">
+          각 지점사업소 관리소장님이 관리단 구성을 위한 진행 상황을 본사에 보고하고,
+          보고별 댓글로 본사와 직접 소통하는 공간입니다. 휴대폰에서 바로 보고를 올리실 수 있습니다.
+        </p>
+      </div>
+
+      <div class="report-bar">
+        <button type="button" class="btn btn-primary" id="addReportBtn">＋ 보고 올리기</button>
+        <input type="search" class="report-search" id="reportSearch" placeholder="지점·관리소장·내용 검색" />
+      </div>
+
+      <p class="report-storage-note" id="reportStorageNote" hidden></p>
+
+      <div class="report-list" id="reportList"></div>
+      <p class="gallery-empty" id="reportEmpty" hidden>아직 등록된 보고가 없습니다. 첫 보고를 올려 주세요.</p>
+    </div>
+  </section>
+
+  <!-- 보고 작성 모달 -->
+  <div class="amodal" id="reportModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3 id="reportModalTitle">관리단 구성 보고 올리기</h3>
+      <p class="amodal-help">에이스 종합관리 본사로 전달됩니다. 별도 로그인 없이 작성하실 수 있습니다.</p>
+      <input type="text" id="reportBranch" placeholder="지점·사업소명 * (예: 구로 지점사업소)" autocomplete="off" />
+      <input type="text" id="reportManager" placeholder="관리소장 성함 *" autocomplete="off" />
+      <input type="text" id="reportBuilding" placeholder="대상 건물·현장명 (선택)" autocomplete="off" />
+      <input type="text" id="reportContact" placeholder="연락처 (선택 · 본사 회신용)" autocomplete="off" />
+      <label class="field-label" for="reportStage">진행 단계</label>
+      <select id="reportStage">
+        <option value="대상 선정·준비">대상 선정·준비</option>
+        <option value="동의서 징구 중">동의서 징구 중</option>
+        <option value="집회 공고">집회 공고</option>
+        <option value="관리단 집회 개최">관리단 집회 개최</option>
+        <option value="관리규약 제정">관리규약 제정</option>
+        <option value="임원 선출">임원 선출</option>
+        <option value="구성 완료">구성 완료</option>
+        <option value="보류·이슈">보류·이슈</option>
+      </select>
+      <textarea id="reportBody" rows="6" placeholder="보고 내용 * — 진행 상황, 동의율, 다음 일정, 본사 지원 요청 사항 등을 적어 주세요."></textarea>
+      <label class="amodal-file-label">현장 사진 (선택 · 여러 장 가능)
+        <input type="file" id="reportImages" accept="image/*" multiple />
+      </label>
+      <div id="reportPhotoPreview" class="report-photo-preview"></div>
+      <p class="form-hint" id="reportStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="reportSubmit">본사로 보고 올리기</button>
+    </div>
+  </div>
+
+  <!-- 보고 상세 + 댓글 스레드 모달 -->
+  <div class="amodal" id="reportDetailModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <div id="reportDetailBody"></div>
+    </div>
+  </div>
 
   <!-- ===== 투표 진행율 조회 챗봇 ===== -->
   <section class="section section-alt" id="progress">
@@ -432,7 +496,7 @@
     // 캐시 회피: 접속할 때마다 고유 주소로 스크립트를 불러옴 (항상 최신)
     (function () {
       var t = Date.now();
-      ['js/main.js', 'js/admin.js'].forEach(function (src) {
+      ['js/main.js', 'js/admin.js', 'js/board.js'].forEach(function (src) {
         var s = document.createElement('script');
         s.src = src + '?t=' + t;
         s.async = false; // main.js → admin.js 순서 보장
