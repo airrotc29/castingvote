@@ -789,3 +789,99 @@ body.admin-on .admin-ctrls.admin-only { display: flex; }
 /* 모달 '또는' 구분, 동영상 파일 썸네일 */
 .amodal-or { text-align: center; font-size: 12px; color: var(--text-soft); margin: 6px 0 10px; position: relative; }
 .videomodal-thumb .vthumb-file { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 16/9; background: #0f2a4a; color: #fff; font-size: 22px; }
+
+/* ============================================================
+   ✦ PREMIUM 디자인 보강 (맨 아래 = 우선 적용)
+   ============================================================ */
+:root {
+  --gold: #b8932f;
+  --gold-light: #d9bd6a;
+  --ink: #16243a;
+  --shadow: 0 12px 34px rgba(15, 42, 74, 0.07);
+  --shadow-lg: 0 28px 60px rgba(15, 42, 74, 0.16);
+}
+
+body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
+
+/* 헤더 — 더 얇고 투명하게 */
+.site-header { background: rgba(255,255,255,.78); backdrop-filter: blur(18px) saturate(150%); border-bottom: 1px solid rgba(15,42,74,.07); }
+.nav-list a { font-weight: 500; }
+.nav-cta { box-shadow: 0 8px 18px rgba(15,42,74,.22); transition: transform .18s ease, background .2s ease, box-shadow .2s ease; }
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(28,95,196,.3); }
+
+/* 섹션 리듬 & 헤더 */
+.section { padding: 104px 0; }
+.section-tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  color: var(--gold); letter-spacing: 4px; font-size: 12px;
+}
+.section-tag::before, .section-tag::after {
+  content: ""; width: 26px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+}
+.section-title {
+  letter-spacing: -0.6px; font-weight: 800;
+  background: linear-gradient(120deg, var(--navy) 30%, var(--blue));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.section-title::after {
+  content: ""; display: block; width: 52px; height: 3px; margin: 20px auto 0;
+  background: linear-gradient(90deg, var(--blue), var(--gold-light)); border-radius: 3px;
+}
+.section-lead { color: #61708a; }
+
+/* 히어로 — 우아한 라이트 그라데이션 + 글로우 */
+.hero {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #ffffff, transparent 60%),
+    linear-gradient(165deg, #f5f9ff 0%, #e9f1fc 50%, #dbe8fb 100%);
+}
+.hero-overlay {
+  background-image:
+    radial-gradient(circle at 16% 22%, rgba(75,139,244,.16), transparent 40%),
+    radial-gradient(circle at 84% 78%, rgba(184,147,47,.10), transparent 44%);
+}
+.hero-logo-img { width: min(440px, 84%); filter: drop-shadow(0 10px 26px rgba(28,95,196,.22)); }
+.hero-title {
+  font-weight: 800; letter-spacing: -1px;
+  background: linear-gradient(120deg, var(--navy) 35%, var(--blue) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero-desc { color: #5a6a85; }
+
+/* 버튼 — 정교한 그라데이션 & 그림자 */
+.btn { letter-spacing: .2px; transition: transform .18s ease, box-shadow .25s ease, background .25s ease; }
+.btn-primary { background: linear-gradient(135deg, #1b54bd, #3f86f0); box-shadow: 0 12px 26px rgba(28,95,196,.32); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 36px rgba(28,95,196,.42); }
+
+/* 카드류 — 부드러운 라운드 & 입체 호버 */
+.card, .resource-item, .prog-card, .post-item, .chatbot, .contact-form, .contact-info, .amodal-box, .quote-card {
+  border-radius: 18px;
+  border-color: rgba(15,42,74,.08);
+}
+.card { padding: 40px 30px; }
+.card-icon {
+  width: 64px; height: 64px; margin: 0 auto 20px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center; font-size: 30px;
+  background: linear-gradient(135deg, #eaf2ff, #dbe8fb);
+  box-shadow: inset 0 0 0 1px rgba(28,95,196,.08);
+}
+.card:hover, .resource-item:hover, .prog-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.card h3, .resource-body h3, .post-body h3, .prog-name { letter-spacing: -0.3px; }
+
+/* 갤러리 — 라운드 통일 */
+.gallery-item { border-radius: 16px; }
+
+/* 진행율 바 — 광택 */
+.prog-bar span, .progress-bar span { background: linear-gradient(90deg, #1b54bd, #4b8bf4); }
+.prog-rate-num, .pd-rate, .chat-rate { background: linear-gradient(120deg, var(--navy), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* 푸터 — 깊고 차분하게 */
+.site-footer { background: linear-gradient(180deg, #0c2444, #081627); }
+
+/* 스크롤바(데스크탑) */
+@media (min-width: 900px) {
+  ::-webkit-scrollbar { width: 11px; }
+  ::-webkit-scrollbar-thumb { background: rgba(15,42,74,.22); border-radius: 999px; border: 3px solid #fbfcfe; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(15,42,74,.36); }
+}
