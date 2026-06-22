@@ -885,3 +885,38 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
   ::-webkit-scrollbar-thumb { background: rgba(15,42,74,.22); border-radius: 999px; border: 3px solid #fbfcfe; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(15,42,74,.36); }
 }
+
+/* ============================================================
+   ✦ 히어로: 청색 배경 + 심플 흰색 CASTING VOTE (최종 우선)
+   ============================================================ */
+.hero {
+  background: linear-gradient(150deg, #2a6fe6 0%, #1a55c4 50%, #0f3a8c 100%);
+  color: #fff;
+}
+.hero-overlay {
+  background-image:
+    radial-gradient(circle at 18% 18%, rgba(255,255,255,.12), transparent 42%),
+    radial-gradient(circle at 85% 85%, rgba(0,0,0,.18), transparent 48%);
+}
+.hero-wordmark {
+  font-size: clamp(40px, 8vw, 88px);
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+  line-height: 1.05;
+  margin: 0 auto 18px;
+  text-shadow: 0 6px 24px rgba(0,0,0,.18);
+}
+.hero-title {
+  color: rgba(255,255,255,.92) !important;
+  -webkit-text-fill-color: rgba(255,255,255,.92);
+  background: none !important;
+  font-weight: 600;
+  font-size: clamp(22px, 3.4vw, 34px);
+  letter-spacing: 0;
+}
+.hero-desc { color: rgba(255,255,255,.82); }
+.hero .btn-ghost { color: #fff; border-color: rgba(255,255,255,.65); }
+.hero .btn-ghost:hover { background: rgba(255,255,255,.14); }
+.hero .btn-primary { background: #fff; color: var(--blue); box-shadow: 0 12px 26px rgba(0,0,0,.18); }
+.hero .btn-primary:hover { background: #f0f5ff; }
