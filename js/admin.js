@@ -1,4 +1,4 @@
-// ===== E-CASTING VOTE 통합 관리자 모듈 =====
+// ===== CASTING VOTE 통합 관리자 모듈 =====
 // 토큰 로그인 → 관리자 모드 → 사진/영상/공지/홍보자료를 GitHub API로 직접 커밋
 (function () {
   const OWNER = 'airrotc29';
