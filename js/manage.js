@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v17 · 2026.06.23 (비번 ace)';
+  const APP_VERSION = 'v18 · 2026.06.23 (본사·소장 로그인)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -15,8 +15,11 @@
   const ENDPOINT = (window.ACE_REPORT_ENDPOINT || localStorage.getItem('ace_report_endpoint') || '').trim();
 
   // ---------- 로그인 (아이디/비밀번호) ----------
-  const LOGIN_ID = '소장';
-  const LOGIN_PW = 'ace';
+  // 소장: 소장/ace, 본사: 본사/본사
+  const LOGINS = [
+    { id: '소장', pw: 'ace', role: 'site' },
+    { id: '본사', pw: '본사', role: 'hq' },
+  ];
   const LOGIN_FLAG = 'ace_logged_in';
   // 비밀번호 로그인 시 GitHub 저장에 쓸 토큰(난독화 문자열). 비우면 로컬 저장만 됨.
   // 값 생성: 브라우저 콘솔에서 obfHelper('your_github_token') 실행 → 결과를 아래에 붙여넣기.
@@ -654,11 +657,13 @@
   $('loginSubmit').addEventListener('click', async () => {
     const id = ($('loginId').value || '').trim();
     const pw = $('loginPw').value || '';
-    if (id !== LOGIN_ID || pw !== LOGIN_PW) { hint($('loginHint'), '아이디 또는 비밀번호가 올바르지 않습니다.', 'error'); return; }
+    const match = LOGINS.find((c) => c.id === id && c.pw === pw);
+    if (!match) { hint($('loginHint'), '아이디 또는 비밀번호가 올바르지 않습니다.', 'error'); return; }
     // 비밀번호로 푸는 내장 토큰이 있으면 GitHub 저장 활성화
     const tok = EMBED_TOKEN_OBF ? deobf(EMBED_TOKEN_OBF) : '';
     if (tok) localStorage.setItem(TOKEN_KEY, tok); else localStorage.removeItem(TOKEN_KEY);
     localStorage.setItem(LOGIN_FLAG, '1');
+    localStorage.setItem('ace_role', match.role);
     setAdmin(true);
     hint($('loginHint'), '', ''); closeModal('loginModal');
     REPORTS = await loadReports(); renderReports(); renderStatus(); refreshNote();
