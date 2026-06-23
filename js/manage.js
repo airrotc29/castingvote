@@ -13,6 +13,12 @@
   const TO_EMAIL = 'airrotc29@habitusinc.co.kr';
   const ENDPOINT = (window.ACE_REPORT_ENDPOINT || localStorage.getItem('ace_report_endpoint') || '').trim();
 
+  // 전체 보고 열람 암호(본사 담당자 전용). 기본 암호: ace2026
+  // 변경: 새 암호의 SHA-256 해시를 아래 기본값 또는 branches.json의 "reportViewPwSha256"에 넣으면 됨.
+  const VIEW_PW_DEFAULT = 'a3b5e354c796d0bd0f8a966462c4a738858611963ff85f59d59bc9c9838eec51';
+  let VIEW_PW = window.ACE_REPORT_VIEW_PW_SHA256 || VIEW_PW_DEFAULT;
+  const VIEW_OK_KEY = 'ace_report_view_ok';
+
   const REPORT_ITEMS = [
     { k: '1', t: '관리단 구성 동정' },
     { k: '2', t: '우호 인원 포섭 결과' },
@@ -42,6 +48,11 @@
   function utf8ToB64(str) { return btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str))); }
   function b64ToUtf8(b64) { const bin = atob(b64.replace(/\s/g, '')); return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))); }
   function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  async function sha256hex(s) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  const isViewUnlocked = () => isAdmin() || localStorage.getItem(VIEW_OK_KEY) === '1';
   function todayStr(d) { d = d || new Date(); return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`; }
 
   // ---------- GitHub Contents API (본사 토큰 모드) ----------
@@ -262,10 +273,30 @@
   }
   function renderReports() {
     const list = $('reportList'), empty = $('reportEmpty');
+    const filterField = $('reportFilter') ? $('reportFilter').parentElement : null;
+
+    // 본사 담당자 전용 — 암호 잠금
+    if (!isViewUnlocked()) {
+      if (filterField) filterField.style.display = 'none';
+      empty.hidden = true;
+      list.innerHTML =
+        '<div class="info-card" style="text-align:center;">' +
+          '<div style="font-size:34px;margin-bottom:6px;">🔒</div>' +
+          '<h3 style="text-align:center;">본사 담당자 전용</h3>' +
+          '<p style="color:var(--soft);margin-bottom:12px;">전체 사업소 보고 열람은 본사 담당자 암호가 필요합니다.<br>관리소장님은 아래 ‘＋ 보고 작성’으로 보고를 올리실 수 있습니다.</p>' +
+          '<div class="field"><input type="password" id="viewPw" placeholder="본사 담당자 암호" autocomplete="off" /></div>' +
+          '<p class="hint" id="viewHint"></p>' +
+          '<button type="button" class="btn block" id="viewUnlockBtn">열람하기</button>' +
+        '</div>';
+      bindLock();
+      return;
+    }
+    if (filterField) filterField.style.display = '';
+
     const items = REPORTS.filter((r) => !reportFilter || r.branchId === reportFilter);
     list.innerHTML = '';
-    if (!items.length) { empty.hidden = false; return; }
-    empty.hidden = true;
+    if (!items.length) { empty.hidden = false; }
+    else { empty.hidden = true; }
     items.forEach((r) => {
       const cmt = (r.comments || []).length;
       const first = REPORT_ITEMS.map((it) => (r.items && r.items[it.k]) ? r.items[it.k] : '').find((x) => x) || '';
@@ -282,6 +313,29 @@
         `<div class="rc-foot"><span class="rc-cmt">💬 본사 소통 ${cmt}</span><span class="rc-open">열기 ›</span></div>`;
       list.appendChild(card);
     });
+    // 본사 토큰 로그인이 아닌 암호 열람 상태면 다시 잠글 수 있게
+    if (!isAdmin() && localStorage.getItem(VIEW_OK_KEY) === '1') {
+      const lock = document.createElement('button');
+      lock.type = 'button'; lock.className = 'btn ghost block'; lock.style.marginTop = '8px';
+      lock.textContent = '🔒 열람 잠그기';
+      lock.addEventListener('click', () => { localStorage.removeItem(VIEW_OK_KEY); renderReports(); window.scrollTo(0, 0); });
+      list.appendChild(lock);
+    }
+  }
+  async function doUnlock() {
+    const v = ($('viewPw').value || '').trim();
+    if (!v) { hint($('viewHint'), '암호를 입력해 주세요.', 'error'); return; }
+    hint($('viewHint'), '확인 중…', '');
+    try {
+      const h = await sha256hex(v);
+      if (h === VIEW_PW) { localStorage.setItem(VIEW_OK_KEY, '1'); renderReports(); }
+      else hint($('viewHint'), '암호가 일치하지 않습니다.', 'error');
+    } catch (e) { hint($('viewHint'), '오류: ' + e.message, 'error'); }
+  }
+  function bindLock() {
+    const btn = $('viewUnlockBtn'), inp = $('viewPw');
+    if (btn) btn.addEventListener('click', doUnlock);
+    if (inp) inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') doUnlock(); });
   }
   $('reportList').addEventListener('click', (e) => { const c = e.target.closest('.report-card'); if (c) openReportDetail(c.dataset.id); });
   $('reportFilter').addEventListener('change', function () { reportFilter = this.value; renderReports(); });
@@ -413,6 +467,7 @@
     try {
       const meta = await fetch(BRANCHES_PATH + '?_cb=' + Date.now(), { cache: 'no-store' }).then((r) => r.json());
       META = meta || {}; BRANCHES = Array.isArray(meta.branches) ? meta.branches : [];
+      if (!window.ACE_REPORT_VIEW_PW_SHA256 && META.reportViewPwSha256) VIEW_PW = META.reportViewPwSha256;
       if (meta.company) { $('hdrSub').textContent = `${BRANCHES.length}개 지점사업소 · 본사 ↔ 관리소장 소통`; }
     } catch (e) { BRANCHES = []; }
     renderStatus();
