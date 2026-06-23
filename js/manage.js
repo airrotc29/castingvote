@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v29 · 2026.06.23 (보고 수정 · 사업소 추가시 계정 자동생성)';
+  const APP_VERSION = 'v30 · 2026.06.23 (현황 본인한정 · 단계색상)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -111,6 +111,7 @@
   const isCentral = () => hasToken() || hasEndpoint();
   // 사업소 계정(소장)으로 로그인한 경우 그 사업소 id. 본사(hq)는 빈 문자열(전체 열람).
   function lockedBranchId() { return (localStorage.getItem('ace_role') === 'site') ? (localStorage.getItem('ace_branch') || '') : ''; }
+  function isHQ() { return localStorage.getItem('ace_role') === 'hq'; }
 
   function headers() { return { Authorization: 'Bearer ' + token(), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }; }
   function utf8ToB64(str) { return btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str))); }
@@ -354,18 +355,21 @@
   }
 
   function renderStatus() {
+    // 사업소 계정은 본인 사업소만 표시. 본사는 전체.
+    const lb = lockedBranchId();
+    const visible = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
     // 요약 통계 (단계 기준)
-    const total = BRANCHES.length;
-    const reported = BRANCHES.filter((b) => branchStage(b) !== null).length;
+    const total = visible.length;
+    const reported = visible.filter((b) => branchStage(b) !== null).length;
     const notyet = total - reported;
     $('statRow').innerHTML =
-      `<div class="stat"><b>${total}</b><span>전체 사업소</span></div>` +
+      `<div class="stat"><b>${total}</b><span>${lb ? '내 사업소' : '전체 사업소'}</span></div>` +
       `<div class="stat"><b>${reported}</b><span>보고 진행</span></div>` +
       `<div class="stat"><b>${notyet}</b><span>미보고</span></div>`;
 
     // 단계별 그룹화 (관리소장이 입력한 과제로 산출한 현재 단계)
     const buckets = {};
-    BRANCHES.forEach((b) => {
+    visible.forEach((b) => {
       const st = branchStage(b);
       const key = st == null ? '__none' : st;
       if (!buckets[key]) buckets[key] = { name: st == null ? '미보고' : st, order: stageOrder(st), list: [] };
@@ -376,7 +380,9 @@
     const wrap = $('groupWrap'); wrap.innerHTML = '';
     ordered.forEach((bk) => {
       const block = document.createElement('div'); block.className = 'group-block';
-      const cls = bk.name === '미보고' ? 'stage-none' : 'stage';
+      // 단계별 색상: 공통=slate, 1=파랑, 2=녹색, 3=주황, 4=적색, 미보고=회색
+      let cls = 'stage-none';
+      if (bk.name !== '미보고') { const o = bk.order; cls = (o >= 1 && o <= 4) ? ('stage-s' + o) : 'stage-s0'; }
       block.innerHTML = `<div class="group-head"><span class="stage-badge ${cls}">${esc(bk.name)}</span><span class="group-desc">${bk.list.length}개 사업소</span></div>`;
       bk.list.forEach((b) => {
         const cnt = REPORTS.filter((r) => r.branchId === b.id).length;
@@ -443,8 +449,8 @@
       }
     }
 
-    // 본사 담당자 — 전략 정보 수정 + 군 이동
-    if (isAdmin()) {
+    // 본사 담당자 — 전략 정보 수정 + 군 이동 (본사 계정 전용)
+    if (isHQ()) {
       h += '<button type="button" class="btn ghost block" id="branchEditBtn" style="margin-top:16px;">✏️ 전략 정보 수정 (본사)</button>';
       h += '<div class="d-sec-title" style="margin-top:18px;">본사 — 분류(군) 이동</div>' +
         '<div class="group-move" id="groupMove">' +
@@ -814,7 +820,7 @@
     pill.textContent = on ? '로그인 ✓' : '로그인';
     $('logoutBtn').style.display = on ? 'block' : 'none';
     if ($('changeCredBtn')) $('changeCredBtn').style.display = on ? 'block' : 'none';
-    if ($('addBranchBtn')) $('addBranchBtn').style.display = on ? 'inline-flex' : 'none';
+    if ($('addBranchBtn')) $('addBranchBtn').style.display = (on && isHQ()) ? 'inline-flex' : 'none';
   }
 
   // ---------- 사업소 추가 (본사 담당자) ----------
