@@ -279,9 +279,37 @@
       h += '<div class="d-sec-title">본사 대응방안</div><ul class="act-list hq">' + b.hqActions.map((a) => `<li>${esc(a)}</li>`).join('') + '</ul>';
     }
     h += `<button type="button" class="btn block" id="branchReportBtn" style="margin-top:18px;">📝 이 사업소 업무보고 작성</button>`;
+
+    // 본사 담당자 — 군 이동
+    if (isAdmin()) {
+      h += '<div class="d-sec-title" style="margin-top:18px;">본사 — 분류(군) 이동</div>' +
+        '<div class="group-move" id="groupMove">' +
+          [1, 2, 3].map((g) => `<button type="button" class="gm-btn${b.group === g ? ' active' : ''}" data-g="${g}">${g}군</button>`).join('') +
+        '</div><p class="hint" id="groupMoveHint"></p>';
+    }
+
     $('branchDetail').innerHTML = h;
     $('branchReportBtn').addEventListener('click', () => { closeModal('branchModal'); openReportForm(b.id); });
+    const gm = $('groupMove');
+    if (gm) gm.addEventListener('click', (e) => {
+      const btn = e.target.closest('.gm-btn'); if (!btn) return;
+      const g = parseInt(btn.dataset.g, 10);
+      if (g === b.group) return;
+      moveBranchGroup(b.id, g);
+    });
     openModal('branchModal');
+  }
+
+  async function moveBranchGroup(id, g) {
+    if (!hasToken()) { alert('군 이동은 본사 담당자 로그인이 필요합니다.'); return; }
+    const hintEl = $('groupMoveHint');
+    if (hintEl) hint(hintEl, `${g}군으로 이동 중…`, '');
+    try {
+      const next = await mutateBranchesObj((o) => { o.branches = (o.branches || []).map((x) => (x.id === id ? Object.assign({}, x, { group: g }) : x)); return o; }, '사업소 군 이동: ' + g + '군');
+      BRANCHES = next.branches;
+      renderStatus(); renderReportFilter();
+      openBranch(id); // 상세 갱신(이동 결과 반영)
+    } catch (e) { if (hintEl) hint(hintEl, '오류: ' + e.message, 'error'); else alert('오류: ' + e.message); }
   }
 
   // ---------- 보고 목록 ----------
