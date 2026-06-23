@@ -342,7 +342,8 @@
 
   // ---------- 보고 작성 ----------
   function openReportForm(branchId) {
-    $('rmBranch').innerHTML = BRANCHES.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+    $('rmBranch').innerHTML = '<option value="" disabled selected>사업소 선택</option>' +
+      BRANCHES.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
     if (branchId) $('rmBranch').value = branchId; else if (reportFilter) $('rmBranch').value = reportFilter;
     $('rmReporter').value = '';
     const d = new Date(); $('rmDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -461,15 +462,33 @@
     note.innerHTML = '<b>안내</b> · 이 브라우저에는 중앙 저장이 설정되어 있지 않습니다. 올리신 보고는 <b>이 기기에 기록</b>되고 본사에는 <b>메일</b>로 전달됩니다. 모든 사업소가 함께 보는 중앙 공유는 본사에 문의하세요.';
   }
 
+  // 내장 기본 사업소 목록 — branches.json 로드 실패(파일 직접 열기 등) 시에도 12개가 항상 선택되도록 보장.
+  // branches.json 이 정상 로드되면 그 데이터(상세 포함)로 대체됩니다.
+  const FALLBACK_BRANCHES = [
+    { id: 'sinhwa1', name: '신화 1', group: 1 },
+    { id: 'present', name: '프리센트', group: 1 },
+    { id: 'mastervalue', name: '마스터밸류', group: 1 },
+    { id: 'shdream', name: 'SH드림타워', group: 1 },
+    { id: 'sinhwa2', name: '신화 2차', group: 2 },
+    { id: 'ace101', name: '에이스 101', group: 2 },
+    { id: 'sejong', name: '세종에이스', group: 2 },
+    { id: 'aceavenue', name: '에이스에비뉴', group: 2 },
+    { id: 'atrium', name: '창원 아트리움시티', group: 3 },
+    { id: 'garimsuite2', name: '가림스위트 2차', group: 3 },
+    { id: 'sky3', name: '스카이 3차', group: 3 },
+    { id: 'visionpark', name: '비전파크', group: 3 },
+  ];
+
   // ---------- 초기화 ----------
   async function init() {
     $('advTags').innerHTML = ADVISORS.map((a) => `<span class="adv-name">${esc(a)}</span>`).join('');
     try {
       const meta = await fetch(BRANCHES_PATH + '?_cb=' + Date.now(), { cache: 'no-store' }).then((r) => r.json());
-      META = meta || {}; BRANCHES = Array.isArray(meta.branches) ? meta.branches : [];
+      META = meta || {};
+      BRANCHES = (meta && Array.isArray(meta.branches) && meta.branches.length) ? meta.branches : FALLBACK_BRANCHES;
       if (!window.ACE_REPORT_VIEW_PW_SHA256 && META.reportViewPwSha256) VIEW_PW = META.reportViewPwSha256;
-      if (meta.company) { $('hdrSub').textContent = `${BRANCHES.length}개 지점사업소 · 본사 ↔ 관리소장 소통`; }
-    } catch (e) { BRANCHES = []; }
+    } catch (e) { META = {}; BRANCHES = FALLBACK_BRANCHES; }
+    $('hdrSub').textContent = `${BRANCHES.length}개 지점사업소 · 본사 ↔ 관리소장 소통`;
     renderStatus();
     renderReportFilter();
     if (hasToken()) { verifyToken(token()).then((ok) => { if (ok) setAdmin(true); }); }
