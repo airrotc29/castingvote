@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v12 · 2026.06.23 (PDF 저장 기능)';
+  const APP_VERSION = 'v13 · 2026.06.23 (로그인 표기·소장 로그인)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -51,7 +51,7 @@
     const res = await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${path}`, { method: 'PUT', headers: headers(), body: JSON.stringify(body) });
     if (!res.ok) {
       if (res.status === 403) throw new Error('이 토큰에 저장소 쓰기 권한이 없습니다. (403) — 토큰을 Contents: Read and write 권한으로 재발급한 뒤 다시 로그인하세요.');
-      if (res.status === 401) throw new Error('토큰이 만료/무효입니다. (401) — 본사 로그인을 다시 하세요.');
+      if (res.status === 401) throw new Error('토큰이 만료/무효입니다. (401) — 다시 로그인하세요.');
       throw new Error('저장 실패 (' + res.status + ')');
     }
     return res.json();
@@ -149,7 +149,7 @@
     if (report._local) { const local = getLocal(); local.reports = local.reports.filter((r) => r.id !== report.id); setLocal(local); return null; }
     if (hasToken()) return mutateReports((items) => items.filter((r) => r.id !== report.id), '보고 삭제');
     if (hasEndpoint()) return callEndpoint('deleteReport', { reportId: report.id });
-    throw new Error('삭제 권한이 없습니다 (본사 로그인 필요).');
+    throw new Error('삭제 권한이 없습니다 (로그인 필요).');
   }
   async function deleteComment(reportId, commentId) {
     const local0 = getLocal();
@@ -317,7 +317,7 @@
   }
 
   async function moveBranchGroup(id, g) {
-    if (!hasToken()) { alert('군 이동은 본사 담당자 로그인이 필요합니다.'); return; }
+    if (!hasToken()) { alert('군 이동은 로그인이 필요합니다.'); return; }
     const hintEl = $('groupMoveHint');
     if (hintEl) hint(hintEl, `${g}군으로 이동 중…`, '');
     try {
@@ -332,7 +332,7 @@
   let editBranchId = null;
   function openBranchEdit(id) {
     const b = BRANCHES.find((x) => x.id === id); if (!b) return;
-    if (!hasToken()) { alert('전략 정보 수정은 본사 담당자 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
+    if (!hasToken()) { alert('전략 정보 수정은 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
     editBranchId = id;
     $('beTitle').textContent = `${b.name} — 전략 정보 수정`;
     $('beStatus').value = b.status || '';
@@ -355,7 +355,7 @@
   }
   $('beSubmit') && $('beSubmit').addEventListener('click', async () => {
     if (!editBranchId) return;
-    if (!hasToken()) { hint($('beHint'), '본사 담당자 로그인이 필요합니다.', 'error'); return; }
+    if (!hasToken()) { hint($('beHint'), '로그인이 필요합니다.', 'error'); return; }
     const patch = {
       status: $('beStatus').value.trim(),
       ownership: parseOwnership($('beOwnership').value),
@@ -393,9 +393,9 @@
       list.innerHTML =
         '<div class="info-card" style="text-align:center;">' +
           '<div style="font-size:34px;margin-bottom:6px;">🔒</div>' +
-          '<h3 style="text-align:center;">본사 담당자 전용</h3>' +
-          '<p style="color:var(--soft);margin-bottom:12px;">전체 사업소 보고 열람은 <b>본사 로그인</b>이 필요합니다.<br>관리소장님은 아래 ‘＋ 보고 작성’으로 보고를 올리실 수 있습니다.</p>' +
-          '<button type="button" class="btn block" id="goLoginBtn">본사 로그인</button>' +
+          '<h3 style="text-align:center;">로그인이 필요합니다</h3>' +
+          '<p style="color:var(--soft);margin-bottom:12px;">보고 열람·작성은 <b>로그인</b> 후 가능합니다.<br>본사·관리소장 모두 GitHub 토큰으로 로그인하면 보고가 GitHub에 저장됩니다.</p>' +
+          '<button type="button" class="btn block" id="goLoginBtn">로그인</button>' +
         '</div>';
       const gl = $('goLoginBtn'); if (gl) gl.addEventListener('click', () => { $('loginToken').value = token(); openModal('loginModal'); });
       return;
@@ -477,7 +477,7 @@
       const next = await addReport(report);
       REPORTS = next ? mergeLocal(next) : await loadReports();
       renderReports(); renderStatus();
-      hint($('rmHint'), isCentral() ? '본사로 보고가 접수되었습니다! (GitHub 저장 · 반영까지 1~2분)' : '보고가 이 기기에 저장되었습니다. (GitHub 저장은 본사 로그인 필요)', 'success');
+      hint($('rmHint'), isCentral() ? '본사로 보고가 접수되었습니다! (GitHub 저장 · 반영까지 1~2분)' : '보고가 이 기기에 저장되었습니다. (GitHub 저장은 로그인 필요)', 'success');
       setTimeout(() => closeModal('reportModal'), 1100);
     } catch (e) { hint($('rmHint'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
@@ -610,21 +610,21 @@
     document.body.classList.toggle('admin-on', on);
     const pill = $('adminPill');
     pill.classList.toggle('on', on);
-    pill.textContent = on ? '본사 ✓' : '본사';
+    pill.textContent = on ? '로그인 ✓' : '로그인';
     $('logoutBtn').style.display = on ? 'block' : 'none';
     if ($('addBranchBtn')) $('addBranchBtn').style.display = on ? 'inline-flex' : 'none';
   }
 
   // ---------- 사업소 추가 (본사 담당자) ----------
   $('addBranchBtn') && $('addBranchBtn').addEventListener('click', () => {
-    if (!hasToken()) { alert('사업소 추가는 본사 담당자 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
+    if (!hasToken()) { alert('사업소 추가는 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
     $('baName').value = ''; $('baReg').value = ''; $('baGroup').value = '3';
     hint($('baHint'), '', ''); openModal('branchAddModal');
   });
   $('baSubmit') && $('baSubmit').addEventListener('click', async () => {
     const name = $('baName').value.trim();
     if (!name) { hint($('baHint'), '사업소명을 입력해 주세요.', 'error'); return; }
-    if (!hasToken()) { hint($('baHint'), '본사 담당자 로그인이 필요합니다.', 'error'); return; }
+    if (!hasToken()) { hint($('baHint'), '로그인이 필요합니다.', 'error'); return; }
     const regVal = $('baReg').value.trim();
     const branch = {
       id: uid('b'), name, group: parseInt($('baGroup').value, 10),
@@ -662,7 +662,7 @@
     const note = $('reportNote');
     if (isCentral()) { note.hidden = true; return; }
     note.hidden = false;
-    note.innerHTML = '<b>안내</b> · 본사 로그인 전이라 보고가 <b>이 기기에만</b> 저장됩니다. GitHub에 저장해 전체가 함께 보려면 헤더의 <b>‘본사’</b> 로그인이 필요합니다.';
+    note.innerHTML = '<b>안내</b> · 로그인 전이라 보고가 <b>이 기기에만</b> 저장됩니다. GitHub에 저장해 전체가 함께 보려면 헤더의 <b>‘로그인’</b>을 눌러 토큰으로 로그인하세요. (본사·관리소장 공용)';
   }
 
   // 내장 기본 사업소 목록 — branches.json 로드 실패(파일 직접 열기 등) 시에도 12개가 항상 선택되도록 보장.
