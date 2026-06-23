@@ -90,6 +90,25 @@
     const res = await fetch(`${API}/repos/${OWNER}/${REPO}`, { headers: { Authorization: 'Bearer ' + t, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' } });
     return res.ok;
   }
+  // branches.json(객체) 읽기/변형 — 본사 토큰 모드
+  async function getBranchesObj() {
+    const data = await getContent(BRANCHES_PATH);
+    if (!data) return { obj: { branches: [] }, sha: null };
+    let obj = {}; try { obj = JSON.parse(b64ToUtf8(data.content)); } catch (e) { obj = {}; }
+    if (typeof obj !== 'object' || Array.isArray(obj) || !obj) obj = {};
+    if (!Array.isArray(obj.branches)) obj.branches = [];
+    return { obj, sha: data.sha };
+  }
+  async function mutateBranchesObj(mutator, message) {
+    let lastErr;
+    for (let i = 0; i < 4; i++) {
+      const { obj, sha } = await getBranchesObj();
+      const next = mutator(obj);
+      try { await putContent(BRANCHES_PATH, utf8ToB64(JSON.stringify(next, null, 2)), message, sha); return next; }
+      catch (e) { lastErr = e; if (String(e.message).includes('(409)')) { await new Promise((r) => setTimeout(r, 700)); continue; } throw e; }
+    }
+    throw lastErr;
+  }
 
   // ---------- 중앙 프록시 ----------
   async function callEndpoint(action, payload) {
@@ -308,7 +327,7 @@
           `<span class="rc-month">${esc(r.month || r.date)}</span>` +
           (r._local ? '<span class="rc-local">이 기기에만</span>' : '') +
         '</div>' +
-        `<div class="rc-meta">보고자 ${esc(r.reporter)} · ${esc(r.date)}</div>` +
+        `<div class="rc-meta">보고자 ${esc(r.reporter)} · ${esc(r.date)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}</div>` +
         `<div class="rc-excerpt">${esc(first)}</div>` +
         `<div class="rc-foot"><span class="rc-cmt">💬 본사 소통 ${cmt}</span><span class="rc-open">열기 ›</span></div>`;
       list.appendChild(card);
@@ -348,10 +367,26 @@
     $('rmReporter').value = '';
     const d = new Date(); $('rmDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     REPORT_ITEMS.forEach((it) => { if ($('rm' + it.k)) $('rm' + it.k).value = ''; });
+    $('rmOccTotal').value = ''; $('rmOccDone').value = ''; $('rmOccRate').value = '';
     hint($('rmHint'), '', '');
     openModal('reportModal');
   }
   $('fabReport').addEventListener('click', () => openReportForm());
+
+  // 입주율 자동 계산 (입주호실 / 전체호실)
+  function calcOcc() {
+    const t = parseInt($('rmOccTotal').value, 10);
+    const d = parseInt($('rmOccDone').value, 10);
+    if (Number.isFinite(t) && t > 0 && Number.isFinite(d) && d >= 0) {
+      const rate = Math.round((d / t) * 1000) / 10;
+      $('rmOccRate').value = rate + '%';
+      return { total: t, occupied: d, rate };
+    }
+    $('rmOccRate').value = '';
+    return null;
+  }
+  $('rmOccTotal').addEventListener('input', calcOcc);
+  $('rmOccDone').addEventListener('input', calcOcc);
 
   $('rmSubmit').addEventListener('click', async () => {
     const bId = $('rmBranch').value;
@@ -364,7 +399,8 @@
     const dv = $('rmDate').value;
     const dateStr = dv ? dv.replace(/-/g, '.') : todayStr();
     const month = dv ? dv.slice(0, 7) : '';
-    const report = { id: uid('r'), branchId: b.id, branchName: b.name, reporter, date: dateStr, month, items, ts: Date.now(), comments: [] };
+    const occupancy = calcOcc();
+    const report = { id: uid('r'), branchId: b.id, branchName: b.name, reporter, date: dateStr, month, occupancy, items, ts: Date.now(), comments: [] };
     const btn = $('rmSubmit'); btn.disabled = true;
     try {
       hint($('rmHint'), '보고를 올리는 중…', '');
@@ -385,6 +421,9 @@
     const comments = r.comments || [];
     let h = `<h2>${esc(r.branchName)} 업무보고</h2>`;
     h += `<div class="rc-meta" style="margin:6px 0 12px;">보고자 ${esc(r.reporter)} · ${esc(r.date)}${r._local ? ' · <span style="color:var(--accent);font-weight:700;">이 기기에만 저장됨</span>' : ''}</div>`;
+    if (r.occupancy) {
+      h += `<div class="r-block"><div class="bt"><span class="num zero">0</span>입주현황</div><div class="bd">입주 ${esc(r.occupancy.occupied)}호실 / 전체 ${esc(r.occupancy.total)}호실 · <b>입주율 ${esc(r.occupancy.rate)}%</b></div></div>`;
+    }
     REPORT_ITEMS.forEach((it) => {
       const v = (r.items && r.items[it.k]) ? r.items[it.k] : '';
       if (!v) return;
@@ -440,7 +479,42 @@
     pill.classList.toggle('on', on);
     pill.textContent = on ? '본사 ✓' : '본사';
     $('logoutBtn').style.display = on ? 'block' : 'none';
+    if ($('addBranchBtn')) $('addBranchBtn').style.display = on ? 'inline-flex' : 'none';
   }
+
+  // ---------- 사업소 추가 (본사 담당자) ----------
+  $('addBranchBtn') && $('addBranchBtn').addEventListener('click', () => {
+    if (!hasToken()) { alert('사업소 추가는 본사 담당자 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
+    ['baName', 'baStatus'].forEach((id) => { if ($(id)) $(id).value = ''; });
+    $('baReg').value = ''; $('baGroup').value = '3'; $('baCommittee').value = 'false';
+    $('baDev').value = '?'; $('baAbility').value = '?'; $('baAlly').value = '?';
+    hint($('baHint'), '', ''); openModal('branchAddModal');
+  });
+  $('baSubmit') && $('baSubmit').addEventListener('click', async () => {
+    const name = $('baName').value.trim();
+    if (!name) { hint($('baHint'), '사업소명을 입력해 주세요.', 'error'); return; }
+    if (!hasToken()) { hint($('baHint'), '본사 담당자 로그인이 필요합니다.', 'error'); return; }
+    const regVal = $('baReg').value.trim();
+    const branch = {
+      id: uid('b'), name, group: parseInt($('baGroup').value, 10),
+      regRate: regVal === '' ? null : Number(regVal),
+      committee: $('baCommittee').value === 'true',
+      developerRel: $('baDev').value, managerAbility: $('baAbility').value, allyRecruited: $('baAlly').value,
+      status: $('baStatus').value.trim(),
+      ownership: [], ownershipTotal: '', situation: '', managerActions: [], hqActions: [],
+    };
+    const btn = $('baSubmit'); btn.disabled = true;
+    try {
+      hint($('baHint'), '추가하는 중…', '');
+      const next = await mutateBranchesObj((o) => { o.branches = (o.branches || []).concat([branch]); return o; }, '사업소 추가: ' + name);
+      BRANCHES = next.branches;
+      renderStatus(); renderReportFilter();
+      $('hdrSub').textContent = `${BRANCHES.length}개 지점사업소 · 본사 ↔ 관리소장 소통`;
+      hint($('baHint'), '추가되었습니다! (반영까지 1~2분)', 'success');
+      setTimeout(() => closeModal('branchAddModal'), 1100);
+    } catch (e) { hint($('baHint'), '오류: ' + e.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
   $('adminPill').addEventListener('click', () => { $('loginToken').value = token(); hint($('loginHint'), '', ''); openModal('loginModal'); });
   $('loginSubmit').addEventListener('click', async () => {
     const t = $('loginToken').value.trim();

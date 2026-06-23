@@ -192,10 +192,21 @@ button { font-family: inherit; cursor: pointer; }
 }
 .r-item textarea::placeholder { color: #aab2be; font-size: 13px; }
 .r-item textarea:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
+.r-item label .num.zero { background: var(--navy); }
+/* 0번 입주현황 입력 */
+.occ-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.occ-field { display: flex; flex-direction: column; gap: 4px; }
+.occ-field span { font-size: 11.5px; font-weight: 700; color: var(--soft); }
+.occ-field input { width: 100%; padding: 11px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; font-family: inherit; text-align: center; background: #fff; }
+.occ-field input:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
+.occ-field input[readonly] { background: var(--bg); color: var(--blue); font-weight: 800; }
+/* 입주현황 표시(상세/카드) */
+.occ-badge { font-size: 11px; font-weight: 700; color: var(--blue); background: rgba(75,139,244,.12); border: 1px solid rgba(75,139,244,.3); border-radius: 999px; padding: 2px 9px; }
 .r-detail { font-size: 13px; line-height: 1.8; white-space: pre-wrap; word-break: keep-all; }
 .r-block { margin-bottom: 12px; }
 .r-block .bt { font-size: 12.5px; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
 .r-block .bt .num { width: 18px; height: 18px; border-radius: 6px; background: var(--blue); color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+.r-block .bt .num.zero { background: var(--navy); }
 .r-block .bd { font-size: 13px; color: var(--text); background: var(--bg); border-radius: 9px; padding: 9px 12px; white-space: pre-wrap; word-break: keep-all; }
 
 /* 평가 / 전략 카드 */

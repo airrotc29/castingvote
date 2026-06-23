@@ -28,6 +28,7 @@
     <section class="screen active" id="scr-status">
       <h2 class="scr-title">사업소 현황</h2>
       <p class="scr-lead">12개 지점사업소를 등기율·추진위·시행사 소통 기준으로 1·2·3군으로 분류해 관리합니다. 카드를 누르면 현황·지분율·대응방안을 볼 수 있습니다.</p>
+      <button type="button" class="btn sm" id="addBranchBtn" style="display:none;margin:0 0 12px;">＋ 사업소 추가 (본사)</button>
       <div class="stat-row" id="statRow"></div>
       <div id="groupWrap"></div>
     </section>
@@ -163,6 +164,14 @@
       <div class="field"><label>대상 사업소 *</label><select id="rmBranch"></select></div>
       <div class="field"><label>보고자(관리소장) *</label><input type="text" id="rmReporter" placeholder="예: 소장 김관리" autocomplete="off" /></div>
       <div class="field"><label>보고일</label><input type="date" id="rmDate" /></div>
+      <div class="r-item">
+        <label><span class="num zero">0</span>입주현황</label>
+        <div class="occ-row">
+          <div class="occ-field"><span>전체호실</span><input type="number" id="rmOccTotal" min="0" inputmode="numeric" placeholder="0" /></div>
+          <div class="occ-field"><span>입주호실</span><input type="number" id="rmOccDone" min="0" inputmode="numeric" placeholder="0" /></div>
+          <div class="occ-field"><span>입주율(자동)</span><input type="text" id="rmOccRate" readonly placeholder="-" /></div>
+        </div>
+      </div>
       <div class="r-item"><label><span class="num">1</span>관리단 구성 동정</label><textarea id="rm1" rows="3" placeholder="예) 405호 중심 추진위 구성 시도 중 정보 입수 / 206호 주도 단톡방(150명) 운영 중"></textarea></div>
       <div class="r-item"><label><span class="num">2</span>우호 인원 포섭 결과</label><textarea id="rm2" rows="3" placeholder="예) (포섭 완료) 관리인 205호 최관리, 위원 1504호·708호 / (진행중) 475호, 1704호…"></textarea></div>
       <div class="r-item"><label><span class="num">3</span>포섭 인원 래포 형성</label><textarea id="rm3" rows="3" placeholder="예) 관리위원(1504호) 하자 우선처리 시공사 협조 중 / 별도 통화·생일 문자 등"></textarea></div>
@@ -179,6 +188,25 @@
     <div class="modal-box">
       <button type="button" class="modal-close" data-close>×</button>
       <div id="reportDetail"></div>
+    </div>
+  </div>
+
+  <!-- 사업소 추가 모달 (본사 담당자) -->
+  <div class="modal" id="branchAddModal" aria-hidden="true">
+    <div class="modal-box">
+      <button type="button" class="modal-close" data-close>×</button>
+      <h2>사업소 추가</h2>
+      <p class="login-help">본사 담당자 전용. 추가한 사업소는 모든 사용자에게 공유됩니다. (세부 지분율·대응방안은 추후 데이터 파일에서 보완할 수 있습니다.)</p>
+      <div class="field"><label>사업소명 *</label><input type="text" id="baName" placeholder="예: 신화 3차" autocomplete="off" /></div>
+      <div class="field"><label>분류(군) *</label><select id="baGroup"><option value="1">1군</option><option value="2">2군</option><option value="3" selected>3군</option></select></div>
+      <div class="field"><label>등기율 (%) <span class="hintlabel">— 입주 전이면 비워두세요</span></label><input type="number" id="baReg" min="0" max="100" step="0.1" inputmode="decimal" placeholder="예: 65.0" /></div>
+      <div class="field"><label>추진위 구성</label><select id="baCommittee"><option value="false" selected>未구성</option><option value="true">旣구성</option></select></div>
+      <div class="field"><label>시행사 성향</label><select id="baDev"><option value="?" selected>미정(?)</option><option value="우호">우호</option></select></div>
+      <div class="field"><label>관리소장 능력</label><select id="baAbility"><option value="?" selected>미정(?)</option><option value="上">上</option><option value="下">下</option></select></div>
+      <div class="field"><label>우호세력 포섭</label><select id="baAlly"><option value="?" selected>미정(?)</option><option value="○">○</option><option value="×">×</option></select></div>
+      <div class="field"><label>현재 상황 <span class="hintlabel">(선택)</span></label><input type="text" id="baStatus" placeholder="예: 입주 전/초기 — 3군 공통 전략 적용" autocomplete="off" /></div>
+      <p class="hint" id="baHint"></p>
+      <button type="button" class="btn block" id="baSubmit">사업소 추가</button>
     </div>
   </div>
 
