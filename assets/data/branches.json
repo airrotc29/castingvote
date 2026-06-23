@@ -11,7 +11,7 @@
   "branches": [
     {
       "id": "sinhwa1",
-      "name": "신화 1차",
+      "name": "신화 1",
       "group": 1,
       "regRate": 50.0,
       "committee": true,
@@ -168,7 +168,7 @@
     },
     {
       "id": "sejong",
-      "name": "세종 에이스",
+      "name": "세종에이스",
       "group": 2,
       "regRate": 53.6,
       "committee": false,
@@ -197,7 +197,7 @@
     },
     {
       "id": "aceavenue",
-      "name": "에이스 에비뉴",
+      "name": "에이스에비뉴",
       "group": 2,
       "regRate": 81.1,
       "committee": false,
@@ -226,7 +226,7 @@
     },
     {
       "id": "atrium",
-      "name": "아트리움시티",
+      "name": "창원 아트리움시티",
       "group": 3,
       "regRate": null,
       "committee": false,
