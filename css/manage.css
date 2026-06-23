@@ -187,7 +187,7 @@ button { font-family: inherit; cursor: pointer; }
 .cmt.hq { align-self: flex-end; align-items: flex-end; }
 .cmt .who { font-size: 11px; font-weight: 700; color: var(--soft); margin-bottom: 3px; }
 .cmt.hq .who { color: var(--blue); }
-.cmt .bubble { background: #fff; border: 1px solid var(--line); border-radius: 13px; border-top-left-radius: 3px; padding: 9px 13px; font-size: 13px; line-height: 1.55; white-space: pre-wrap; word-break: keep-all; }
+.cmt .bubble { background: #fff3c4; border: 1px solid #ecd27a; border-radius: 13px; border-top-left-radius: 3px; padding: 9px 13px; font-size: 13px; line-height: 1.55; white-space: pre-wrap; word-break: keep-all; color: var(--text); }
 /* 공백 없는 긴 문자열(토큰·URL·반복문자 등)도 박스 안에서 강제 줄바꿈 */
 .cmt .bubble, .r-block .bd, .r-detail { word-break: break-all; overflow-wrap: anywhere; }
 .d-text, .d-status, .rc-excerpt, .bh-info, .own-table td, .act-list li, .rd-body { overflow-wrap: anywhere; word-break: break-word; }
