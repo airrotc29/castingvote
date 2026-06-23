@@ -530,10 +530,11 @@
     else comments.forEach((c) => {
       const hq = c.role === 'hq';
       const canDel = isAdmin() || r._local;
-      h += `<div class="cmt ${hq ? 'hq' : ''}"><span class="who">${esc(c.author)}${hq ? ' · 본사' : ''}</span><div class="bubble">${esc(c.body)}</div><span class="when">${esc(c.date)}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div>`;
+      h += `<div class="cmt ${hq ? 'hq' : ''}"><span class="who">${hq ? '본사' : '현장(소장)'}</span><div class="bubble">${esc(c.body)}</div><span class="when">${esc(c.date)}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div>`;
     });
     h += '</div>';
-    h += '<div class="cmt-form"><div class="cmt-row"><input type="text" id="cAuthor" placeholder="작성자 이름" autocomplete="off" /><select id="cRole"><option value="site">현장(소장)</option><option value="hq">본사</option></select></div>' +
+    h += '<div class="cmt-form">' +
+      '<div class="field" style="margin-bottom:8px;"><select id="cRole"><option value="site">현장(소장)</option><option value="hq">본사</option></select></div>' +
       '<div class="field" style="margin-bottom:8px;"><textarea id="cBody" rows="2" placeholder="메시지를 입력하세요"></textarea></div>' +
       '<p class="hint" id="cHint"></p><button type="button" class="btn block" id="cSubmit">댓글 남기기</button></div>';
     if (isAdmin() || r._local) h += `<button type="button" class="btn ghost block" id="rDelBtn" style="margin-top:10px;">이 보고 삭제</button>`;
@@ -542,8 +543,9 @@
     openModal('reportDetailModal');
 
     $('cSubmit').addEventListener('click', async () => {
-      const author = $('cAuthor').value.trim(), role = $('cRole').value, body = $('cBody').value.trim();
-      if (!author || !body) { hint($('cHint'), '이름과 내용을 입력해 주세요.', 'error'); return; }
+      const role = $('cRole').value, body = $('cBody').value.trim();
+      if (!body) { hint($('cHint'), '내용을 입력해 주세요.', 'error'); return; }
+      const author = role === 'hq' ? '본사' : '현장';
       const comment = { id: uid('c'), author, role, body, date: todayStr(), ts: Date.now() };
       $('cSubmit').disabled = true;
       try {
