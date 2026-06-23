@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v34 · 2026.06.23 (군 배지 검정 통일)';
+  const APP_VERSION = 'v35 · 2026.06.23 (소장 현황요약 숨김)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -362,14 +362,20 @@
     const lb = lockedBranchId();
     if ($('statusLead')) $('statusLead').style.display = lb ? 'none' : '';
     const visible = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
-    // 요약 통계 (단계 기준)
-    const total = visible.length;
-    const reported = visible.filter((b) => branchStage(b) !== null).length;
-    const notyet = total - reported;
-    $('statRow').innerHTML =
-      `<div class="stat"><b>${total}</b><span>${lb ? '내 사업소' : '전체 사업소'}</span></div>` +
-      `<div class="stat"><b>${reported}</b><span>보고 진행</span></div>` +
-      `<div class="stat"><b>${notyet}</b><span>미보고</span></div>`;
+    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시)
+    if (lb) {
+      $('statRow').style.display = 'none';
+      $('statRow').innerHTML = '';
+    } else {
+      $('statRow').style.display = '';
+      const total = visible.length;
+      const reported = visible.filter((b) => branchStage(b) !== null).length;
+      const notyet = total - reported;
+      $('statRow').innerHTML =
+        `<div class="stat"><b>${total}</b><span>전체 사업소</span></div>` +
+        `<div class="stat"><b>${reported}</b><span>보고 진행</span></div>` +
+        `<div class="stat"><b>${notyet}</b><span>미보고</span></div>`;
+    }
 
     // 단계별 그룹화 (관리소장이 입력한 과제로 산출한 현재 단계)
     const buckets = {};
