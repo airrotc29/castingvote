@@ -5,6 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
+  const APP_VERSION = 'v8 · 2026.06.23 (이름삭제·줄바꿈·암호제거)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -627,7 +628,7 @@
       META = meta || {};
       BRANCHES = (meta && Array.isArray(meta.branches) && meta.branches.length) ? meta.branches : FALLBACK_BRANCHES;
     } catch (e) { META = {}; BRANCHES = FALLBACK_BRANCHES; }
-    $('hdrSub').textContent = `${BRANCHES.length}개 지점사업소 · 본사 ↔ 관리소장 소통`;
+    $('hdrSub').textContent = `${BRANCHES.length}개 지점사업소 · ${APP_VERSION}`;
     renderStatus();
     renderReportFilter();
     if (hasToken()) { verifyToken(token()).then((ok) => { if (ok) setAdmin(true); }); }
