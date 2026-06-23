@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v10 · 2026.06.23 (본사 파랑·현장 노랑)';
+  const APP_VERSION = 'v11 · 2026.06.23 (보고작성버튼 제거·새글 강조)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -166,11 +166,14 @@
   let reportFilter = '', openReportId = null;
 
   // 새 보고(읽지 않은 보고) 추적 — 반짝임 표시용
+  // 새 보고/새 댓글 추적 — {reportId: 마지막으로 본 댓글 수}
   const SEEN_KEY = 'ace_seen_reports';
-  function getSeen() { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch (e) { return new Set(); } }
-  function markSeen(id) { const s = getSeen(); if (!s.has(id)) { s.add(id); localStorage.setItem(SEEN_KEY, JSON.stringify([...s])); } }
-  function unseenCount() { const s = getSeen(); return REPORTS.filter((r) => !s.has(r.id)).length; }
-  function branchUnseen(bid) { const s = getSeen(); return REPORTS.some((r) => r.branchId === bid && !s.has(r.id)); }
+  function getSeen() { try { const o = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; } catch (e) { return {}; } }
+  function setSeen(o) { localStorage.setItem(SEEN_KEY, JSON.stringify(o)); }
+  function isNew(r) { const s = getSeen(); const c = s[r.id]; if (c === undefined) return true; return (r.comments || []).length > c; }
+  function markSeen(r) { const s = getSeen(); s[r.id] = (r.comments || []).length; setSeen(s); }
+  function unseenCount() { return REPORTS.filter(isNew).length; }
+  function branchUnseen(bid) { return REPORTS.some((r) => r.branchId === bid && isNew(r)); }
   function updateTabDot() { const dot = $('reportTabDot'); if (dot) dot.hidden = unseenCount() === 0; }
 
   // ---------- 모달 ----------
@@ -225,9 +228,10 @@
       block.innerHTML = `<div class="group-head"><span class="group-badge g${g}">${g}군</span><span class="group-desc">${esc(META.groupCriteria && META.groupCriteria[g] || '')}</span></div>`;
       list.forEach((b) => {
         const cnt = REPORTS.filter((r) => r.branchId === b.id).length;
-        const dot = branchUnseen(b.id) ? '<span class="newdot"></span>' : '';
+        const newB = branchUnseen(b.id);
+        const dot = newB ? '<span class="newdot"></span>' : '';
         const card = document.createElement('button');
-        card.type = 'button'; card.className = `b-card g${g}`; card.dataset.id = b.id;
+        card.type = 'button'; card.className = `b-card g${g}` + (newB ? ' is-new' : ''); card.dataset.id = b.id;
         card.innerHTML =
           `<div class="b-top"><span class="b-name">${esc(b.name)}${dot}</span>` +
           `<span class="b-count">보고 ${cnt}건 ›</span></div>`;
@@ -261,18 +265,17 @@
     h += `<div class="d-sec-title">보고 이력 <span style="color:var(--soft);font-weight:600;">· ${reps.length}건 (최근순)</span></div>`;
     if (!reps.length) h += '<p class="rd-empty">아직 등록된 보고가 없습니다. 아래에서 첫 보고를 작성해 주세요.</p>';
     else {
-      const seenB = getSeen();
       h += '<div class="bh-list">';
       reps.forEach((r) => {
-        h += `<button type="button" class="bh-item" data-rid="${esc(r.id)}">` +
-          `<span class="bh-date">${esc(r.date)}${!seenB.has(r.id) ? ' <span class="new-badge">NEW</span>' : ''}</span>` +
+        const isN = isNew(r);
+        h += `<button type="button" class="bh-item${isN ? ' is-new' : ''}" data-rid="${esc(r.id)}">` +
+          `<span class="bh-date">${esc(r.date)}${isN ? ' <span class="new-badge">NEW</span>' : ''}</span>` +
           `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
           `<span class="bh-cmt">💬 ${(r.comments || []).length}</span>` +
           '</button>';
       });
       h += '</div>';
     }
-    h += `<button type="button" class="btn ghost block" id="branchReportBtn" style="margin-top:14px;">＋ 이 사업소 보고 작성</button>`;
 
     // 사업소 전략 정보 (있을 때만)
     if (b.status || (b.ownership && b.ownership.length) || b.situation || (b.managerActions && b.managerActions.length) || (b.hqActions && b.hqActions.length)) {
@@ -298,7 +301,6 @@
     }
 
     $('branchDetail').innerHTML = h;
-    $('branchReportBtn').addEventListener('click', () => { closeModal('branchModal'); openReportForm(b.id); });
     if ($('branchEditBtn')) $('branchEditBtn').addEventListener('click', () => openBranchEdit(b.id));
     // 보고 이력 항목 클릭 → 해당 보고 상세(+댓글)
     $('branchDetail').querySelectorAll('.bh-item').forEach((it) => {
@@ -404,16 +406,16 @@
     list.innerHTML = '';
     if (!items.length) { empty.hidden = false; }
     else { empty.hidden = true; }
-    const seen = getSeen();
     items.forEach((r) => {
       const cmt = (r.comments || []).length;
+      const isN = isNew(r);
       const first = REPORT_ITEMS.map((it) => (r.items && r.items[it.k]) ? r.items[it.k] : '').find((x) => x) || '';
       const card = document.createElement('button');
-      card.type = 'button'; card.className = 'report-card'; card.dataset.id = r.id;
+      card.type = 'button'; card.className = 'report-card' + (isN ? ' is-new' : ''); card.dataset.id = r.id;
       card.innerHTML =
         '<div class="rc-top">' +
           `<span class="rc-branch">${esc(r.branchName)}</span>` +
-          (!seen.has(r.id) ? '<span class="new-badge">NEW</span>' : '') +
+          (isN ? '<span class="new-badge">NEW</span>' : '') +
           `<span class="rc-month">${esc(r.month || r.date)}</span>` +
           (r._local ? '<span class="rc-local">이 기기에만</span>' : '') +
         '</div>' +
@@ -486,7 +488,7 @@
     const r = REPORTS.find((x) => x.id === id);
     if (!r) { closeModal('reportDetailModal'); return; }
     openReportId = id;
-    if (!getSeen().has(id)) { markSeen(id); renderStatus(); renderReports(); } // 읽음 처리 → 반짝임 해제
+    if (isNew(r)) { markSeen(r); renderStatus(); renderReports(); } else { markSeen(r); } // 읽음(댓글 수 포함) 처리 → 표시 해제
     updateTabDot();
     const comments = r.comments || [];
     let h = `<h2>${esc(r.branchName)} 업무보고</h2>`;
