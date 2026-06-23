@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v43 · 2026.06.23 (막대 통계 퍼센트 표기)';
+  const APP_VERSION = 'v44 · 2026.06.23 (보고목록 한줄·번호)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -612,22 +612,18 @@
     list.innerHTML = '';
     if (!items.length) { empty.hidden = false; }
     else { empty.hidden = true; }
-    items.forEach((r) => {
+    items.forEach((r, i) => {
       const cmt = (r.comments || []).length;
       const isN = isNew(r);
-      const first = Object.values(r.items || {}).find((v) => v) || '';
       const card = document.createElement('button');
       card.type = 'button'; card.className = 'report-card' + (isN ? ' is-new' : ''); card.dataset.id = r.id;
       card.innerHTML =
-        '<div class="rc-top">' +
-          `<span class="rc-branch">${esc(r.branchName)}</span>` +
-          (isN ? '<span class="new-badge">NEW</span>' : '') +
-          `<span class="rc-month">${esc(r.month || r.date)}</span>` +
-          (r._local ? '<span class="rc-local">이 기기에만</span>' : '') +
-        '</div>' +
-        `<div class="rc-meta">보고자 ${esc(r.reporter)} · ${esc(r.date)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}</div>` +
-        `<div class="rc-excerpt">${esc(first)}</div>` +
-        `<div class="rc-foot"><span class="rc-cmt">💬 본사 소통 ${cmt}</span><span class="rc-open">열기 ›</span></div>`;
+        `<span class="rc-no">${i + 1}</span>` +
+        `<span class="rc-branch">${esc(r.branchName)}</span>` +
+        (isN ? '<span class="new-badge">N</span>' : '') +
+        `<span class="rc-date">${esc(r.date)}</span>` +
+        `<span class="rc-cmt">💬 ${cmt}</span>` +
+        '<span class="rc-open">›</span>';
       list.appendChild(card);
     });
     updateTabDot();
