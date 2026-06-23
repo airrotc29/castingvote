@@ -71,9 +71,7 @@ body.admin-on #appGate { display: none; }
 .group-block { margin-bottom: 18px; }
 .group-head { display: flex; align-items: center; gap: 8px; margin: 0 2px 9px; }
 .group-badge { font-size: 13px; font-weight: 900; color: #fff; border-radius: 8px; padding: 3px 10px; }
-.group-badge.g1 { background: var(--g1); }
-.group-badge.g2 { background: var(--g2); }
-.group-badge.g3 { background: var(--g3); }
+.group-badge.g1, .group-badge.g2, .group-badge.g3 { background: #1a1a1a; }
 .group-desc { font-size: 11.5px; color: var(--soft); flex: 1; word-break: keep-all; }
 .stage-badge { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; box-sizing: border-box; font-size: 13px; font-weight: 900; color: #fff; border-radius: 9px; padding: 9px 13px; text-align: left; line-height: 1.3; background: linear-gradient(135deg, var(--navy), var(--blue)); }
 .stage-badge .sb-name { flex: 1; word-break: keep-all; text-align: left; }
