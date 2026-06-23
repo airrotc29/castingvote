@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
+  const OWNER = 'airrotc29', REPO = '-', BRANCH = 'main';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
