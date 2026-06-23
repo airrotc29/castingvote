@@ -38,7 +38,7 @@
     <!-- ===== 현황 ===== -->
     <section class="screen active" id="scr-status">
       <h2 class="scr-title">사업소 현황</h2>
-      <p class="scr-lead">12개 지점사업소를 등기율·추진위·시행사 소통 기준으로 1·2·3군으로 분류해 관리합니다. 카드를 누르면 현황·지분율·대응방안을 볼 수 있습니다.</p>
+      <p class="scr-lead" id="statusLead">12개 지점사업소를 등기율·추진위·시행사 소통 기준으로 1·2·3군으로 분류해 관리합니다. 카드를 누르면 현황·지분율·대응방안을 볼 수 있습니다.</p>
       <button type="button" class="btn sm" id="addBranchBtn" style="display:none;margin:0 0 12px;">＋ 사업소 추가 (본사)</button>
       <div class="stat-row" id="statRow"></div>
       <div id="groupWrap"></div>
@@ -157,9 +157,11 @@
     <div class="modal-box">
       <button type="button" class="modal-close" data-close>×</button>
       <h2>사업소 추가</h2>
-      <p class="login-help">본사 담당자 전용. 추가한 사업소는 모든 사용자에게 공유됩니다. <b>추가 시 그 사업소의 로그인 계정(아이디=다음 번호, 초기 비번 1234)이 자동 생성</b>됩니다. (세부 지분율·대응방안은 추후 데이터 파일에서 보완할 수 있습니다.)</p>
+      <p class="login-help">본사 담당자 전용. 추가한 사업소는 모든 사용자에게 공유됩니다. <b>그 사업소의 로그인 아이디·비밀번호를 함께 부여</b>합니다. (비우면 아이디=다음 번호, 비번=1234 자동 설정. 세부 지분율·대응방안은 추후 데이터 파일에서 보완할 수 있습니다.)</p>
       <div class="field"><label>사업소명 *</label><input type="text" id="baName" placeholder="예: 신화 3차" autocomplete="off" /></div>
       <div class="field"><label>분류(군) *</label><select id="baGroup"><option value="1">1군</option><option value="2">2군</option><option value="3" selected>3군</option></select></div>
+      <div class="field"><label>로그인 아이디 <span class="hintlabel">— 비우면 다음 번호 자동</span></label><input type="text" id="baLoginId" placeholder="예: 13" autocomplete="off" autocapitalize="off" /></div>
+      <div class="field"><label>로그인 비밀번호 <span class="hintlabel">— 비우면 1234</span></label><input type="text" id="baLoginPw" placeholder="예: 1234" autocomplete="off" autocapitalize="off" /></div>
       <div class="field"><label>등기율 (%) <span class="hintlabel">— 입주 전이면 비워두세요</span></label><input type="number" id="baReg" min="0" max="100" step="0.1" inputmode="decimal" placeholder="예: 65.0" /></div>
       <p class="hint" id="baHint"></p>
       <button type="button" class="btn block" id="baSubmit">사업소 추가</button>

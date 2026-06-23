@@ -75,7 +75,9 @@ body.admin-on #appGate { display: none; }
 .group-badge.g2 { background: var(--g2); }
 .group-badge.g3 { background: var(--g3); }
 .group-desc { font-size: 11.5px; color: var(--soft); flex: 1; word-break: keep-all; }
-.stage-badge { font-size: 12.5px; font-weight: 900; color: #fff; border-radius: 8px; padding: 4px 11px; word-break: keep-all; line-height: 1.3; background: linear-gradient(135deg, var(--navy), var(--blue)); }
+.stage-badge { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; box-sizing: border-box; font-size: 13px; font-weight: 900; color: #fff; border-radius: 9px; padding: 9px 13px; text-align: left; line-height: 1.3; background: linear-gradient(135deg, var(--navy), var(--blue)); }
+.stage-badge .sb-name { flex: 1; word-break: keep-all; text-align: left; }
+.stage-badge .sb-count { flex: none; font-size: 11.5px; font-weight: 800; opacity: .92; background: rgba(255,255,255,.22); border-radius: 20px; padding: 2px 9px; white-space: nowrap; }
 .stage-badge.stage-none { background: #9aa3b2; }
 .stage-badge.stage-s0 { background: linear-gradient(135deg, #334155, #475569); }  /* 공통 - 슬레이트 */
 .stage-badge.stage-s1 { background: linear-gradient(135deg, #1c5fc4, #3b82f6); }  /* 1단계 - 파랑 */
