@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v24 · 2026.06.23 (단계별 현황 · 군별 보고서식)';
+  const APP_VERSION = 'v25 · 2026.06.23 (사업소별 로그인 1~12)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -18,7 +18,18 @@
   // 계정은 assets/data/auth.json 에 저장(비밀번호는 SHA-256 해시). 없으면 아래 기본값.
   const AUTH_PATH = 'assets/data/auth.json';
   const DEFAULT_ACCOUNTS = [
-    { id: '소장', role: 'site', pwHash: '2a0b6287a0e65cff2844cf0887b1c19d960385071c4a0da3d90cfea2c3824e3f' }, // ace
+    { id: '1', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'sinhwa1', branchName: '신화 1차' },
+    { id: '2', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'sinhwa2', branchName: '신화 2차' },
+    { id: '3', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'present', branchName: '프리센트' },
+    { id: '4', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'atrium', branchName: '창원 아트리움시티' },
+    { id: '5', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'ace101', branchName: '에이스 101' },
+    { id: '6', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'sejong', branchName: '세종에이스' },
+    { id: '7', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'aceavenue', branchName: '에이스에비뉴' },
+    { id: '8', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'garimsuite2', branchName: '가림스위트 2차' },
+    { id: '9', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'sky3', branchName: '스카이 3차' },
+    { id: '10', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'visionpark', branchName: '비전파크' },
+    { id: '11', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'mastervalue', branchName: '마스터밸류' },
+    { id: '12', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'shdream', branchName: 'SH드림타워' },
     { id: '본사', role: 'hq', pwHash: 'b89a1c3aae305aeca883f51f8e2442b9b5eb6178dfc845c751b7dcf952ac8b9e' }, // ace01
   ];
   let AUTH = DEFAULT_ACCOUNTS.slice();
@@ -575,7 +586,10 @@
   function openReportForm(branchId) {
     $('rmBranch').innerHTML = BRANCHES.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
     // 사업소를 항상 한 곳 선택해 두어 보고서식이 바로 보이도록 함
+    // (로그인한 관리소장 계정에 사업소가 연결돼 있으면 그 사업소를 기본 선택)
+    const myBranch = localStorage.getItem('ace_branch') || '';
     if (branchId) $('rmBranch').value = branchId;
+    else if (myBranch && BRANCHES.some((b) => b.id === myBranch)) $('rmBranch').value = myBranch;
     else if (reportFilter) $('rmBranch').value = reportFilter;
     else if (BRANCHES[0]) $('rmBranch').value = BRANCHES[0].id;
     $('rmReporter').value = '';
@@ -792,11 +806,12 @@
     localStorage.setItem(LOGIN_FLAG, '1');
     localStorage.setItem('ace_acct', acc.id);
     localStorage.setItem('ace_role', acc.role);
+    if (acc.branchId) localStorage.setItem('ace_branch', acc.branchId); else localStorage.removeItem('ace_branch');
     setAdmin(true);
     hint($('loginHint'), '', ''); closeModal('loginModal');
     REPORTS = await loadReports(); renderReports(); renderStatus(); refreshNote();
   });
-  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); setAdmin(false); closeModal('loginModal'); refreshNote(); renderReports(); renderStatus(); });
+  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); localStorage.removeItem('ace_branch'); setAdmin(false); closeModal('loginModal'); refreshNote(); renderReports(); renderStatus(); });
 
   // ---------- 아이디/비밀번호 변경 ----------
   function curRole() { return localStorage.getItem('ace_role') || ''; }
@@ -836,13 +851,13 @@
   });
   $('resetCredBtn') && $('resetCredBtn').addEventListener('click', async () => {
     if (curRole() !== 'hq') { alert('본사만 초기화할 수 있습니다.'); return; }
-    if (!confirm('모든 계정을 기본값(소장/ace, 본사/ace01)으로 초기화할까요?')) return;
+    if (!confirm('모든 계정을 기본값(사업소 1~12 / 비번 1234, 본사 / ace01)으로 초기화할까요?')) return;
     const btn = $('resetCredBtn'); btn.disabled = true;
     try {
       hint($('ccHint'), '초기화 중…', '');
       const next = await mutateAuth((o) => { o.accounts = DEFAULT_ACCOUNTS.slice(); return o; }, '계정 초기화');
       AUTH = next.accounts;
-      hint($('ccHint'), '초기화되었습니다. 기본: 소장/ace, 본사/ace01 (반영 1~2분)', 'success');
+      hint($('ccHint'), '초기화되었습니다. 기본: 사업소 1~12 / 비번 1234, 본사 / ace01 (반영 1~2분)', 'success');
     } catch (e) { hint($('ccHint'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });
