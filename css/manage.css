@@ -103,6 +103,7 @@ body.admin-on #appGate { display: none; }
 .bh-item { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left;
   background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px; }
 .bh-item:active { background: var(--bg); }
+.bh-no { flex-shrink: 0; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; background: var(--navy); border-radius: 50%; }
 .bh-date { font-size: 13px; font-weight: 800; color: var(--navy); flex-shrink: 0; }
 .bh-info { font-size: 12.5px; color: var(--soft); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bh-cmt { font-size: 12px; font-weight: 700; color: var(--blue); flex-shrink: 0; }

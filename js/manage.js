@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v35 · 2026.06.23 (소장 현황요약 숨김)';
+  const APP_VERSION = 'v36 · 2026.06.23 (보고이력 번호)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -434,9 +434,10 @@
     if (!reps.length) h += '<p class="rd-empty">아직 등록된 보고가 없습니다. 아래에서 첫 보고를 작성해 주세요.</p>';
     else {
       h += '<div class="bh-list">';
-      reps.forEach((r) => {
+      reps.forEach((r, i) => {
         const isN = isNew(r);
         h += `<button type="button" class="bh-item${isN ? ' is-new' : ''}" data-rid="${esc(r.id)}">` +
+          `<span class="bh-no">${i + 1}</span>` +
           `<span class="bh-date">${esc(r.date)}${isN ? ' <span class="new-badge">NEW</span>' : ''}</span>` +
           `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
           `<span class="bh-cmt">💬 ${(r.comments || []).length}</span>` +
