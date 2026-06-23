@@ -59,7 +59,11 @@
     const body = { message, content: b64, branch: BRANCH };
     if (sha) body.sha = sha;
     const res = await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${path}`, { method: 'PUT', headers: headers(), body: JSON.stringify(body) });
-    if (!res.ok) throw new Error('저장 실패 (' + res.status + ')');
+    if (!res.ok) {
+      if (res.status === 403) throw new Error('이 토큰에 저장소 쓰기 권한이 없습니다. (403) — 토큰을 Contents: Read and write 권한으로 재발급한 뒤 다시 로그인하세요.');
+      if (res.status === 401) throw new Error('토큰이 만료/무효입니다. (401) — 본사 로그인을 다시 하세요.');
+      throw new Error('저장 실패 (' + res.status + ')');
+    }
     return res.json();
   }
   async function loadReportsJson() {
