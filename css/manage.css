@@ -271,6 +271,8 @@ button { font-family: inherit; cursor: pointer; }
 
 /* 로그인 도움말 */
 .login-help { font-size: 12px; color: var(--soft); line-height: 1.6; margin-bottom: 10px; }
+/* 토큰 입력칸: 비밀번호 타입이 아니라 CSS로만 가림 → 브라우저 '암호 저장' 팝업 방지 */
+.mask-input { -webkit-text-security: disc; text-security: disc; }
 .login-help a { color: var(--blue); font-weight: 700; }
 .note-box { font-size: 12px; color: var(--soft); background: var(--bg); border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; line-height: 1.6; }
 .note-box b { color: var(--navy); }
