@@ -181,9 +181,17 @@ button { font-family: inherit; cursor: pointer; }
 .cmt-row select { width: 120px; }
 
 /* 보고 항목(6) */
-.r-item { margin-bottom: 11px; }
-.r-item label { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 800; color: var(--navy); margin-bottom: 5px; }
+.r-item { margin-bottom: 14px; }
+.r-item label { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
 .r-item label .num { width: 19px; height: 19px; border-radius: 6px; background: var(--blue); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.r-item textarea {
+  display: block; width: 100%; padding: 12px 13px;
+  border: 1px solid var(--line); border-radius: 10px; background: #fff;
+  font-size: 14px; line-height: 1.6; font-family: inherit; color: var(--text);
+  min-height: 92px; resize: vertical;
+}
+.r-item textarea::placeholder { color: #aab2be; font-size: 13px; }
+.r-item textarea:focus { outline: none; border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(75,139,244,.15); }
 .r-detail { font-size: 13px; line-height: 1.8; white-space: pre-wrap; word-break: keep-all; }
 .r-block { margin-bottom: 12px; }
 .r-block .bt { font-size: 12.5px; font-weight: 800; color: var(--navy); display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
