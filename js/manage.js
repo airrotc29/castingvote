@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v11 · 2026.06.23 (보고작성버튼 제거·새글 강조)';
+  const APP_VERSION = 'v12 · 2026.06.23 (PDF 저장 기능)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -484,6 +484,62 @@
   });
 
   // ---------- 보고 상세 + 댓글 ----------
+  // ---------- 보고서 PDF 생성 ----------
+  let _h2pPromise = null;
+  function loadH2P() {
+    if (window.html2pdf) return Promise.resolve();
+    if (_h2pPromise) return _h2pPromise;
+    _h2pPromise = new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js';
+      s.onload = res; s.onerror = rej; document.head.appendChild(s);
+    });
+    return _h2pPromise;
+  }
+  function pdfBlock(num, title, body) {
+    return '<div style="margin-bottom:10px;">' +
+      `<div style="font-size:13px;font-weight:800;color:#0f2a4a;margin-bottom:4px;">${num}. ${esc(title)}</div>` +
+      `<div style="font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-all;background:#f4f7fb;border-radius:8px;padding:9px 12px;">${esc(body)}</div>` +
+      '</div>';
+  }
+  function reportPdfHtml(r) {
+    let h = '<div style="font-family:\'Noto Sans KR\',sans-serif;color:#1f2937;width:180mm;padding:4px;">';
+    h += '<div style="border-bottom:2px solid #123a6b;padding-bottom:8px;margin-bottom:14px;">' +
+      '<div style="font-size:12px;color:#1c5fc4;font-weight:700;">에이스 종합관리㈜ · 지점사업소 관리단 구성</div>' +
+      `<div style="font-size:22px;font-weight:900;color:#0f2a4a;">${esc(r.branchName)} 업무보고</div>` +
+      `<div style="font-size:12px;color:#5b6573;margin-top:4px;">보고자 ${esc(r.reporter)} · ${esc(r.date)}</div>` +
+      '</div>';
+    if (r.occupancy) h += pdfBlock('0', '입주현황', `입주 ${r.occupancy.occupied}호실 / 전체 ${r.occupancy.total}호실 · 입주율 ${r.occupancy.rate}%`);
+    REPORT_ITEMS.forEach((it) => { const v = (r.items && r.items[it.k]) || ''; if (v) h += pdfBlock(it.k, it.t, v); });
+    const cmts = r.comments || [];
+    if (cmts.length) {
+      h += '<div style="margin-top:14px;font-weight:800;color:#0f2a4a;border-top:1px solid #e2e8f0;padding-top:10px;margin-bottom:6px;">본사 ↔ 현장 소통</div>';
+      cmts.forEach((c) => {
+        const hq = c.role === 'hq';
+        h += `<div style="margin:6px 0;padding:8px 12px;border-radius:8px;background:${hq ? '#e8f0fe' : '#fff8e1'};">` +
+          `<b style="font-size:11px;color:${hq ? '#1c5fc4' : '#9a7b00'};">${hq ? '본사' : '현장(소장)'}</b> ` +
+          `<span style="font-size:11px;color:#999;">${esc(c.date)}</span>` +
+          `<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-all;">${esc(c.body)}</div></div>`;
+      });
+    }
+    return h + '</div>';
+  }
+  async function genReportPdf(r, btn) {
+    const label = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'PDF 생성 중…'; }
+    try {
+      await loadH2P();
+      const el = document.createElement('div');
+      el.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;';
+      el.innerHTML = reportPdfHtml(r);
+      document.body.appendChild(el);
+      const fname = (`${r.branchName}_업무보고_${r.date}`).replace(/[\\/:*?"<>|]/g, '-') + '.pdf';
+      await window.html2pdf().set({ margin: 10, filename: fname, image: { type: 'jpeg', quality: 0.96 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save();
+      document.body.removeChild(el);
+    } catch (e) { alert('PDF 생성 오류: ' + e.message); }
+    finally { if (btn) { btn.disabled = false; btn.textContent = label; } }
+  }
+
   function openReportDetail(id) {
     const r = REPORTS.find((x) => x.id === id);
     if (!r) { closeModal('reportDetailModal'); return; }
@@ -492,7 +548,8 @@
     updateTabDot();
     const comments = r.comments || [];
     let h = `<h2>${esc(r.branchName)} 업무보고</h2>`;
-    h += `<div class="rc-meta" style="margin:6px 0 12px;">보고자 ${esc(r.reporter)} · ${esc(r.date)}${r._local ? ' · <span style="color:var(--accent);font-weight:700;">이 기기에만 저장됨</span>' : ''}</div>`;
+    h += `<div class="rc-meta" style="margin:6px 0 10px;">보고자 ${esc(r.reporter)} · ${esc(r.date)}${r._local ? ' · <span style="color:var(--accent);font-weight:700;">이 기기에만 저장됨</span>' : ''}</div>`;
+    h += '<button type="button" class="btn block" id="pdfBtn" style="margin-bottom:14px;">📄 이 보고서 PDF로 저장</button>';
     if (r.occupancy) {
       h += `<div class="r-block"><div class="bt"><span class="num zero">0</span>입주현황</div><div class="bd">입주 ${esc(r.occupancy.occupied)}호실 / 전체 ${esc(r.occupancy.total)}호실 · <b>입주율 ${esc(r.occupancy.rate)}%</b></div></div>`;
     }
@@ -518,6 +575,8 @@
 
     $('reportDetail').innerHTML = h;
     openModal('reportDetailModal');
+
+    if ($('pdfBtn')) $('pdfBtn').addEventListener('click', function () { genReportPdf(r, this); });
 
     $('cSubmit').addEventListener('click', async () => {
       const role = $('cRole').value, body = $('cBody').value.trim();
