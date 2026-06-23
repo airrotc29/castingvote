@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v36 · 2026.06.23 (보고이력 번호)';
+  const APP_VERSION = 'v37 · 2026.06.23 (단계별 통계 · 추가버튼 헤더이동)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -362,19 +362,18 @@
     const lb = lockedBranchId();
     if ($('statusLead')) $('statusLead').style.display = lb ? 'none' : '';
     const visible = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
-    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시)
+    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시). 단계별(번호) 집계.
     if (lb) {
       $('statRow').style.display = 'none';
       $('statRow').innerHTML = '';
     } else {
       $('statRow').style.display = '';
-      const total = visible.length;
-      const reported = visible.filter((b) => branchStage(b) !== null).length;
-      const notyet = total - reported;
-      $('statRow').innerHTML =
-        `<div class="stat"><b>${total}</b><span>전체 사업소</span></div>` +
-        `<div class="stat"><b>${reported}</b><span>보고 진행</span></div>` +
-        `<div class="stat"><b>${notyet}</b><span>미보고</span></div>`;
+      const byOrder = {};
+      visible.forEach((b) => { const o = stageOrder(branchStage(b)); byOrder[o] = (byOrder[o] || 0) + 1; });
+      const labelOf = (o) => (o === 0 ? '공통' : o === 99 ? '미보고' : (o >= 1 && o <= 4) ? (o + '단계') : '기타');
+      // 1~4단계는 항상 표시(0건 포함), 공통·미보고는 있을 때만
+      const orders = [].concat(byOrder[0] ? [0] : [], [1, 2, 3, 4], byOrder[99] ? [99] : []);
+      $('statRow').innerHTML = orders.map((o) => `<div class="stat stat-click" data-order="${o}"><b>${byOrder[o] || 0}</b><span>${labelOf(o)}</span></div>`).join('');
     }
 
     // 단계별 그룹화 (관리소장이 입력한 과제로 산출한 현재 단계)
@@ -389,7 +388,7 @@
 
     const wrap = $('groupWrap'); wrap.innerHTML = '';
     ordered.forEach((bk) => {
-      const block = document.createElement('div'); block.className = 'group-block';
+      const block = document.createElement('div'); block.className = 'group-block'; block.dataset.order = bk.order;
       // 단계별 색상: 공통=slate, 1=파랑, 2=녹색, 3=주황, 4=적색, 미보고=회색
       let cls = 'stage-none';
       if (bk.name !== '미보고') { const o = bk.order; cls = (o >= 1 && o <= 4) ? ('stage-s' + o) : 'stage-s0'; }
@@ -410,6 +409,12 @@
     updateTabDot();
   }
 
+  $('statRow').addEventListener('click', (e) => {
+    const s = e.target.closest('.stat-click'); if (!s) return;
+    const o = s.dataset.order;
+    const blk = document.querySelector('.group-block[data-order="' + o + '"]');
+    if (blk) { blk.scrollIntoView({ behavior: 'smooth', block: 'start' }); blk.classList.remove('flash'); void blk.offsetWidth; blk.classList.add('flash'); setTimeout(() => blk.classList.remove('flash'), 1300); }
+  });
   $('groupWrap').addEventListener('click', (e) => {
     const card = e.target.closest('.b-card'); if (!card) return;
     openBranch(card.dataset.id);
