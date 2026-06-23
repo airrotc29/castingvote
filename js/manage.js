@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v37 · 2026.06.23 (단계별 통계 · 추가버튼 헤더이동)';
+  const APP_VERSION = 'v38 · 2026.06.23 (단계 막대그래프 · 심플 리디자인)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -362,18 +362,27 @@
     const lb = lockedBranchId();
     if ($('statusLead')) $('statusLead').style.display = lb ? 'none' : '';
     const visible = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
-    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시). 단계별(번호) 집계.
+    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시). 단계별 막대그래프.
     if (lb) {
       $('statRow').style.display = 'none';
       $('statRow').innerHTML = '';
     } else {
-      $('statRow').style.display = '';
-      const byOrder = {};
-      visible.forEach((b) => { const o = stageOrder(branchStage(b)); byOrder[o] = (byOrder[o] || 0) + 1; });
-      const labelOf = (o) => (o === 0 ? '공통' : o === 99 ? '미보고' : (o >= 1 && o <= 4) ? (o + '단계') : '기타');
-      // 1~4단계는 항상 표시(0건 포함), 공통·미보고는 있을 때만
-      const orders = [].concat(byOrder[0] ? [0] : [], [1, 2, 3, 4], byOrder[99] ? [99] : []);
-      $('statRow').innerHTML = orders.map((o) => `<div class="stat stat-click" data-order="${o}"><b>${byOrder[o] || 0}</b><span>${labelOf(o)}</span></div>`).join('');
+      const el = $('statRow'); el.style.display = ''; el.className = 'bar-chart';
+      const byOrder = {}, namesByOrder = {};
+      visible.forEach((b) => { const o = stageOrder(branchStage(b)); byOrder[o] = (byOrder[o] || 0) + 1; (namesByOrder[o] = namesByOrder[o] || []).push(b.name); });
+      const labelOf = (o) => (o === 0 ? '공통' : o === 99 ? '미보고' : (o + '단계'));
+      const colorOf = (o) => (o === 99 ? 'b-none' : o === 0 ? 'b-s0' : 'b-s' + o);
+      // 순서: 미보고 → (공통) → 1 → 2 → 3 → 4 단계
+      const orders = [].concat(byOrder[99] ? [99] : [], byOrder[0] ? [0] : [], [1, 2, 3, 4]);
+      const max = Math.max(1, ...orders.map((o) => byOrder[o] || 0));
+      el.innerHTML = orders.map((o) => {
+        const c = byOrder[o] || 0; const w = Math.round((c / max) * 100);
+        const names = (namesByOrder[o] || []).join(', ');
+        return `<div class="bar-row" data-order="${o}" data-label="${esc(labelOf(o))}" data-names="${esc(names)}" title="${esc(labelOf(o))} (${c}): ${esc(names || '없음')}">` +
+          `<span class="bar-label">${esc(labelOf(o))}</span>` +
+          `<div class="bar-track"><div class="bar-fill ${colorOf(o)}" style="width:${w}%"></div></div>` +
+          `<span class="bar-val">${c}</span></div>`;
+      }).join('');
     }
 
     // 단계별 그룹화 (관리소장이 입력한 과제로 산출한 현재 단계)
@@ -397,10 +406,11 @@
         const cnt = REPORTS.filter((r) => r.branchId === b.id).length;
         const newB = branchUnseen(b.id);
         const dot = newB ? '<span class="newdot"></span>' : '';
+        const stc = bk.order === 99 ? 'st-none' : bk.order === 0 ? 'st-s0' : 'st-s' + bk.order;
         const card = document.createElement('button');
-        card.type = 'button'; card.className = `b-card g${b.group}` + (newB ? ' is-new' : ''); card.dataset.id = b.id;
+        card.type = 'button'; card.className = `b-card ${stc}` + (newB ? ' is-new' : ''); card.dataset.id = b.id;
         card.innerHTML =
-          `<div class="b-top"><span class="b-name">${esc(b.name)} <span class="group-badge g${b.group}" style="font-size:10px;vertical-align:middle;">${b.group}군</span>${dot}</span>` +
+          `<div class="b-top"><span class="b-name">${esc(b.name)}</span> <span class="group-badge g${b.group}">${b.group}군</span>${dot}` +
           `<span class="b-count">보고 ${cnt}건 ›</span></div>`;
         block.appendChild(card);
       });
@@ -409,12 +419,23 @@
     updateTabDot();
   }
 
-  $('statRow').addEventListener('click', (e) => {
-    const s = e.target.closest('.stat-click'); if (!s) return;
-    const o = s.dataset.order;
-    const blk = document.querySelector('.group-block[data-order="' + o + '"]');
-    if (blk) { blk.scrollIntoView({ behavior: 'smooth', block: 'start' }); blk.classList.remove('flash'); void blk.offsetWidth; blk.classList.add('flash'); setTimeout(() => blk.classList.remove('flash'), 1300); }
-  });
+  function showBarTip(row) {
+    const tip = $('barTip'); if (!tip) return;
+    const names = row.dataset.names || '';
+    const val = row.querySelector('.bar-val') ? row.querySelector('.bar-val').textContent : '';
+    tip.innerHTML = `<b>${esc(row.dataset.label || '')} · ${esc(val)}개</b>` + (names ? `<span>${esc(names)}</span>` : '<span>해당 사업소 없음</span>');
+    tip.classList.add('show');
+    const r = row.getBoundingClientRect();
+    const tw = tip.offsetWidth;
+    let left = r.left; if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+    tip.style.left = Math.max(8, left) + 'px';
+    tip.style.top = (r.bottom + 6) + 'px';
+  }
+  function hideBarTip() { const tip = $('barTip'); if (tip) tip.classList.remove('show'); }
+  let barTipTimer = null;
+  $('statRow').addEventListener('mouseover', (e) => { const row = e.target.closest('.bar-row'); if (row) showBarTip(row); });
+  $('statRow').addEventListener('mouseout', (e) => { const row = e.target.closest('.bar-row'); if (row) hideBarTip(); });
+  $('statRow').addEventListener('click', (e) => { const row = e.target.closest('.bar-row'); if (!row) return; showBarTip(row); clearTimeout(barTipTimer); barTipTimer = setTimeout(hideBarTip, 3000); });
   $('groupWrap').addEventListener('click', (e) => {
     const card = e.target.closest('.b-card'); if (!card) return;
     openBranch(card.dataset.id);
