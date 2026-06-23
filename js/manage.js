@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v26 · 2026.06.23 (사업소별 로그인·보고 한정)';
+  const APP_VERSION = 'v27 · 2026.06.23 (작성 중 배경클릭 닫힘 방지)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -289,8 +289,13 @@
   // ---------- 모달 ----------
   function openModal(id) { const m = $(id); if (m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } }
   function closeModal(id) { const m = $(id); if (m) { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); if (id === 'reportDetailModal') openReportId = null; } }
+  // 입력 폼 모달은 바깥(어두운 배경) 클릭으로 닫지 않음 — 작성 중 내용 유실 방지. ×버튼으로만 닫힘.
+  const NO_BACKDROP_CLOSE = new Set(['reportModal', 'branchAddModal', 'branchEditModal', 'changeCredModal']);
   document.querySelectorAll('.modal').forEach((m) => {
-    m.addEventListener('click', (e) => { if (e.target === m || e.target.closest('[data-close]')) closeModal(m.id); });
+    m.addEventListener('click', (e) => {
+      if (e.target.closest('[data-close]')) { closeModal(m.id); return; }
+      if (e.target === m && !NO_BACKDROP_CLOSE.has(m.id)) closeModal(m.id);
+    });
   });
   function hint(el, msg, type) { if (el) { el.className = 'hint' + (type ? ' ' + type : ''); el.textContent = msg; } }
 
