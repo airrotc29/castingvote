@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v40 · 2026.06.23 (단계 개수 표기 중복 수정)';
+  const APP_VERSION = 'v41 · 2026.06.23 (과제번호 단계색 · 댓글 간격 정리)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -642,9 +642,10 @@
     if (!grp) { $('rmItems').innerHTML = '<p class="hint">먼저 사업소를 선택하면 해당 군의 단계별 과제가 표시됩니다.</p>'; return; }
     let h = `<p class="rf-grouptag">${grp}군 보고서식</p>`;
     stagesForGroup(grp).forEach((s) => {
-      h += `<div class="rf-stage ${stageColorClass(s.name)}">${esc(s.name)}</div>`;
+      const sc = stageColorClass(s.name);
+      h += `<div class="rf-stage ${sc}">${esc(s.name)}</div>`;
       s.tasks.forEach((t) => {
-        h += `<div class="r-item"><label><span class="rf-no">${esc(t.no)}</span>${esc(t.t)}</label>` +
+        h += `<div class="r-item"><label><span class="rf-no ${sc}">${esc(t.no)}</span>${esc(t.t)}</label>` +
           `<textarea id="rm_${t.k}" rows="2" placeholder="내용 입력 (해당 시)"></textarea></div>`;
       });
     });
@@ -791,9 +792,10 @@
     reportStages(r).forEach((s) => {
       const filled = s.tasks.filter((t) => r.items && r.items[t.k]);
       if (!filled.length) return;
-      h += `<div class="rd-stage ${stageColorClass(s.name)}">${esc(s.name)}</div>`;
+      const sc = stageColorClass(s.name);
+      h += `<div class="rd-stage ${sc}">${esc(s.name)}</div>`;
       filled.forEach((t) => {
-        h += `<div class="r-block"><div class="bt"><span class="rf-no">${esc(t.no)}</span>${esc(t.t)}</div><div class="bd">${esc(r.items[t.k])}</div></div>`;
+        h += `<div class="r-block"><div class="bt"><span class="rf-no ${sc}">${esc(t.no)}</span>${esc(t.t)}</div><div class="bd">${esc(r.items[t.k])}</div></div>`;
       });
     });
 
@@ -802,7 +804,7 @@
     else comments.forEach((c) => {
       const hq = c.role === 'hq';
       const canDel = isAdmin() || r._local;
-      h += `<div class="cmt ${hq ? 'hq' : ''}"><span class="who">${hq ? '본사' : '현장(소장)'}</span><div class="bubble">${esc(c.body)}</div><span class="when">${esc(c.date)}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div>`;
+      h += `<div class="cmt ${hq ? 'hq' : ''}"><span class="who">${hq ? '본사' : '현장(소장)'}</span><div class="bubble">${esc(c.body)}</div><div class="cmt-meta"><span class="when">${esc(c.date)}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div></div>`;
     });
     h += '</div>';
     // 댓글 작성자 = 로그인한 계정에 따라 고정 (사업소 계정→현장(소장), 본사 계정→본사)
@@ -1021,8 +1023,9 @@
     const stages = stagesForGroup(eduGroup);
     let h = '';
     stages.forEach((s, si) => {
-      h += `<div class="edu-stage"><div class="rd-stage ${stageColorClass(s.name)}" style="margin:0 0 10px;">${esc(s.name)}</div><ul class="edu-tasks">`;
-      s.tasks.forEach((t) => { h += `<li><span class="edu-no">${esc(t.no)}</span><span class="edu-t">${esc(t.t)}</span></li>`; });
+      const sc = stageColorClass(s.name);
+      h += `<div class="edu-stage"><div class="rd-stage ${sc}" style="margin:0 0 10px;">${esc(s.name)}</div><ul class="edu-tasks">`;
+      s.tasks.forEach((t) => { h += `<li><span class="edu-no ${sc}">${esc(t.no)}</span><span class="edu-t">${esc(t.t)}</span></li>`; });
       h += '</ul></div>';
       if (si < stages.length - 1) h += '<div class="edu-arrow">▼</div>';
     });

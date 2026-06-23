@@ -253,8 +253,10 @@ body.admin-on #appGate { display: none; }
 .cmt, .cmts > * { min-width: 0; max-width: 100%; }
 .cmt .bubble { max-width: 100%; }
 .cmt.hq .bubble { background: linear-gradient(135deg, var(--blue), var(--blue-light)); color: #fff; border: none; border-top-left-radius: 13px; border-top-right-radius: 3px; }
-.cmt .when { font-size: 10px; color: var(--soft); margin-top: 3px; }
-.cmt .cdel { background: none; border: none; color: var(--red); font-size: 11px; margin-top: 1px; }
+.cmt-meta { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.cmt.hq .cmt-meta { flex-direction: row-reverse; }
+.cmt .when { font-size: 10px; color: var(--soft); margin: 0; }
+.cmt .cdel { background: none; border: none; color: var(--red); font-size: 11px; padding: 0; margin: 0; line-height: 1; cursor: pointer; }
 .cmt-form { border-top: 1px solid var(--line); padding-top: 12px; }
 .cmt-asrole { font-size: 12.5px; color: var(--soft); margin: 0 0 8px; }
 .cmt-asrole b { display: inline-block; font-size: 12.5px; font-weight: 800; color: #fff; border-radius: 7px; padding: 3px 10px; margin-left: 4px; }
@@ -274,7 +276,12 @@ body.admin-on #appGate { display: none; }
 .rf-stage.s3, .rd-stage.s3 { background: linear-gradient(135deg, #c2660c, #f59e0b); }
 .rf-stage.s4, .rd-stage.s4 { background: linear-gradient(135deg, #b91c1c, #ef4444); }
 .rf-no { display: inline-block; min-width: 30px; font-size: 11px; font-weight: 800; color: #fff; background: var(--blue); border-radius: 6px; padding: 2px 6px; margin-right: 7px; text-align: center; flex-shrink: 0; }
-.r-block .bt .rf-no { background: var(--blue); }
+/* 과제번호 배지 — 단계별 색상 통일 */
+.rf-no.s0, .edu-no.s0 { background: #475569; color: #fff; }
+.rf-no.s1, .edu-no.s1 { background: #2563eb; color: #fff; }
+.rf-no.s2, .edu-no.s2 { background: #16a34a; color: #fff; }
+.rf-no.s3, .edu-no.s3 { background: #ea580c; color: #fff; }
+.rf-no.s4, .edu-no.s4 { background: #dc2626; color: #fff; }
 
 /* 보고 항목 */
 .r-item { margin-bottom: 14px; }
