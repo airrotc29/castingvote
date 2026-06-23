@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v23 · 2026.06.23 (단계별 현황 · 군별 보고서식)';
+  const APP_VERSION = 'v24 · 2026.06.23 (단계별 현황 · 군별 보고서식)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -573,9 +573,11 @@
     $('rmItems').innerHTML = h;
   }
   function openReportForm(branchId) {
-    $('rmBranch').innerHTML = '<option value="" disabled selected>사업소 선택</option>' +
-      BRANCHES.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
-    if (branchId) $('rmBranch').value = branchId; else if (reportFilter) $('rmBranch').value = reportFilter;
+    $('rmBranch').innerHTML = BRANCHES.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+    // 사업소를 항상 한 곳 선택해 두어 보고서식이 바로 보이도록 함
+    if (branchId) $('rmBranch').value = branchId;
+    else if (reportFilter) $('rmBranch').value = reportFilter;
+    else if (BRANCHES[0]) $('rmBranch').value = BRANCHES[0].id;
     $('rmReporter').value = '';
     const d = new Date(); $('rmDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     rebuildRmItems();
