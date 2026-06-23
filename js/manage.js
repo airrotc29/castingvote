@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v16 · 2026.06.23 (PDF 인쇄저장 방식)';
+  const APP_VERSION = 'v17 · 2026.06.23 (비번 ace)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -16,7 +16,7 @@
 
   // ---------- 로그인 (아이디/비밀번호) ----------
   const LOGIN_ID = '소장';
-  const LOGIN_PW = '에이스';
+  const LOGIN_PW = 'ace';
   const LOGIN_FLAG = 'ace_logged_in';
   // 비밀번호 로그인 시 GitHub 저장에 쓸 토큰(난독화 문자열). 비우면 로컬 저장만 됨.
   // 값 생성: 브라우저 콘솔에서 obfHelper('your_github_token') 실행 → 결과를 아래에 붙여넣기.
