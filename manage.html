@@ -128,20 +128,7 @@
       <div class="field"><label>대상 사업소 *</label><select id="rmBranch"></select></div>
       <div class="field"><label>보고자(관리소장) *</label><input type="text" id="rmReporter" placeholder="예: 소장 김관리" autocomplete="off" /></div>
       <div class="field"><label>보고일</label><input type="date" id="rmDate" /></div>
-      <div class="r-item">
-        <label><span class="num zero">0</span>입주현황</label>
-        <div class="occ-row">
-          <div class="occ-field"><span>전체호실</span><input type="number" id="rmOccTotal" min="0" inputmode="numeric" placeholder="0" /></div>
-          <div class="occ-field"><span>입주호실</span><input type="number" id="rmOccDone" min="0" inputmode="numeric" placeholder="0" /></div>
-          <div class="occ-field"><span>입주율(자동)</span><input type="text" id="rmOccRate" readonly placeholder="-" /></div>
-        </div>
-      </div>
-      <div class="r-item"><label><span class="num">1</span>관리단 구성 동정</label><textarea id="rm1" rows="3" placeholder="예) 405호 중심 추진위 구성 시도 중 정보 입수 / 206호 주도 단톡방(150명) 운영 중"></textarea></div>
-      <div class="r-item"><label><span class="num">2</span>우호 인원 포섭 결과</label><textarea id="rm2" rows="3" placeholder="예) (포섭 완료) 관리인 205호 최관리, 위원 1504호·708호 / (진행중) 475호, 1704호…"></textarea></div>
-      <div class="r-item"><label><span class="num">3</span>포섭 인원 래포 형성</label><textarea id="rm3" rows="3" placeholder="예) 관리위원(1504호) 하자 우선처리 시공사 협조 중 / 별도 통화·생일 문자 등"></textarea></div>
-      <div class="r-item"><label><span class="num">4</span>추진위 미팅 실적</label><textarea id="rm4" rows="3" placeholder="예) 관리인(205호) 관리사무소 미팅 — 전유부 하자절차·분양율 문의 / 추진위 5명 회의"></textarea></div>
-      <div class="r-item"><label><span class="num">5</span>시행/시공사 관련</label><textarea id="rm5" rows="3" placeholder="예) 시공사 공용부 하자 리스트 발송 / 시행사 분양현황 자료 수령 예정"></textarea></div>
-      <div class="r-item"><label><span class="num">6</span>계획 및 착안사항</label><textarea id="rm6" rows="3" placeholder="예) 차주 하자 관련 전 구분소유자 문자 발송 / 추진위–시공사 미팅 추진"></textarea></div>
+      <div id="rmItems"></div>
       <p class="hint" id="rmHint"></p>
       <button type="button" class="btn block" id="rmSubmit">본사로 보고 올리기</button>
     </div>

@@ -201,7 +201,13 @@ button { font-family: inherit; cursor: pointer; }
 .cmt-row input { flex: 1; }
 .cmt-row select { width: 120px; }
 
-/* 보고 항목(6) */
+/* 보고 단계 헤더 / 과제 번호 */
+.rf-stage { font-size: 14px; font-weight: 900; color: #fff; background: linear-gradient(135deg, var(--navy), var(--blue)); border-radius: 9px; padding: 8px 12px; margin: 16px 0 10px; }
+.rd-stage { font-size: 14px; font-weight: 900; color: var(--navy); border-bottom: 2px solid var(--blue); padding: 8px 2px 5px; margin: 16px 0 8px; }
+.rf-no { display: inline-block; min-width: 30px; font-size: 11px; font-weight: 800; color: #fff; background: var(--blue); border-radius: 6px; padding: 2px 6px; margin-right: 7px; text-align: center; flex-shrink: 0; }
+.r-block .bt .rf-no { background: var(--blue); }
+
+/* 보고 항목 */
 .r-item { margin-bottom: 14px; }
 .r-item label { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
 .r-item label .num { width: 19px; height: 19px; border-radius: 6px; background: var(--blue); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
