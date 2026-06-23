@@ -31,6 +31,14 @@ img { max-width: 100%; display: block; }
 button { font-family: inherit; cursor: pointer; }
 .app { max-width: var(--maxw); margin: 0 auto; min-height: 100vh; background: var(--bg); }
 
+/* 로그인 게이트 — 로그아웃 상태에서 전체를 가림 */
+#appGate { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(160deg, var(--navy), var(--blue)); }
+#appGate .gate-box { width: 100%; max-width: 360px; background: #fff; border-radius: 18px; padding: 30px 24px; text-align: center; box-shadow: 0 18px 50px rgba(0,0,0,.3); }
+#appGate .gate-logo { font-size: 12px; letter-spacing: 2px; font-weight: 800; color: var(--blue); margin-bottom: 6px; }
+#appGate .gate-box h2 { font-size: 21px; font-weight: 900; color: var(--navy); letter-spacing: -.3px; }
+#appGate .gate-box p { font-size: 13px; color: var(--soft); line-height: 1.7; margin: 12px 0 20px; }
+body.admin-on #appGate { display: none; }
+
 /* 헤더 */
 .app-header {
   position: sticky; top: 0; z-index: 50;

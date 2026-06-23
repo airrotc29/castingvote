@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v30 · 2026.06.23 (현황 본인한정 · 단계색상)';
+  const APP_VERSION = 'v31 · 2026.06.23 (로그인 게이트)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -865,7 +865,9 @@
     } catch (e) { hint($('baHint'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });
-  $('adminPill').addEventListener('click', () => { if ($('loginPw')) $('loginPw').value = ''; hint($('loginHint'), '', ''); openModal('loginModal'); });
+  function openLogin() { if ($('loginPw')) $('loginPw').value = ''; if ($('loginId')) $('loginId').value = ''; hint($('loginHint'), '', ''); openModal('loginModal'); }
+  $('adminPill').addEventListener('click', openLogin);
+  $('gateLoginBtn') && $('gateLoginBtn').addEventListener('click', openLogin);
   $('loginSubmit').addEventListener('click', async () => {
     const id = ($('loginId').value || '').trim();
     const pw = $('loginPw').value || '';
