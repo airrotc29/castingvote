@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v27 · 2026.06.23 (작성 중 배경클릭 닫힘 방지)';
+  const APP_VERSION = 'v28 · 2026.06.23 (댓글 작성자 로그인계정 고정)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -731,8 +731,11 @@
       h += `<div class="cmt ${hq ? 'hq' : ''}"><span class="who">${hq ? '본사' : '현장(소장)'}</span><div class="bubble">${esc(c.body)}</div><span class="when">${esc(c.date)}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div>`;
     });
     h += '</div>';
+    // 댓글 작성자 = 로그인한 계정에 따라 고정 (사업소 계정→현장(소장), 본사 계정→본사)
+    const myRole = (localStorage.getItem('ace_role') === 'hq') ? 'hq' : 'site';
+    const myLabel = myRole === 'hq' ? '본사' : '현장(소장)';
     h += '<div class="cmt-form">' +
-      '<div class="field" style="margin-bottom:8px;"><select id="cRole"><option value="site">현장(소장)</option><option value="hq">본사</option></select></div>' +
+      `<div class="cmt-asrole ${myRole === 'hq' ? 'hq' : 'site'}">작성자: <b>${myLabel}</b></div>` +
       '<div class="field" style="margin-bottom:8px;"><textarea id="cBody" rows="3" placeholder="메시지를 입력하세요"></textarea></div>' +
       '<p class="hint" id="cHint"></p><button type="button" class="btn block" id="cSubmit">댓글 남기기</button></div>';
     if (isAdmin() || r._local) h += `<button type="button" class="btn ghost block" id="rDelBtn" style="margin-top:10px;">이 보고 삭제</button>`;
@@ -743,7 +746,7 @@
     if ($('pdfBtn')) $('pdfBtn').addEventListener('click', function () { genReportPdf(r, this); });
 
     $('cSubmit').addEventListener('click', async () => {
-      const role = $('cRole').value, body = $('cBody').value.trim();
+      const role = myRole, body = $('cBody').value.trim();
       if (!body) { hint($('cHint'), '내용을 입력해 주세요.', 'error'); return; }
       const author = role === 'hq' ? '본사' : '현장';
       const comment = { id: uid('c'), author, role, body, date: todayStr(), ts: Date.now() };

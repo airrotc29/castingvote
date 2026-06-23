@@ -200,6 +200,10 @@ button { font-family: inherit; cursor: pointer; }
 .cmt .when { font-size: 10px; color: var(--soft); margin-top: 3px; }
 .cmt .cdel { background: none; border: none; color: var(--red); font-size: 11px; margin-top: 1px; }
 .cmt-form { border-top: 1px solid var(--line); padding-top: 12px; }
+.cmt-asrole { font-size: 12.5px; color: var(--soft); margin: 0 0 8px; }
+.cmt-asrole b { display: inline-block; font-size: 12.5px; font-weight: 800; color: #fff; border-radius: 7px; padding: 3px 10px; margin-left: 4px; }
+.cmt-asrole.site b { background: #d8a800; }
+.cmt-asrole.hq b { background: var(--blue); }
 .cmt-row { display: flex; gap: 7px; margin-bottom: 7px; }
 .cmt-row input { flex: 1; }
 .cmt-row select { width: 120px; }
