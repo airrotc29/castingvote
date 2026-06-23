@@ -247,7 +247,7 @@ button { font-family: inherit; cursor: pointer; }
 .tabbar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
   max-width: var(--maxw); margin: 0 auto;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
   background: #fff; border-top: 1px solid var(--line);
   padding-bottom: env(safe-area-inset-bottom);
   box-shadow: 0 -4px 16px rgba(15,42,74,.06);

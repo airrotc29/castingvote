@@ -47,42 +47,6 @@
       <p class="empty" id="reportEmpty" hidden>아직 등록된 보고가 없습니다. 우측 하단 ‘＋ 보고 작성’으로 첫 보고를 올려 주세요.</p>
     </section>
 
-    <!-- ===== 평가 ===== -->
-    <section class="screen" id="scr-eval">
-      <h2 class="scr-title">본사 주관 소장 평가</h2>
-      <p class="scr-lead">월 1회 시행. 평가 결과(의지·성과) 기반으로 인사 조치를 시행합니다.</p>
-
-      <div class="info-card">
-        <h3>평가 배점</h3>
-        <div class="weight-bar"><div class="w1" style="flex:70">우호세력 포섭 70%</div><div class="w2" style="flex:30">하자 중재 30%</div></div>
-      </div>
-
-      <div class="info-card">
-        <h3>① 우호 세력 포섭 진척도 (70%) — 의지 × 실행</h3>
-        <ul>
-          <li>내용 포섭 대상 발굴 — 선관위원장·선관위원·관리인·관리위원 후보 사전 확보 (추진위 자생 발생 前 확보 목표)</li>
-          <li>추진위 래포 형성도 — 추진위원 소유 전유부 집중 관리 실적, 접촉 횟수</li>
-          <li>시행사·시공사 협조 관계 — 담당자 협조(회의·공문 발송 실적)</li>
-          <li>관리규약 및 법령 이해도 평가</li>
-        </ul>
-      </div>
-
-      <div class="info-card">
-        <h3>② 하자 중재 역량 (30%)</h3>
-        <ul>
-          <li>하자처리 현황 본사 보고 (월 1회)</li>
-          <li>시공사–추진위 하자처리 논의 시 중립적 중재자 역할 수행 여부 (회의 개최 실적)</li>
-        </ul>
-        <p style="margin-top:8px;color:var(--soft);font-size:12.5px;">※ 종합 평가 후 저능력 또는 능력 부재 시 과감한 교체 단행</p>
-      </div>
-
-      <div class="info-card">
-        <h3>자문단(특별 지원팀) 구성 — 집단 지성 전사적 지원</h3>
-        <p>경험 풍부한 소장 11명 + 본사 3명(부장 2, 최재우 과장) 매칭. (소장)카톡방 Q&A·업무 노하우 공유 / (본사)법률·행정·재정 지원.</p>
-        <div class="tag-row" id="advTags"></div>
-      </div>
-    </section>
-
     <!-- ===== 전략 ===== -->
     <section class="screen" id="scr-strategy">
       <h2 class="scr-title">기본 개념 · 전략</h2>
@@ -143,7 +107,6 @@
   <nav class="tabbar" id="tabbar">
     <button type="button" class="active" data-tab="scr-status"><span class="ic">📊</span>현황</button>
     <button type="button" data-tab="scr-report"><span class="ic">📝</span>보고</button>
-    <button type="button" data-tab="scr-eval"><span class="ic">⭐</span>평가</button>
     <button type="button" data-tab="scr-strategy"><span class="ic">🧭</span>전략</button>
   </nav>
 
@@ -200,11 +163,6 @@
       <div class="field"><label>사업소명 *</label><input type="text" id="baName" placeholder="예: 신화 3차" autocomplete="off" /></div>
       <div class="field"><label>분류(군) *</label><select id="baGroup"><option value="1">1군</option><option value="2">2군</option><option value="3" selected>3군</option></select></div>
       <div class="field"><label>등기율 (%) <span class="hintlabel">— 입주 전이면 비워두세요</span></label><input type="number" id="baReg" min="0" max="100" step="0.1" inputmode="decimal" placeholder="예: 65.0" /></div>
-      <div class="field"><label>추진위 구성</label><select id="baCommittee"><option value="false" selected>未구성</option><option value="true">旣구성</option></select></div>
-      <div class="field"><label>시행사 성향</label><select id="baDev"><option value="?" selected>미정(?)</option><option value="우호">우호</option></select></div>
-      <div class="field"><label>관리소장 능력</label><select id="baAbility"><option value="?" selected>미정(?)</option><option value="上">上</option><option value="下">下</option></select></div>
-      <div class="field"><label>우호세력 포섭</label><select id="baAlly"><option value="?" selected>미정(?)</option><option value="○">○</option><option value="×">×</option></select></div>
-      <div class="field"><label>현재 상황 <span class="hintlabel">(선택)</span></label><input type="text" id="baStatus" placeholder="예: 입주 전/초기 — 3군 공통 전략 적용" autocomplete="off" /></div>
       <p class="hint" id="baHint"></p>
       <button type="button" class="btn block" id="baSubmit">사업소 추가</button>
     </div>

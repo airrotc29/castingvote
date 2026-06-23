@@ -27,13 +27,6 @@
     { k: '5', t: '시행/시공사 관련' },
     { k: '6', t: '계획 및 착안사항' },
   ];
-  const ADVISORS = [
-    '백귀만(청라에이스하이테크시티)', '강봉규(더콜롬버스2)', '이대희(청라에이스하이테크시티)',
-    '백명기(에이스테크노타워9)', '최양희(에이스테크노타워3)', '오민석(에이스하이엔드타워1차)',
-    '박용제(강서한강자이타워)', '최영복(아티스포럼)', '이대영(에이스NS타워)',
-    '한수연(하이엔드타워9)', '유효진(스타밸리)', '본사 부장 2명', '본사 최재우 과장',
-  ];
-
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -527,9 +520,7 @@
   // ---------- 사업소 추가 (본사 담당자) ----------
   $('addBranchBtn') && $('addBranchBtn').addEventListener('click', () => {
     if (!hasToken()) { alert('사업소 추가는 본사 담당자 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
-    ['baName', 'baStatus'].forEach((id) => { if ($(id)) $(id).value = ''; });
-    $('baReg').value = ''; $('baGroup').value = '3'; $('baCommittee').value = 'false';
-    $('baDev').value = '?'; $('baAbility').value = '?'; $('baAlly').value = '?';
+    $('baName').value = ''; $('baReg').value = ''; $('baGroup').value = '3';
     hint($('baHint'), '', ''); openModal('branchAddModal');
   });
   $('baSubmit') && $('baSubmit').addEventListener('click', async () => {
@@ -540,9 +531,7 @@
     const branch = {
       id: uid('b'), name, group: parseInt($('baGroup').value, 10),
       regRate: regVal === '' ? null : Number(regVal),
-      committee: $('baCommittee').value === 'true',
-      developerRel: $('baDev').value, managerAbility: $('baAbility').value, allyRecruited: $('baAlly').value,
-      status: $('baStatus').value.trim(),
+      committee: false, developerRel: '?', managerAbility: '?', allyRecruited: '?', status: '',
       ownership: [], ownershipTotal: '', situation: '', managerActions: [], hqActions: [],
     };
     const btn = $('baSubmit'); btn.disabled = true;
@@ -581,7 +570,7 @@
   // 내장 기본 사업소 목록 — branches.json 로드 실패(파일 직접 열기 등) 시에도 12개가 항상 선택되도록 보장.
   // branches.json 이 정상 로드되면 그 데이터(상세 포함)로 대체됩니다.
   const FALLBACK_BRANCHES = [
-    { id: 'sinhwa1', name: '신화 1', group: 1 },
+    { id: 'sinhwa1', name: '신화 1차', group: 1 },
     { id: 'present', name: '프리센트', group: 1 },
     { id: 'mastervalue', name: '마스터밸류', group: 1 },
     { id: 'shdream', name: 'SH드림타워', group: 1 },
@@ -597,7 +586,6 @@
 
   // ---------- 초기화 ----------
   async function init() {
-    $('advTags').innerHTML = ADVISORS.map((a) => `<span class="adv-name">${esc(a)}</span>`).join('');
     try {
       const meta = await fetch(BRANCHES_PATH + '?_cb=' + Date.now(), { cache: 'no-store' }).then((r) => r.json());
       META = meta || {};

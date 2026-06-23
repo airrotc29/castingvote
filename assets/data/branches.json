@@ -11,7 +11,7 @@
   "branches": [
     {
       "id": "sinhwa1",
-      "name": "신화 1",
+      "name": "신화 1차",
       "group": 1,
       "regRate": 50.0,
       "committee": true,
