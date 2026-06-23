@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v13 · 2026.06.23 (로그인 표기·소장 로그인)';
+  const APP_VERSION = 'v14 · 2026.06.23 (소장/에이스 로그인·PDF수정)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -13,6 +13,16 @@
   const REPORTS_PATH = 'assets/data/branch-reports.json';
   const TO_EMAIL = 'airrotc29@habitusinc.co.kr';
   const ENDPOINT = (window.ACE_REPORT_ENDPOINT || localStorage.getItem('ace_report_endpoint') || '').trim();
+
+  // ---------- 로그인 (아이디/비밀번호) ----------
+  const LOGIN_ID = '소장';
+  const LOGIN_PW = '에이스';
+  const LOGIN_FLAG = 'ace_logged_in';
+  // 비밀번호 로그인 시 GitHub 저장에 쓸 토큰(난독화 문자열). 비우면 로컬 저장만 됨.
+  // 값 생성: 브라우저 콘솔에서 obfHelper('your_github_token') 실행 → 결과를 아래에 붙여넣기.
+  const EMBED_TOKEN_OBF = '';
+  function deobf(b64) { try { const s = atob(b64); const k = 'aCe2026!'; let o = ''; for (let i = 0; i < s.length; i++) o += String.fromCharCode(s.charCodeAt(i) ^ k.charCodeAt(i % k.length)); return o; } catch (e) { return ''; } }
+  window.obfHelper = function (t) { const k = 'aCe2026!'; let s = ''; for (let i = 0; i < t.length; i++) s += String.fromCharCode(t.charCodeAt(i) ^ k.charCodeAt(i % k.length)); return btoa(s); };
 
   const REPORT_ITEMS = [
     { k: '1', t: '관리단 구성 동정' },
@@ -332,7 +342,7 @@
   let editBranchId = null;
   function openBranchEdit(id) {
     const b = BRANCHES.find((x) => x.id === id); if (!b) return;
-    if (!hasToken()) { alert('전략 정보 수정은 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
+    if (!hasToken()) { alert('전략 정보 수정은 로그인이 필요합니다.'); openModal('loginModal'); return; }
     editBranchId = id;
     $('beTitle').textContent = `${b.name} — 전략 정보 수정`;
     $('beStatus').value = b.status || '';
@@ -397,7 +407,7 @@
           '<p style="color:var(--soft);margin-bottom:12px;">보고 열람·작성은 <b>로그인</b> 후 가능합니다.<br>본사·관리소장 모두 GitHub 토큰으로 로그인하면 보고가 GitHub에 저장됩니다.</p>' +
           '<button type="button" class="btn block" id="goLoginBtn">로그인</button>' +
         '</div>';
-      const gl = $('goLoginBtn'); if (gl) gl.addEventListener('click', () => { $('loginToken').value = token(); openModal('loginModal'); });
+      const gl = $('goLoginBtn'); if (gl) gl.addEventListener('click', () => { openModal('loginModal'); });
       return;
     }
     if (filterField) filterField.style.display = '';
@@ -503,7 +513,7 @@
       '</div>';
   }
   function reportPdfHtml(r) {
-    let h = '<div style="font-family:\'Noto Sans KR\',sans-serif;color:#1f2937;width:180mm;padding:4px;">';
+    let h = '<div style="font-family:\'Noto Sans KR\',sans-serif;color:#1f2937;width:100%;box-sizing:border-box;">';
     h += '<div style="border-bottom:2px solid #123a6b;padding-bottom:8px;margin-bottom:14px;">' +
       '<div style="font-size:12px;color:#1c5fc4;font-weight:700;">에이스 종합관리㈜ · 지점사업소 관리단 구성</div>' +
       `<div style="font-size:22px;font-weight:900;color:#0f2a4a;">${esc(r.branchName)} 업무보고</div>` +
@@ -527,17 +537,26 @@
   async function genReportPdf(r, btn) {
     const label = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = 'PDF 생성 중…'; }
+    let el = null;
     try {
       await loadH2P();
-      const el = document.createElement('div');
-      el.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;';
+      el = document.createElement('div');
+      // 화면에 보이게(고정, 흰 배경) 렌더링해야 캡처가 백지로 안 나옴
+      el.style.cssText = 'position:fixed;top:0;left:0;width:720px;max-width:100vw;background:#fff;z-index:2147483647;padding:24px;box-sizing:border-box;max-height:100vh;overflow:auto;';
       el.innerHTML = reportPdfHtml(r);
       document.body.appendChild(el);
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+      await new Promise((res) => setTimeout(res, 120));
       const fname = (`${r.branchName}_업무보고_${r.date}`).replace(/[\\/:*?"<>|]/g, '-') + '.pdf';
-      await window.html2pdf().set({ margin: 10, filename: fname, image: { type: 'jpeg', quality: 0.96 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save();
-      document.body.removeChild(el);
+      await window.html2pdf().set({
+        margin: [10, 10, 10, 10], filename: fname,
+        image: { type: 'jpeg', quality: 0.96 },
+        html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true, windowWidth: 800 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] },
+      }).from(el).save();
     } catch (e) { alert('PDF 생성 오류: ' + e.message); }
-    finally { if (btn) { btn.disabled = false; btn.textContent = label; } }
+    finally { if (el && el.parentNode) el.parentNode.removeChild(el); if (btn) { btn.disabled = false; btn.textContent = label; } }
   }
 
   function openReportDetail(id) {
@@ -617,7 +636,7 @@
 
   // ---------- 사업소 추가 (본사 담당자) ----------
   $('addBranchBtn') && $('addBranchBtn').addEventListener('click', () => {
-    if (!hasToken()) { alert('사업소 추가는 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
+    if (!hasToken()) { alert('사업소 추가는 로그인이 필요합니다.'); openModal('loginModal'); return; }
     $('baName').value = ''; $('baReg').value = ''; $('baGroup').value = '3';
     hint($('baHint'), '', ''); openModal('branchAddModal');
   });
@@ -644,19 +663,20 @@
     } catch (e) { hint($('baHint'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });
-  $('adminPill').addEventListener('click', () => { $('loginToken').value = token(); hint($('loginHint'), '', ''); openModal('loginModal'); });
+  $('adminPill').addEventListener('click', () => { if ($('loginPw')) $('loginPw').value = ''; hint($('loginHint'), '', ''); openModal('loginModal'); });
   $('loginSubmit').addEventListener('click', async () => {
-    const t = $('loginToken').value.trim();
-    if (!t) { hint($('loginHint'), '토큰을 입력해 주세요.', 'error'); return; }
-    hint($('loginHint'), '확인 중…', '');
-    try {
-      if (!(await verifyToken(t))) { hint($('loginHint'), '유효하지 않은 토큰이거나 저장소 권한이 없습니다.', 'error'); return; }
-      localStorage.setItem(TOKEN_KEY, t); setAdmin(true);
-      hint($('loginHint'), '', ''); closeModal('loginModal');
-      REPORTS = await loadReports(); renderReports(); refreshNote();
-    } catch (e) { hint($('loginHint'), '오류: ' + e.message, 'error'); }
+    const id = ($('loginId').value || '').trim();
+    const pw = $('loginPw').value || '';
+    if (id !== LOGIN_ID || pw !== LOGIN_PW) { hint($('loginHint'), '아이디 또는 비밀번호가 올바르지 않습니다.', 'error'); return; }
+    // 비밀번호로 푸는 내장 토큰이 있으면 GitHub 저장 활성화
+    const tok = EMBED_TOKEN_OBF ? deobf(EMBED_TOKEN_OBF) : '';
+    if (tok) localStorage.setItem(TOKEN_KEY, tok); else localStorage.removeItem(TOKEN_KEY);
+    localStorage.setItem(LOGIN_FLAG, '1');
+    setAdmin(true);
+    hint($('loginHint'), '', ''); closeModal('loginModal');
+    REPORTS = await loadReports(); renderReports(); renderStatus(); refreshNote();
   });
-  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); setAdmin(false); closeModal('loginModal'); refreshNote(); renderReports(); });
+  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); setAdmin(false); closeModal('loginModal'); refreshNote(); renderReports(); renderStatus(); });
 
   function refreshNote() {
     const note = $('reportNote');
@@ -692,7 +712,7 @@
     $('hdrSub').textContent = `${BRANCHES.length}개 지점사업소 · ${APP_VERSION}`;
     renderStatus();
     renderReportFilter();
-    if (hasToken()) { verifyToken(token()).then((ok) => { if (ok) setAdmin(true); }); }
+    if (localStorage.getItem(LOGIN_FLAG) === '1') { if (EMBED_TOKEN_OBF && !hasToken()) localStorage.setItem(TOKEN_KEY, deobf(EMBED_TOKEN_OBF)); setAdmin(true); }
     REPORTS = await loadReports();
     renderReports();
     renderStatus(); // 보고 건수 반영
