@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v46 · 2026.06.23 (단계글자 확대·사업소글자 축소)';
+  const APP_VERSION = 'v47 · 2026.06.23 (단계명 괄호 0.6배 축소)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -355,6 +355,8 @@
   }
   // 단계명 → 색상 클래스 (s0 공통, s1~s4 단계)
   function stageColorClass(name) { const o = stageOrder(name); return (o >= 1 && o <= 4) ? ('s' + o) : 's0'; }
+  // 단계명 표기: 괄호 부분(예: (추진위 자생))은 작은 글씨로
+  function fmtStageName(name) { const m = /^(.*?)\s*(\(.*\))\s*$/.exec(String(name || '')); return m ? `${esc(m[1].trim())} <span class="sb-sub">${esc(m[2])}</span>` : esc(name); }
   function stageHex(name) { const o = stageOrder(name); return ({ 1: '#1c5fc4', 2: '#15803d', 3: '#c2660c', 4: '#b91c1c' })[o] || '#334155'; }
 
   function renderStatus() {
@@ -403,7 +405,7 @@
       // 단계별 색상: 공통=slate, 1=파랑, 2=녹색, 3=주황, 4=적색, 미보고=회색
       let cls = 'stage-none';
       if (bk.name !== '미보고') { const o = bk.order; cls = (o >= 1 && o <= 4) ? ('stage-s' + o) : 'stage-s0'; }
-      block.innerHTML = `<div class="group-head"><span class="stage-badge ${cls}"><span class="sb-name">${esc(bk.name)}</span><span class="sb-count">${bk.list.length}</span></span></div>`;
+      block.innerHTML = `<div class="group-head"><span class="stage-badge ${cls}"><span class="sb-name">${fmtStageName(bk.name)}</span><span class="sb-count">${bk.list.length}</span></span></div>`;
       bk.list.forEach((b) => {
         const cnt = REPORTS.filter((r) => r.branchId === b.id).length;
         const newB = branchUnseen(b.id);
