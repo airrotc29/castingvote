@@ -78,8 +78,18 @@ button { font-family: inherit; cursor: pointer; }
 .b-card.g1 { border-left-color: var(--g1); }
 .b-card.g2 { border-left-color: var(--g2); }
 .b-card.g3 { border-left-color: var(--g3); }
-.b-top { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.b-top { display: flex; align-items: center; gap: 8px; }
 .b-name { font-size: 16px; font-weight: 800; color: var(--navy); }
+.b-count { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--blue); white-space: nowrap; }
+
+/* 사업소 상세 — 보고 이력 리스트 */
+.bh-list { display: flex; flex-direction: column; gap: 8px; }
+.bh-item { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left;
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px; }
+.bh-item:active { background: var(--bg); }
+.bh-date { font-size: 13px; font-weight: 800; color: var(--navy); flex-shrink: 0; }
+.bh-info { font-size: 12.5px; color: var(--soft); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bh-cmt { font-size: 12px; font-weight: 700; color: var(--blue); flex-shrink: 0; }
 .b-reg { margin-left: auto; font-size: 12px; font-weight: 800; color: var(--blue); }
 .b-reg.none { color: var(--soft); font-weight: 600; }
 .b-bar { height: 7px; background: #e9edf2; border-radius: 999px; overflow: hidden; margin-bottom: 9px; }

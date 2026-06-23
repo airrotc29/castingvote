@@ -229,18 +229,12 @@
       const block = document.createElement('div'); block.className = 'group-block';
       block.innerHTML = `<div class="group-head"><span class="group-badge g${g}">${g}군</span><span class="group-desc">${esc(META.groupCriteria && META.groupCriteria[g] || '')}</span></div>`;
       list.forEach((b) => {
-        const reg = b.regRate == null ? '<span class="b-reg none">입주전</span>' : `<span class="b-reg">등기율 ${b.regRate}%</span>`;
-        const barW = b.regRate == null ? 0 : Math.max(0, Math.min(100, b.regRate));
+        const cnt = REPORTS.filter((r) => r.branchId === b.id).length;
         const card = document.createElement('button');
         card.type = 'button'; card.className = `b-card g${g}`; card.dataset.id = b.id;
         card.innerHTML =
-          `<div class="b-top"><span class="b-name">${esc(b.name)}</span>${reg}</div>` +
-          `<div class="b-bar"><span style="width:${barW}%"></span></div>` +
-          '<div class="b-chips">' +
-            (b.committee ? '<span class="chip yes">추진위 ○</span>' : '<span class="chip no">추진위 ×</span>') +
-            devChip(b.developerRel) + abilityChip(b.managerAbility) + allyChip(b.allyRecruited) +
-          '</div>' +
-          (b.status ? `<div class="b-status">📌 ${esc(b.status)}</div>` : '');
+          `<div class="b-top"><span class="b-name">${esc(b.name)}</span>` +
+          `<span class="b-count">보고 ${cnt}건 ›</span></div>`;
         block.appendChild(card);
       });
       wrap.appendChild(block);
@@ -264,21 +258,37 @@
   function openBranch(id) {
     const b = BRANCHES.find((x) => x.id === id); if (!b) return;
     let h = `<h2>${esc(b.name)} <span class="group-badge g${b.group}" style="font-size:12px;vertical-align:middle;">${b.group}군</span></h2>`;
-    h += '<div class="d-tags">' +
-      (b.regRate == null ? '<span class="chip">입주 전</span>' : `<span class="chip yes">등기율 ${b.regRate}%</span>`) +
-      (b.committee ? '<span class="chip yes">추진위 旣구성</span>' : '<span class="chip no">추진위 未구성</span>') +
-      devChip(b.developerRel) + abilityChip(b.managerAbility) + allyChip(b.allyRecruited) +
-      '</div>';
-    if (b.status) h += `<div class="d-status">📌 ${esc(b.status)}</div>`;
-    if (b.ownership && b.ownership.length) { h += '<div class="d-sec-title">지분율 현황</div>' + ownTable(b); }
-    if (b.situation) h += '<div class="d-sec-title">현황 · 핵심 이슈</div><div class="d-text">' + esc(b.situation) + '</div>';
-    if (b.managerActions && b.managerActions.length) {
-      h += '<div class="d-sec-title">관리소장 대응방안</div><ul class="act-list mgr">' + b.managerActions.map((a) => `<li>${esc(a)}</li>`).join('') + '</ul>';
+
+    // 이 사업소의 보고서 — 날짜별(최근순)
+    const reps = REPORTS.filter((r) => r.branchId === id).slice().sort((a, b2) => (b2.ts || 0) - (a.ts || 0));
+    h += `<div class="d-sec-title">보고 이력 <span style="color:var(--soft);font-weight:600;">· ${reps.length}건 (최근순)</span></div>`;
+    if (!reps.length) h += '<p class="rd-empty">아직 등록된 보고가 없습니다. 아래에서 첫 보고를 작성해 주세요.</p>';
+    else {
+      h += '<div class="bh-list">';
+      reps.forEach((r) => {
+        h += `<button type="button" class="bh-item" data-rid="${esc(r.id)}">` +
+          `<span class="bh-date">${esc(r.date)}</span>` +
+          `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
+          `<span class="bh-cmt">💬 ${(r.comments || []).length}</span>` +
+          '</button>';
+      });
+      h += '</div>';
     }
-    if (b.hqActions && b.hqActions.length) {
-      h += '<div class="d-sec-title">본사 대응방안</div><ul class="act-list hq">' + b.hqActions.map((a) => `<li>${esc(a)}</li>`).join('') + '</ul>';
+    h += `<button type="button" class="btn ghost block" id="branchReportBtn" style="margin-top:14px;">＋ 이 사업소 보고 작성</button>`;
+
+    // 사업소 전략 정보 (있을 때만)
+    if (b.status || (b.ownership && b.ownership.length) || b.situation || (b.managerActions && b.managerActions.length) || (b.hqActions && b.hqActions.length)) {
+      h += '<div class="d-sec-title" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">사업소 전략 정보</div>';
+      if (b.status) h += `<div class="d-status">📌 ${esc(b.status)}</div>`;
+      if (b.ownership && b.ownership.length) { h += '<div class="d-sec-title">지분율 현황</div>' + ownTable(b); }
+      if (b.situation) h += '<div class="d-sec-title">현황 · 핵심 이슈</div><div class="d-text">' + esc(b.situation) + '</div>';
+      if (b.managerActions && b.managerActions.length) {
+        h += '<div class="d-sec-title">관리소장 대응방안</div><ul class="act-list mgr">' + b.managerActions.map((a) => `<li>${esc(a)}</li>`).join('') + '</ul>';
+      }
+      if (b.hqActions && b.hqActions.length) {
+        h += '<div class="d-sec-title">본사 대응방안</div><ul class="act-list hq">' + b.hqActions.map((a) => `<li>${esc(a)}</li>`).join('') + '</ul>';
+      }
     }
-    h += `<button type="button" class="btn block" id="branchReportBtn" style="margin-top:18px;">📝 이 사업소 업무보고 작성</button>`;
 
     // 본사 담당자 — 군 이동
     if (isAdmin()) {
@@ -290,6 +300,10 @@
 
     $('branchDetail').innerHTML = h;
     $('branchReportBtn').addEventListener('click', () => { closeModal('branchModal'); openReportForm(b.id); });
+    // 보고 이력 항목 클릭 → 해당 보고 상세(+댓글)
+    $('branchDetail').querySelectorAll('.bh-item').forEach((it) => {
+      it.addEventListener('click', () => { closeModal('branchModal'); openReportDetail(it.dataset.rid); });
+    });
     const gm = $('groupMove');
     if (gm) gm.addEventListener('click', (e) => {
       const btn = e.target.closest('.gm-btn'); if (!btn) return;
@@ -434,7 +448,7 @@
       hint($('rmHint'), '보고를 올리는 중…', '');
       const next = await addReport(report);
       REPORTS = next ? mergeLocal(next) : await loadReports();
-      renderReports();
+      renderReports(); renderStatus();
       hint($('rmHint'), isCentral() ? '본사로 보고가 접수되었습니다! (반영까지 1~2분)' : '보고가 기록되었습니다. 본사 전달용 메일 창이 열립니다.', 'success');
       setTimeout(() => closeModal('reportModal'), 1100);
     } catch (e) { hint($('rmHint'), '오류: ' + e.message, 'error'); }
@@ -495,7 +509,7 @@
     const rDel = $('rDelBtn');
     if (rDel) rDel.addEventListener('click', async () => {
       if (!confirm('이 보고를 삭제할까요?')) return;
-      try { const next = await deleteReport(r); REPORTS = next ? mergeLocal(next) : await loadReports(); renderReports(); closeModal('reportDetailModal'); }
+      try { const next = await deleteReport(r); REPORTS = next ? mergeLocal(next) : await loadReports(); renderReports(); renderStatus(); closeModal('reportDetailModal'); }
       catch (e) { alert('삭제 오류: ' + e.message); }
     });
   }
@@ -596,6 +610,7 @@
     if (hasToken()) { verifyToken(token()).then((ok) => { if (ok) setAdmin(true); }); }
     REPORTS = await loadReports();
     renderReports();
+    renderStatus(); // 보고 건수 반영
     refreshNote();
   }
   init();
