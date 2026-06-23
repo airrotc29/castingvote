@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v25 · 2026.06.23 (사업소별 로그인 1~12)';
+  const APP_VERSION = 'v26 · 2026.06.23 (사업소별 로그인·보고 한정)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -109,6 +109,8 @@
   const hasEndpoint = () => !!ENDPOINT;
   const isAdmin = () => document.body.classList.contains('admin-on');
   const isCentral = () => hasToken() || hasEndpoint();
+  // 사업소 계정(소장)으로 로그인한 경우 그 사업소 id. 본사(hq)는 빈 문자열(전체 열람).
+  function lockedBranchId() { return (localStorage.getItem('ace_role') === 'site') ? (localStorage.getItem('ace_branch') || '') : ''; }
 
   function headers() { return { Authorization: 'Bearer ' + token(), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }; }
   function utf8ToB64(str) { return btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str))); }
@@ -518,6 +520,13 @@
   // ---------- 보고 목록 ----------
   function renderReportFilter() {
     const sel = $('reportFilter');
+    const lb = lockedBranchId();
+    if (lb) {
+      const b = BRANCHES.find((x) => x.id === lb);
+      sel.innerHTML = `<option value="${esc(lb)}">${esc(b ? b.name : '내 사업소')}</option>`;
+      sel.value = lb;
+      return;
+    }
     sel.innerHTML = '<option value="">전체 사업소 보고 보기</option>' + BRANCHES.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
     sel.value = reportFilter;
   }
@@ -539,9 +548,11 @@
       const gl = $('goLoginBtn'); if (gl) gl.addEventListener('click', () => { openModal('loginModal'); });
       return;
     }
-    if (filterField) filterField.style.display = '';
-
-    const items = REPORTS.filter((r) => !reportFilter || r.branchId === reportFilter);
+    const lb = lockedBranchId();
+    // 사업소 계정은 본인 사업소만, 필터 드롭다운은 숨김. 본사는 전체 + 필터 표시.
+    if (filterField) filterField.style.display = lb ? 'none' : '';
+    const eff = lb || reportFilter;
+    const items = REPORTS.filter((r) => !eff || r.branchId === eff);
     list.innerHTML = '';
     if (!items.length) { empty.hidden = false; }
     else { empty.hidden = true; }
@@ -584,12 +595,14 @@
     $('rmItems').innerHTML = h;
   }
   function openReportForm(branchId) {
-    $('rmBranch').innerHTML = BRANCHES.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+    // 사업소 계정(소장)은 본인 사업소만 선택 가능. 본사는 전체 선택 가능.
+    const lb = lockedBranchId();
+    const opts = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
+    $('rmBranch').innerHTML = opts.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+    $('rmBranch').disabled = !!lb;
     // 사업소를 항상 한 곳 선택해 두어 보고서식이 바로 보이도록 함
-    // (로그인한 관리소장 계정에 사업소가 연결돼 있으면 그 사업소를 기본 선택)
-    const myBranch = localStorage.getItem('ace_branch') || '';
-    if (branchId) $('rmBranch').value = branchId;
-    else if (myBranch && BRANCHES.some((b) => b.id === myBranch)) $('rmBranch').value = myBranch;
+    if (lb) $('rmBranch').value = lb;
+    else if (branchId) $('rmBranch').value = branchId;
     else if (reportFilter) $('rmBranch').value = reportFilter;
     else if (BRANCHES[0]) $('rmBranch').value = BRANCHES[0].id;
     $('rmReporter').value = '';
@@ -809,9 +822,10 @@
     if (acc.branchId) localStorage.setItem('ace_branch', acc.branchId); else localStorage.removeItem('ace_branch');
     setAdmin(true);
     hint($('loginHint'), '', ''); closeModal('loginModal');
+    reportFilter = ''; renderReportFilter();
     REPORTS = await loadReports(); renderReports(); renderStatus(); refreshNote();
   });
-  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); localStorage.removeItem('ace_branch'); setAdmin(false); closeModal('loginModal'); refreshNote(); renderReports(); renderStatus(); });
+  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); localStorage.removeItem('ace_branch'); setAdmin(false); closeModal('loginModal'); reportFilter = ''; renderReportFilter(); refreshNote(); renderReports(); renderStatus(); });
 
   // ---------- 아이디/비밀번호 변경 ----------
   function curRole() { return localStorage.getItem('ace_role') || ''; }
