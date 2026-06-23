@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v28 · 2026.06.23 (댓글 작성자 로그인계정 고정)';
+  const APP_VERSION = 'v29 · 2026.06.23 (보고 수정 · 사업소 추가시 계정 자동생성)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -261,6 +261,12 @@
     if (hasEndpoint()) return callEndpoint('deleteReport', { reportId: report.id });
     throw new Error('삭제 권한이 없습니다 (로그인 필요).');
   }
+  async function updateReport(report) {
+    if (report._local) { const local = getLocal(); local.reports = local.reports.map((r) => (r.id === report.id ? report : r)); setLocal(local); return null; }
+    if (hasToken()) return mutateReports((items) => items.map((r) => (r.id === report.id ? Object.assign({}, r, report) : r)), '보고 수정: ' + report.branchName);
+    if (hasEndpoint()) return callEndpoint('updateReport', { report });
+    throw new Error('수정 권한이 없습니다 (로그인 필요).');
+  }
   async function deleteComment(reportId, commentId) {
     const local0 = getLocal();
     const ownLocal = local0.reports.find((r) => r.id === reportId);
@@ -288,7 +294,7 @@
 
   // ---------- 모달 ----------
   function openModal(id) { const m = $(id); if (m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } }
-  function closeModal(id) { const m = $(id); if (m) { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); if (id === 'reportDetailModal') openReportId = null; } }
+  function closeModal(id) { const m = $(id); if (m) { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); if (id === 'reportDetailModal') openReportId = null; if (id === 'reportModal') editReportId = null; } }
   // 입력 폼 모달은 바깥(어두운 배경) 클릭으로 닫지 않음 — 작성 중 내용 유실 방지. ×버튼으로만 닫힘.
   const NO_BACKDROP_CLOSE = new Set(['reportModal', 'branchAddModal', 'branchEditModal', 'changeCredModal']);
   document.querySelectorAll('.modal').forEach((m) => {
@@ -585,12 +591,14 @@
   $('reportFilter').addEventListener('change', function () { reportFilter = this.value; renderReports(); });
 
   // ---------- 보고 작성 ----------
-  // 선택한 사업소의 군에 맞는 단계별 과제 입력칸 생성
-  function rebuildRmItems() {
+  let editReportId = null; // 수정 중인 보고 id (없으면 신규 작성)
+  // 선택한 사업소의 군에 맞는 단계별 과제 입력칸 생성 (groupOverride: 수정 시 원 보고의 군 유지)
+  function rebuildRmItems(groupOverride) {
     const b = BRANCHES.find((x) => x.id === $('rmBranch').value);
-    if (!b) { $('rmItems').innerHTML = '<p class="hint">먼저 사업소를 선택하면 해당 군의 단계별 과제가 표시됩니다.</p>'; return; }
-    let h = `<p class="rf-grouptag">${b.group}군 보고서식</p>`;
-    stagesForGroup(b.group).forEach((s) => {
+    const grp = (typeof groupOverride === 'number' && groupOverride) || (b && b.group);
+    if (!grp) { $('rmItems').innerHTML = '<p class="hint">먼저 사업소를 선택하면 해당 군의 단계별 과제가 표시됩니다.</p>'; return; }
+    let h = `<p class="rf-grouptag">${grp}군 보고서식</p>`;
+    stagesForGroup(grp).forEach((s) => {
       h += `<div class="rf-stage">${esc(s.name)}</div>`;
       s.tasks.forEach((t) => {
         h += `<div class="r-item"><label><span class="rf-no">${esc(t.no)}</span>${esc(t.t)}</label>` +
@@ -599,40 +607,63 @@
     });
     $('rmItems').innerHTML = h;
   }
-  function openReportForm(branchId) {
-    // 사업소 계정(소장)은 본인 사업소만 선택 가능. 본사는 전체 선택 가능.
+  function openReportForm(branchId, editReport) {
+    editReportId = editReport ? editReport.id : null;
+    // 사업소 계정(소장)은 본인 사업소만 선택 가능. 본사는 전체 선택 가능. 수정 시 사업소 고정.
     const lb = lockedBranchId();
     const opts = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
     $('rmBranch').innerHTML = opts.map((b) => `<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
-    $('rmBranch').disabled = !!lb;
+    $('rmBranch').disabled = !!lb || !!editReport;
     // 사업소를 항상 한 곳 선택해 두어 보고서식이 바로 보이도록 함
-    if (lb) $('rmBranch').value = lb;
+    if (editReport) $('rmBranch').value = editReport.branchId;
+    else if (lb) $('rmBranch').value = lb;
     else if (branchId) $('rmBranch').value = branchId;
     else if (reportFilter) $('rmBranch').value = reportFilter;
     else if (BRANCHES[0]) $('rmBranch').value = BRANCHES[0].id;
-    $('rmReporter').value = '';
-    const d = new Date(); $('rmDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    rebuildRmItems();
+    if (editReport) {
+      $('rmReporter').value = editReport.reporter || '';
+      $('rmDate').value = (editReport.date || '').replace(/\./g, '-');
+    } else {
+      $('rmReporter').value = '';
+      const d = new Date(); $('rmDate').value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+    rebuildRmItems(editReport ? editReport.group : undefined);
+    if (editReport) { Object.keys(editReport.items || {}).forEach((k) => { const el = $('rm_' + k); if (el) el.value = editReport.items[k]; }); }
+    if ($('rmTitle')) $('rmTitle').textContent = editReport ? '업무보고 수정' : '관리단 관련 업무보고';
+    $('rmSubmit').textContent = editReport ? '수정 내용 저장' : '본사로 보고 올리기';
     hint($('rmHint'), '', '');
     openModal('reportModal');
   }
   $('fabReport').addEventListener('click', () => openReportForm());
-  $('rmBranch') && $('rmBranch').addEventListener('change', rebuildRmItems);
+  $('rmBranch') && $('rmBranch').addEventListener('change', () => rebuildRmItems());
 
   $('rmSubmit').addEventListener('click', async () => {
     const bId = $('rmBranch').value;
     const b = BRANCHES.find((x) => x.id === bId);
     const reporter = $('rmReporter').value.trim();
     if (!b || !reporter) { hint($('rmHint'), '사업소와 보고자(관리소장)는 필수입니다.', 'error'); return; }
+    const orig = editReportId ? REPORTS.find((x) => x.id === editReportId) : null;
+    const group = orig ? (orig.group || b.group) : b.group;
     const items = {}; let any = false;
-    stagesForGroup(b.group).forEach((s) => s.tasks.forEach((t) => { const el = $('rm_' + t.k); const v = el ? el.value.trim() : ''; items[t.k] = v; if (v) any = true; }));
+    stagesForGroup(group).forEach((s) => s.tasks.forEach((t) => { const el = $('rm_' + t.k); const v = el ? el.value.trim() : ''; items[t.k] = v; if (v) any = true; }));
     if (!any) { hint($('rmHint'), '최소 한 개 이상의 과제를 작성해 주세요.', 'error'); return; }
     const dv = $('rmDate').value;
     const dateStr = dv ? dv.replace(/-/g, '.') : todayStr();
     const month = dv ? dv.slice(0, 7) : '';
-    const report = { id: uid('r'), branchId: b.id, branchName: b.name, group: b.group, reporter, date: dateStr, month, occupancy: null, items, ts: Date.now(), comments: [] };
     const btn = $('rmSubmit'); btn.disabled = true;
     try {
+      if (orig) {
+        // ----- 수정 -----
+        const updated = Object.assign({}, orig, { branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, items });
+        hint($('rmHint'), '수정 내용을 저장하는 중…', '');
+        const next = await updateReport(updated);
+        REPORTS = next ? mergeLocal(next) : await loadReports();
+        renderReports(); renderStatus();
+        hint($('rmHint'), '수정되었습니다! (반영까지 1~2분)', 'success');
+        setTimeout(() => closeModal('reportModal'), 1000);
+        btn.disabled = false; return;
+      }
+      const report = { id: uid('r'), branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, occupancy: null, items, ts: Date.now(), comments: [] };
       hint($('rmHint'), '보고를 올리는 중…', '');
       const next = await addReport(report);
       REPORTS = next ? mergeLocal(next) : await loadReports();
@@ -738,12 +769,15 @@
       `<div class="cmt-asrole ${myRole === 'hq' ? 'hq' : 'site'}">작성자: <b>${myLabel}</b></div>` +
       '<div class="field" style="margin-bottom:8px;"><textarea id="cBody" rows="3" placeholder="메시지를 입력하세요"></textarea></div>' +
       '<p class="hint" id="cHint"></p><button type="button" class="btn block" id="cSubmit">댓글 남기기</button></div>';
+    if (isAdmin() || r._local) h += `<button type="button" class="btn ghost block" id="rEditBtn" style="margin-top:10px;">✏️ 이 보고 수정</button>`;
     if (isAdmin() || r._local) h += `<button type="button" class="btn ghost block" id="rDelBtn" style="margin-top:10px;">이 보고 삭제</button>`;
 
     $('reportDetail').innerHTML = h;
     openModal('reportDetailModal');
 
     if ($('pdfBtn')) $('pdfBtn').addEventListener('click', function () { genReportPdf(r, this); });
+    const rEdit = $('rEditBtn');
+    if (rEdit) rEdit.addEventListener('click', () => { closeModal('reportDetailModal'); openReportForm(null, r); });
 
     $('cSubmit').addEventListener('click', async () => {
       const role = myRole, body = $('cBody').value.trim();
@@ -805,10 +839,23 @@
       hint($('baHint'), '추가하는 중…', '');
       const next = await mutateBranchesObj((o) => { o.branches = (o.branches || []).concat([branch]); return o; }, '사업소 추가: ' + name);
       BRANCHES = next.branches;
+      // 새 사업소 로그인 계정 자동 생성 (아이디 = 다음 번호, 초기 비번 = 1234)
+      let newId = '';
+      try {
+        const pw1234 = await sha256hex('1234');
+        const nextAuth = await mutateAuth((o) => {
+          const accs = o.accounts || [];
+          const maxNum = accs.reduce((m, a) => { const n = parseInt(a.id, 10); return (Number.isFinite(n) && n > m) ? n : m; }, 0);
+          newId = String(maxNum + 1);
+          o.accounts = accs.concat([{ id: newId, role: 'site', pwHash: pw1234, branchId: branch.id, branchName: name }]);
+          return o;
+        }, '사업소 계정 추가: ' + name);
+        AUTH = nextAuth.accounts;
+      } catch (e2) { newId = ''; }
       renderStatus(); renderReportFilter();
       $('hdrSub').textContent = `${BRANCHES.length}개 지점사업소 · 본사 ↔ 관리소장 소통`;
-      hint($('baHint'), '추가되었습니다! (반영까지 1~2분)', 'success');
-      setTimeout(() => closeModal('branchAddModal'), 1100);
+      hint($('baHint'), newId ? `추가되었습니다! 로그인 아이디 ${newId} · 초기 비번 1234 (반영 1~2분)` : '추가되었습니다! (계정은 자동 생성 실패 — 다시 시도해 주세요)', newId ? 'success' : 'error');
+      setTimeout(() => closeModal('branchAddModal'), 1800);
     } catch (e) { hint($('baHint'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });

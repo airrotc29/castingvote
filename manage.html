@@ -123,7 +123,7 @@
   <div class="modal" id="reportModal" aria-hidden="true">
     <div class="modal-box">
       <button type="button" class="modal-close" data-close>×</button>
-      <h2>관리단 관련 업무보고</h2>
+      <h2 id="rmTitle">관리단 관련 업무보고</h2>
       <p class="login-help">매월 말 본사 보고. 별도 로그인 없이 작성하실 수 있습니다.</p>
       <div class="field"><label>대상 사업소 *</label><select id="rmBranch"></select></div>
       <div class="field"><label>보고자(관리소장) *</label><input type="text" id="rmReporter" placeholder="예: 소장 김관리" autocomplete="off" /></div>
@@ -147,7 +147,7 @@
     <div class="modal-box">
       <button type="button" class="modal-close" data-close>×</button>
       <h2>사업소 추가</h2>
-      <p class="login-help">본사 담당자 전용. 추가한 사업소는 모든 사용자에게 공유됩니다. (세부 지분율·대응방안은 추후 데이터 파일에서 보완할 수 있습니다.)</p>
+      <p class="login-help">본사 담당자 전용. 추가한 사업소는 모든 사용자에게 공유됩니다. <b>추가 시 그 사업소의 로그인 계정(아이디=다음 번호, 초기 비번 1234)이 자동 생성</b>됩니다. (세부 지분율·대응방안은 추후 데이터 파일에서 보완할 수 있습니다.)</p>
       <div class="field"><label>사업소명 *</label><input type="text" id="baName" placeholder="예: 신화 3차" autocomplete="off" /></div>
       <div class="field"><label>분류(군) *</label><select id="baGroup"><option value="1">1군</option><option value="2">2군</option><option value="3" selected>3군</option></select></div>
       <div class="field"><label>등기율 (%) <span class="hintlabel">— 입주 전이면 비워두세요</span></label><input type="number" id="baReg" min="0" max="100" step="0.1" inputmode="decimal" placeholder="예: 65.0" /></div>
