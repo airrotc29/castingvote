@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v15 · 2026.06.23 (나가기 확인)';
+  const APP_VERSION = 'v16 · 2026.06.23 (PDF 인쇄저장 방식)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -494,18 +494,7 @@
   });
 
   // ---------- 보고 상세 + 댓글 ----------
-  // ---------- 보고서 PDF 생성 ----------
-  let _h2pPromise = null;
-  function loadH2P() {
-    if (window.html2pdf) return Promise.resolve();
-    if (_h2pPromise) return _h2pPromise;
-    _h2pPromise = new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js';
-      s.onload = res; s.onerror = rej; document.head.appendChild(s);
-    });
-    return _h2pPromise;
-  }
+  // ---------- 보고서 PDF (인쇄 → PDF로 저장) ----------
   function pdfBlock(num, title, body) {
     return '<div style="margin-bottom:10px;">' +
       `<div style="font-size:13px;font-weight:800;color:#0f2a4a;margin-bottom:4px;">${num}. ${esc(title)}</div>` +
@@ -534,29 +523,27 @@
     }
     return h + '</div>';
   }
-  async function genReportPdf(r, btn) {
-    const label = btn ? btn.textContent : '';
-    if (btn) { btn.disabled = true; btn.textContent = 'PDF 생성 중…'; }
-    let el = null;
-    try {
-      await loadH2P();
-      el = document.createElement('div');
-      // 화면에 보이게(고정, 흰 배경) 렌더링해야 캡처가 백지로 안 나옴
-      el.style.cssText = 'position:fixed;top:0;left:0;width:720px;max-width:100vw;background:#fff;z-index:2147483647;padding:24px;box-sizing:border-box;max-height:100vh;overflow:auto;';
-      el.innerHTML = reportPdfHtml(r);
-      document.body.appendChild(el);
-      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
-      await new Promise((res) => setTimeout(res, 120));
-      const fname = (`${r.branchName}_업무보고_${r.date}`).replace(/[\\/:*?"<>|]/g, '-') + '.pdf';
-      await window.html2pdf().set({
-        margin: [10, 10, 10, 10], filename: fname,
-        image: { type: 'jpeg', quality: 0.96 },
-        html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true, windowWidth: 800 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] },
-      }).from(el).save();
-    } catch (e) { alert('PDF 생성 오류: ' + e.message); }
-    finally { if (el && el.parentNode) el.parentNode.removeChild(el); if (btn) { btn.disabled = false; btn.textContent = label; } }
+  function genReportPdf(r) {
+    // 새 창에 보고서를 그려 인쇄(=PDF로 저장) — 한글이 완벽히 나오고 백지 문제 없음
+    const w = window.open('', '_blank');
+    if (!w) { alert('PDF 저장을 위해 팝업을 허용해 주세요. (브라우저 주소창의 팝업 차단 해제)'); return; }
+    const title = esc((r.branchName || '업무보고') + ' 업무보고 ' + (r.date || ''));
+    const css = '@page{size:A4;margin:14mm}' +
+      '*{box-sizing:border-box}' +
+      "body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;color:#1f2937;margin:0;padding:18px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}" +
+      '@media print{body{padding:0}}';
+    w.document.open();
+    w.document.write(
+      '<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<title>' + title + '</title>' +
+      '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">' +
+      '<style>' + css + '</style></head><body>' +
+      reportPdfHtml(r) +
+      '<scr' + 'ipt>window.onload=function(){setTimeout(function(){try{window.focus();window.print();}catch(e){}},500);};<\/scr' + 'ipt>' +
+      '</body></html>'
+    );
+    w.document.close();
   }
 
   function openReportDetail(id) {
