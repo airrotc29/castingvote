@@ -69,7 +69,8 @@ body.admin-on #appGate { display: none; }
 .bar-label { flex: none; width: 40px; font-size: 11px; font-weight: 700; color: var(--soft); text-align: right; }
 .bar-track { flex: 1; background: #eef2f7; border-radius: 8px; height: 16px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 8px; min-width: 4px; transition: width .5s cubic-bezier(.22,.61,.36,1); }
-.bar-val { flex: none; width: 18px; font-size: 12.5px; font-weight: 800; color: var(--navy); text-align: left; }
+.bar-val { flex: none; min-width: 56px; font-size: 12.5px; font-weight: 800; color: var(--navy); text-align: left; white-space: nowrap; }
+.bar-pct { font-style: normal; font-size: 10.5px; font-weight: 600; color: var(--soft); margin-left: 3px; }
 .bar-fill.b-none { background: #c7cfdb; }
 .bar-fill.b-s0 { background: #475569; }
 .bar-fill.b-s1 { background: #2563eb; }

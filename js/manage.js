@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v42 · 2026.06.23 (댓글 작성자 라벨 제거)';
+  const APP_VERSION = 'v43 · 2026.06.23 (막대 통계 퍼센트 표기)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -375,13 +375,15 @@
       // 순서: 미보고 → (공통) → 1 → 2 → 3 → 4 단계
       const orders = [].concat(byOrder[99] ? [99] : [], byOrder[0] ? [0] : [], [1, 2, 3, 4]);
       const max = Math.max(1, ...orders.map((o) => byOrder[o] || 0));
+      const totalV = visible.length || 1;
       el.innerHTML = orders.map((o) => {
         const c = byOrder[o] || 0; const w = Math.round((c / max) * 100);
+        const pct = Math.round((c / totalV) * 100);
         const names = (namesByOrder[o] || []).join(', ');
-        return `<div class="bar-row" data-order="${o}" data-label="${esc(labelOf(o))}" data-names="${esc(names)}" title="${esc(labelOf(o))} (${c}): ${esc(names || '없음')}">` +
+        return `<div class="bar-row" data-order="${o}" data-label="${esc(labelOf(o))}" data-names="${esc(names)}" title="${esc(labelOf(o))} (${c}·${pct}%): ${esc(names || '없음')}">` +
           `<span class="bar-label">${esc(labelOf(o))}</span>` +
           `<div class="bar-track"><div class="bar-fill ${colorOf(o)}" style="width:${w}%"></div></div>` +
-          `<span class="bar-val">${c}</span></div>`;
+          `<span class="bar-val">${c}<i class="bar-pct">(${pct}%)</i></span></div>`;
       }).join('');
     }
 
