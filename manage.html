@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>에이스 종합관리 — 지점사업소 관리단 구성 전략</title>
+  <meta name="description" content="에이스 종합관리㈜ 지점사업소 관리단 구성 전략 · 사업소 현황 · 소장 월례 보고 · 본사 소통" />
+  <meta name="theme-color" content="#0c2748" />
+  <meta property="og:title" content="에이스 종합관리 — 관리단 구성 전략" />
+  <meta property="og:description" content="지점사업소 관리단 구성 현황 · 소장 보고 · 본사 소통" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/manage.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- 헤더 -->
+    <header class="app-header">
+      <div class="eyebrow">ACE 종합관리㈜</div>
+      <h1>지점사업소 관리단 구성 전략</h1>
+      <div class="sub" id="hdrSub">12개 지점사업소 · 본사 ↔ 관리소장 소통</div>
+      <button type="button" class="admin-pill" id="adminPill">본사</button>
+    </header>
+
+    <!-- ===== 현황 ===== -->
+    <section class="screen active" id="scr-status">
+      <h2 class="scr-title">사업소 현황</h2>
+      <p class="scr-lead">12개 지점사업소를 등기율·추진위·시행사 소통 기준으로 1·2·3군으로 분류해 관리합니다. 카드를 누르면 현황·지분율·대응방안을 볼 수 있습니다.</p>
+      <div class="stat-row" id="statRow"></div>
+      <div id="groupWrap"></div>
+    </section>
+
+    <!-- ===== 보고 ===== -->
+    <section class="screen" id="scr-report">
+      <h2 class="scr-title">월례 업무보고</h2>
+      <p class="scr-lead">관리소장이 매월 본사에 관리단 구성 진행 상황을 보고하고, 보고별 댓글로 본사와 소통합니다. (소장 → 본사, 월 1회)</p>
+      <p class="note-box" id="reportNote" hidden></p>
+      <div class="field" style="margin-bottom:14px;">
+        <select id="reportFilter">
+          <option value="">전체 사업소 보고 보기</option>
+        </select>
+      </div>
+      <div id="reportList"></div>
+      <p class="empty" id="reportEmpty" hidden>아직 등록된 보고가 없습니다. 우측 하단 ‘＋ 보고 작성’으로 첫 보고를 올려 주세요.</p>
+    </section>
+
+    <!-- ===== 평가 ===== -->
+    <section class="screen" id="scr-eval">
+      <h2 class="scr-title">본사 주관 소장 평가</h2>
+      <p class="scr-lead">월 1회 시행. 평가 결과(의지·성과) 기반으로 인사 조치를 시행합니다.</p>
+
+      <div class="info-card">
+        <h3>평가 배점</h3>
+        <div class="weight-bar"><div class="w1" style="flex:70">우호세력 포섭 70%</div><div class="w2" style="flex:30">하자 중재 30%</div></div>
+      </div>
+
+      <div class="info-card">
+        <h3>① 우호 세력 포섭 진척도 (70%) — 의지 × 실행</h3>
+        <ul>
+          <li>내용 포섭 대상 발굴 — 선관위원장·선관위원·관리인·관리위원 후보 사전 확보 (추진위 자생 발생 前 확보 목표)</li>
+          <li>추진위 래포 형성도 — 추진위원 소유 전유부 집중 관리 실적, 접촉 횟수</li>
+          <li>시행사·시공사 협조 관계 — 담당자 협조(회의·공문 발송 실적)</li>
+          <li>관리규약 및 법령 이해도 평가</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>② 하자 중재 역량 (30%)</h3>
+        <ul>
+          <li>하자처리 현황 본사 보고 (월 1회)</li>
+          <li>시공사–추진위 하자처리 논의 시 중립적 중재자 역할 수행 여부 (회의 개최 실적)</li>
+        </ul>
+        <p style="margin-top:8px;color:var(--soft);font-size:12.5px;">※ 종합 평가 후 저능력 또는 능력 부재 시 과감한 교체 단행</p>
+      </div>
+
+      <div class="info-card">
+        <h3>자문단(특별 지원팀) 구성 — 집단 지성 전사적 지원</h3>
+        <p>경험 풍부한 소장 11명 + 본사 3명(부장 2, 최재우 과장) 매칭. (소장)카톡방 Q&A·업무 노하우 공유 / (본사)법률·행정·재정 지원.</p>
+        <div class="tag-row" id="advTags"></div>
+      </div>
+    </section>
+
+    <!-- ===== 전략 ===== -->
+    <section class="screen" id="scr-strategy">
+      <h2 class="scr-title">기본 개념 · 전략</h2>
+      <p class="scr-lead">관리소장 중심의 재계약 추진. 역량 투입 비중은 관리소장 80% / 본사 20%.</p>
+
+      <div class="info-card">
+        <h3>역량 투입 비중</h3>
+        <div class="weight-bar"><div class="w1" style="flex:80">관리소장 80%</div><div class="w2" style="flex:20">본사 20%</div></div>
+        <p style="margin-top:10px;font-size:12.5px;color:var(--soft);">사업소 현장에서 관리소장 활동이 재계약의 90% 이상을 결정합니다. <b style="color:var(--navy)">우호 인원 포섭 → 추진위 활동 주도 → 추진위와 래포 형성 → 재계약 성사.</b></p>
+      </div>
+
+      <div class="info-card">
+        <h3>개념도 (관리소장 중심)</h3>
+        <div class="concept">
+          <div class="node"><b>지점 사업소 (관리소장)</b><p>우호 세력 포섭·추진위 구성 주도, 추진위 대상 서비스 제공(장소·행정)</p></div>
+          <div class="arrow">▲ 협조 · 지원 ▼</div>
+          <div class="node"><b>추진위 (구분소유자)</b><p>관리단 구성의 주도 세력 (구성 前 상대적 약자 — 인적·행정·물적 후원 갈망)</p></div>
+          <div class="arrow">▲ 협조 · 중재 ▼</div>
+          <div class="node"><b>시행/시공사 (현장 담당자)</b><p>(시행사)관리단 구성의 법적 권한 보유 · (시공사)하자보수 주체</p></div>
+          <div class="arrow">▲ 보고 · 지원/평가 ▼</div>
+          <div class="node"><b>본사</b><p>관리소장 지원(법·재정·행정), 정보·TOOL 지원(등기율·전자투표)</p></div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>관리소장 역할 (80%)</h3>
+        <ul>
+          <li>규약·집합건물법상 ‘선관위·관리위원회·관리인’ 사전 포섭 (위원장·위원·관리인·관리위원 보직 구성)</li>
+          <li>포섭 인원 중심 추진위 구성 및 활동 여건 마련 (회의 장소 제공, 회의록 작성, 본사 소통 채널)</li>
+          <li>지속적 접촉으로 추진위와 래포(친밀관계) 형성 (추진위원 소유 전유부 집중 관리)</li>
+          <li>하자 관련 회의 중재 (시공사 ↔ 관리사 ↔ 추진위)</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>본사 역할 (20%)</h3>
+        <ul>
+          <li>관리단 구성 간 법·행정적 컨설팅, 등기율 산출 및 정보 제공</li>
+          <li>전자투표 지원, 관리소장 활동 재정·행정 지원</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>군 분류 기준</h3>
+        <ul>
+          <li><b>1군</b> — 등기율 50% 이상 · 추진위 旣구성 · 시행사 소통</li>
+          <li><b>2군</b> — 등기율 50% 이상 · 추진위 未구성 · 시행사 소통</li>
+          <li><b>3군</b> — 1·2군 이외 (대체로 입주 전/초기)</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- 플로팅 보고 작성 -->
+  <button type="button" class="fab" id="fabReport">＋ 보고 작성</button>
+
+  <!-- 하단 탭바 -->
+  <nav class="tabbar" id="tabbar">
+    <button type="button" class="active" data-tab="scr-status"><span class="ic">📊</span>현황</button>
+    <button type="button" data-tab="scr-report"><span class="ic">📝</span>보고</button>
+    <button type="button" data-tab="scr-eval"><span class="ic">⭐</span>평가</button>
+    <button type="button" data-tab="scr-strategy"><span class="ic">🧭</span>전략</button>
+  </nav>
+
+  <!-- 사업소 상세 모달 -->
+  <div class="modal" id="branchModal" aria-hidden="true">
+    <div class="modal-box">
+      <button type="button" class="modal-close" data-close>×</button>
+      <div id="branchDetail"></div>
+    </div>
+  </div>
+
+  <!-- 보고 작성 모달 -->
+  <div class="modal" id="reportModal" aria-hidden="true">
+    <div class="modal-box">
+      <button type="button" class="modal-close" data-close>×</button>
+      <h2>관리단 관련 업무보고</h2>
+      <p class="login-help">매월 말 본사 보고. 별도 로그인 없이 작성하실 수 있습니다.</p>
+      <div class="field"><label>대상 사업소 *</label><select id="rmBranch"></select></div>
+      <div class="field"><label>보고자(관리소장) *</label><input type="text" id="rmReporter" placeholder="예: 소장 김관리" autocomplete="off" /></div>
+      <div class="field"><label>보고일</label><input type="date" id="rmDate" /></div>
+      <div class="r-item"><label><span class="num">1</span>관리단 구성 동정</label><textarea id="rm1" placeholder="예) 405호 중심 추진위 구성 시도 중 정보 입수 / 206호 주도 단톡방(150명) 운영 중"></textarea></div>
+      <div class="r-item"><label><span class="num">2</span>우호 인원 포섭 결과</label><textarea id="rm2" placeholder="예) (포섭 완료) 관리인 205호 최관리, 위원 1504호·708호 / (진행중) 475호, 1704호…"></textarea></div>
+      <div class="r-item"><label><span class="num">3</span>포섭 인원 래포 형성</label><textarea id="rm3" placeholder="예) 관리위원(1504호) 하자 우선처리 시공사 협조 중 / 별도 통화·생일 문자 등"></textarea></div>
+      <div class="r-item"><label><span class="num">4</span>추진위 미팅 실적</label><textarea id="rm4" placeholder="예) 관리인(205호) 관리사무소 미팅 — 전유부 하자절차·분양율 문의 / 추진위 5명 회의"></textarea></div>
+      <div class="r-item"><label><span class="num">5</span>시행/시공사 관련</label><textarea id="rm5" placeholder="예) 시공사 공용부 하자 리스트 발송 / 시행사 분양현황 자료 수령 예정"></textarea></div>
+      <div class="r-item"><label><span class="num">6</span>계획 및 착안사항</label><textarea id="rm6" placeholder="예) 차주 하자 관련 전 구분소유자 문자 발송 / 추진위–시공사 미팅 추진"></textarea></div>
+      <p class="hint" id="rmHint"></p>
+      <button type="button" class="btn block" id="rmSubmit">본사로 보고 올리기</button>
+    </div>
+  </div>
+
+  <!-- 보고 상세 + 댓글 모달 -->
+  <div class="modal" id="reportDetailModal" aria-hidden="true">
+    <div class="modal-box">
+      <button type="button" class="modal-close" data-close>×</button>
+      <div id="reportDetail"></div>
+    </div>
+  </div>
+
+  <!-- 본사 로그인 모달 -->
+  <div class="modal" id="loginModal" aria-hidden="true">
+    <div class="modal-box">
+      <button type="button" class="modal-close" data-close>×</button>
+      <h2>본사 관리자 로그인</h2>
+      <p class="login-help">본사가 GitHub 액세스 토큰으로 로그인하면 보고·댓글이 저장소에 직접 기록되고, 보고/댓글 삭제가 가능합니다. 토큰은 이 브라우저에만 저장됩니다.
+        <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">토큰 발급 ↗</a></p>
+      <div class="field"><input type="password" id="loginToken" placeholder="github_pat_... 또는 ghp_..." autocomplete="off" /></div>
+      <p class="hint" id="loginHint"></p>
+      <button type="button" class="btn block" id="loginSubmit">로그인</button>
+      <button type="button" class="btn ghost block" id="logoutBtn" style="margin-top:8px;display:none;">로그아웃</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var t = Date.now();
+      var s = document.createElement('script');
+      s.src = 'js/manage.js?t=' + t; s.async = false;
+      document.body.appendChild(s);
+    })();
+  </script>
+</body>
+</html>
