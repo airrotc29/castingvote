@@ -509,7 +509,7 @@
     h += '</div>';
     h += '<div class="cmt-form">' +
       '<div class="field" style="margin-bottom:8px;"><select id="cRole"><option value="site">현장(소장)</option><option value="hq">본사</option></select></div>' +
-      '<div class="field" style="margin-bottom:8px;"><textarea id="cBody" rows="2" placeholder="메시지를 입력하세요"></textarea></div>' +
+      '<div class="field" style="margin-bottom:8px;"><textarea id="cBody" rows="3" placeholder="메시지를 입력하세요"></textarea></div>' +
       '<p class="hint" id="cHint"></p><button type="button" class="btn block" id="cSubmit">댓글 남기기</button></div>';
     if (isAdmin() || r._local) h += `<button type="button" class="btn ghost block" id="rDelBtn" style="margin-top:10px;">이 보고 삭제</button>`;
 

@@ -188,6 +188,8 @@ button { font-family: inherit; cursor: pointer; }
 .cmt .who { font-size: 11px; font-weight: 700; color: var(--soft); margin-bottom: 3px; }
 .cmt.hq .who { color: var(--blue); }
 .cmt .bubble { background: #fff; border: 1px solid var(--line); border-radius: 13px; border-top-left-radius: 3px; padding: 9px 13px; font-size: 13px; line-height: 1.55; white-space: pre-wrap; word-break: keep-all; }
+/* 공백 없는 긴 문자열(토큰·URL 등)도 박스 안에서 줄바꿈 */
+.cmt .bubble, .r-block .bd, .r-detail, .d-text, .d-status, .rc-excerpt, .bh-info, .own-table td, .act-list li, .rd-body { overflow-wrap: anywhere; word-break: break-word; }
 .cmt.hq .bubble { background: linear-gradient(135deg, var(--blue), var(--blue-light)); color: #fff; border: none; border-top-left-radius: 13px; border-top-right-radius: 3px; }
 .cmt .when { font-size: 10px; color: var(--soft); margin-top: 3px; }
 .cmt .cdel { background: none; border: none; color: var(--red); font-size: 11px; margin-top: 1px; }
