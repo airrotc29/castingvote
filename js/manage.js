@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v18 · 2026.06.23 (본사·소장 로그인)';
+  const APP_VERSION = 'v19 · 2026.06.23 (본사 비번 ace01)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -18,7 +18,7 @@
   // 소장: 소장/ace, 본사: 본사/본사
   const LOGINS = [
     { id: '소장', pw: 'ace', role: 'site' },
-    { id: '본사', pw: '본사', role: 'hq' },
+    { id: '본사', pw: 'ace01', role: 'hq' },
   ];
   const LOGIN_FLAG = 'ace_logged_in';
   // 비밀번호 로그인 시 GitHub 저장에 쓸 토큰(난독화 문자열). 비우면 로컬 저장만 됨.
