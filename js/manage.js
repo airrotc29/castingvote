@@ -142,7 +142,7 @@
   async function addReport(report) {
     if (hasToken()) return mutateReports((items) => items.concat([report]), '월례 보고: ' + report.branchName);
     if (hasEndpoint()) return callEndpoint('addReport', { report });
-    const local = getLocal(); local.reports.push(report); setLocal(local); sendReportMail(report); return null;
+    const local = getLocal(); local.reports.push(report); setLocal(local); return null;
   }
   async function addComment(reportId, comment) {
     // 로컬에만 있는 보고는 토큰/엔드포인트 여부와 무관하게 로컬에 저장(중앙엔 그 보고가 없어 유실되던 문제 방지)
@@ -171,15 +171,17 @@
     if (local.comments[reportId]) local.comments[reportId] = local.comments[reportId].filter((c) => c.id !== commentId);
     setLocal(local); return null;
   }
-  function sendReportMail(r) {
-    let body = `[에이스 종합관리 — 관리단 업무보고]\n사업소: ${r.branchName}\n보고자: ${r.reporter}\n보고일: ${r.date}\n`;
-    REPORT_ITEMS.forEach((it) => { body += `------------------------------\n${it.k}. ${it.t}\n${(r.items && r.items[it.k]) || '-'}\n`; });
-    window.open(`mailto:${TO_EMAIL}?subject=${encodeURIComponent('[에이스 종합관리] ' + r.branchName + ' 업무보고')}&body=${encodeURIComponent(body)}`, '_blank');
-  }
-
   // ---------- 상태 ----------
   let META = {}, BRANCHES = [], REPORTS = [];
   let reportFilter = '', openReportId = null;
+
+  // 새 보고(읽지 않은 보고) 추적 — 반짝임 표시용
+  const SEEN_KEY = 'ace_seen_reports';
+  function getSeen() { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch (e) { return new Set(); } }
+  function markSeen(id) { const s = getSeen(); if (!s.has(id)) { s.add(id); localStorage.setItem(SEEN_KEY, JSON.stringify([...s])); } }
+  function unseenCount() { const s = getSeen(); return REPORTS.filter((r) => !s.has(r.id)).length; }
+  function branchUnseen(bid) { const s = getSeen(); return REPORTS.some((r) => r.branchId === bid && !s.has(r.id)); }
+  function updateTabDot() { const dot = $('reportTabDot'); if (dot) dot.hidden = unseenCount() === 0; }
 
   // ---------- 모달 ----------
   function openModal(id) { const m = $(id); if (m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } }
@@ -233,15 +235,17 @@
       block.innerHTML = `<div class="group-head"><span class="group-badge g${g}">${g}군</span><span class="group-desc">${esc(META.groupCriteria && META.groupCriteria[g] || '')}</span></div>`;
       list.forEach((b) => {
         const cnt = REPORTS.filter((r) => r.branchId === b.id).length;
+        const dot = branchUnseen(b.id) ? '<span class="newdot"></span>' : '';
         const card = document.createElement('button');
         card.type = 'button'; card.className = `b-card g${g}`; card.dataset.id = b.id;
         card.innerHTML =
-          `<div class="b-top"><span class="b-name">${esc(b.name)}</span>` +
+          `<div class="b-top"><span class="b-name">${esc(b.name)}${dot}</span>` +
           `<span class="b-count">보고 ${cnt}건 ›</span></div>`;
         block.appendChild(card);
       });
       wrap.appendChild(block);
     });
+    updateTabDot();
   }
 
   $('groupWrap').addEventListener('click', (e) => {
@@ -267,10 +271,11 @@
     h += `<div class="d-sec-title">보고 이력 <span style="color:var(--soft);font-weight:600;">· ${reps.length}건 (최근순)</span></div>`;
     if (!reps.length) h += '<p class="rd-empty">아직 등록된 보고가 없습니다. 아래에서 첫 보고를 작성해 주세요.</p>';
     else {
+      const seenB = getSeen();
       h += '<div class="bh-list">';
       reps.forEach((r) => {
         h += `<button type="button" class="bh-item" data-rid="${esc(r.id)}">` +
-          `<span class="bh-date">${esc(r.date)}</span>` +
+          `<span class="bh-date">${esc(r.date)}${!seenB.has(r.id) ? ' <span class="new-badge">NEW</span>' : ''}</span>` +
           `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
           `<span class="bh-cmt">💬 ${(r.comments || []).length}</span>` +
           '</button>';
@@ -411,6 +416,7 @@
     list.innerHTML = '';
     if (!items.length) { empty.hidden = false; }
     else { empty.hidden = true; }
+    const seen = getSeen();
     items.forEach((r) => {
       const cmt = (r.comments || []).length;
       const first = REPORT_ITEMS.map((it) => (r.items && r.items[it.k]) ? r.items[it.k] : '').find((x) => x) || '';
@@ -419,6 +425,7 @@
       card.innerHTML =
         '<div class="rc-top">' +
           `<span class="rc-branch">${esc(r.branchName)}</span>` +
+          (!seen.has(r.id) ? '<span class="new-badge">NEW</span>' : '') +
           `<span class="rc-month">${esc(r.month || r.date)}</span>` +
           (r._local ? '<span class="rc-local">이 기기에만</span>' : '') +
         '</div>' +
@@ -435,6 +442,7 @@
       lock.addEventListener('click', () => { localStorage.removeItem(VIEW_OK_KEY); renderReports(); window.scrollTo(0, 0); });
       list.appendChild(lock);
     }
+    updateTabDot();
   }
   async function doUnlock() {
     const v = ($('viewPw').value || '').trim();
@@ -502,7 +510,7 @@
       const next = await addReport(report);
       REPORTS = next ? mergeLocal(next) : await loadReports();
       renderReports(); renderStatus();
-      hint($('rmHint'), isCentral() ? '본사로 보고가 접수되었습니다! (반영까지 1~2분)' : '보고가 기록되었습니다. 본사 전달용 메일 창이 열립니다.', 'success');
+      hint($('rmHint'), isCentral() ? '본사로 보고가 접수되었습니다! (GitHub 저장 · 반영까지 1~2분)' : '보고가 이 기기에 저장되었습니다. (GitHub 저장은 본사 로그인 필요)', 'success');
       setTimeout(() => closeModal('reportModal'), 1100);
     } catch (e) { hint($('rmHint'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
@@ -513,6 +521,8 @@
     const r = REPORTS.find((x) => x.id === id);
     if (!r) { closeModal('reportDetailModal'); return; }
     openReportId = id;
+    if (!getSeen().has(id)) { markSeen(id); renderStatus(); renderReports(); } // 읽음 처리 → 반짝임 해제
+    updateTabDot();
     const comments = r.comments || [];
     let h = `<h2>${esc(r.branchName)} 업무보고</h2>`;
     h += `<div class="rc-meta" style="margin:6px 0 12px;">보고자 ${esc(r.reporter)} · ${esc(r.date)}${r._local ? ' · <span style="color:var(--accent);font-weight:700;">이 기기에만 저장됨</span>' : ''}</div>`;
@@ -626,7 +636,7 @@
     const note = $('reportNote');
     if (isCentral()) { note.hidden = true; return; }
     note.hidden = false;
-    note.innerHTML = '<b>안내</b> · 이 브라우저에는 중앙 저장이 설정되어 있지 않습니다. 올리신 보고는 <b>이 기기에 기록</b>되고 본사에는 <b>메일</b>로 전달됩니다. 모든 사업소가 함께 보는 중앙 공유는 본사에 문의하세요.';
+    note.innerHTML = '<b>안내</b> · 본사 로그인 전이라 보고가 <b>이 기기에만</b> 저장됩니다. GitHub에 저장해 전체가 함께 보려면 헤더의 <b>‘본사’</b> 로그인이 필요합니다.';
   }
 
   // 내장 기본 사업소 목록 — branches.json 로드 실패(파일 직접 열기 등) 시에도 12개가 항상 선택되도록 보장.

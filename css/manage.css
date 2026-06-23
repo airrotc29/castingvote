@@ -258,6 +258,13 @@ button { font-family: inherit; cursor: pointer; }
 }
 .tabbar button .ic { font-size: 19px; line-height: 1; }
 .tabbar button.active { color: var(--blue); }
+.tabbar button { position: relative; }
+
+/* 새 보고 반짝임 표시 */
+@keyframes acePulse { 0%, 100% { opacity: 1; } 50% { opacity: .2; } }
+.tab-dot { position: absolute; top: 6px; left: calc(50% + 10px); width: 9px; height: 9px; border-radius: 50%; background: var(--red); animation: acePulse 1s ease-in-out infinite; }
+.newdot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--red); margin-left: 6px; vertical-align: middle; animation: acePulse 1s ease-in-out infinite; }
+.new-badge { display: inline-block; font-size: 10px; font-weight: 800; color: #fff; background: var(--red); border-radius: 999px; padding: 1px 7px; margin-left: 4px; animation: acePulse 1s ease-in-out infinite; }
 
 /* 플로팅 보고 버튼 */
 .fab {
