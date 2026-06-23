@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v32 · 2026.06.23 (단계바 균일 · 사업소 아이디/비번 부여)';
+  const APP_VERSION = 'v33 · 2026.06.23 (보고폼/상세/PDF 단계색상)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -353,6 +353,9 @@
     const m = /^(\d+)단계/.exec(name);
     return m ? parseInt(m[1], 10) : 50;
   }
+  // 단계명 → 색상 클래스 (s0 공통, s1~s4 단계)
+  function stageColorClass(name) { const o = stageOrder(name); return (o >= 1 && o <= 4) ? ('s' + o) : 's0'; }
+  function stageHex(name) { const o = stageOrder(name); return ({ 1: '#1c5fc4', 2: '#15803d', 3: '#c2660c', 4: '#b91c1c' })[o] || '#334155'; }
 
   function renderStatus() {
     // 사업소 계정은 본인 사업소만 표시. 본사는 전체.
@@ -606,7 +609,7 @@
     if (!grp) { $('rmItems').innerHTML = '<p class="hint">먼저 사업소를 선택하면 해당 군의 단계별 과제가 표시됩니다.</p>'; return; }
     let h = `<p class="rf-grouptag">${grp}군 보고서식</p>`;
     stagesForGroup(grp).forEach((s) => {
-      h += `<div class="rf-stage">${esc(s.name)}</div>`;
+      h += `<div class="rf-stage ${stageColorClass(s.name)}">${esc(s.name)}</div>`;
       s.tasks.forEach((t) => {
         h += `<div class="r-item"><label><span class="rf-no">${esc(t.no)}</span>${esc(t.t)}</label>` +
           `<textarea id="rm_${t.k}" rows="2" placeholder="내용 입력 (해당 시)"></textarea></div>`;
@@ -700,7 +703,7 @@
     reportStages(r).forEach((s) => {
       const filled = s.tasks.filter((t) => r.items && r.items[t.k]);
       if (!filled.length) return;
-      h += `<div style="font-size:13px;font-weight:900;color:#123a6b;margin:14px 0 6px;border-bottom:1px solid #d7e0ee;padding-bottom:3px;">${esc(s.name)}</div>`;
+      h += `<div style="font-size:13px;font-weight:900;color:#fff;background:${stageHex(s.name)};border-radius:6px;margin:14px 0 6px;padding:5px 10px;">${esc(s.name)}</div>`;
       filled.forEach((t) => { h += pdfBlock(t.no, t.t, r.items[t.k]); });
     });
     const cmts = r.comments || [];
@@ -755,7 +758,7 @@
     reportStages(r).forEach((s) => {
       const filled = s.tasks.filter((t) => r.items && r.items[t.k]);
       if (!filled.length) return;
-      h += `<div class="rd-stage">${esc(s.name)}</div>`;
+      h += `<div class="rd-stage ${stageColorClass(s.name)}">${esc(s.name)}</div>`;
       filled.forEach((t) => {
         h += `<div class="r-block"><div class="bt"><span class="rf-no">${esc(t.no)}</span>${esc(t.t)}</div><div class="bd">${esc(r.items[t.k])}</div></div>`;
       });

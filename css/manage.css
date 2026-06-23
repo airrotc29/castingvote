@@ -225,7 +225,13 @@ body.admin-on #appGate { display: none; }
 
 /* 보고 단계 헤더 / 과제 번호 */
 .rf-stage { font-size: 14px; font-weight: 900; color: #fff; background: linear-gradient(135deg, var(--navy), var(--blue)); border-radius: 9px; padding: 8px 12px; margin: 16px 0 10px; }
-.rd-stage { font-size: 14px; font-weight: 900; color: var(--navy); border-bottom: 2px solid var(--blue); padding: 8px 2px 5px; margin: 16px 0 8px; }
+.rd-stage { font-size: 14px; font-weight: 900; color: #fff; background: linear-gradient(135deg, var(--navy), var(--blue)); border-radius: 9px; padding: 8px 12px; margin: 16px 0 8px; }
+/* 단계별 배지 색상: 공통=슬레이트, 1=파랑, 2=녹색, 3=주황, 4=적색 */
+.rf-stage.s0, .rd-stage.s0 { background: linear-gradient(135deg, #334155, #475569); }
+.rf-stage.s1, .rd-stage.s1 { background: linear-gradient(135deg, #1c5fc4, #3b82f6); }
+.rf-stage.s2, .rd-stage.s2 { background: linear-gradient(135deg, #15803d, #22c55e); }
+.rf-stage.s3, .rd-stage.s3 { background: linear-gradient(135deg, #c2660c, #f59e0b); }
+.rf-stage.s4, .rd-stage.s4 { background: linear-gradient(135deg, #b91c1c, #ef4444); }
 .rf-no { display: inline-block; min-width: 30px; font-size: 11px; font-weight: 800; color: #fff; background: var(--blue); border-radius: 6px; padding: 2px 6px; margin-right: 7px; text-align: center; flex-shrink: 0; }
 .r-block .bt .rf-no { background: var(--blue); }
 
