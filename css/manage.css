@@ -81,44 +81,64 @@ body.admin-on #appGate { display: none; }
 #barTip b { display: block; font-size: 12px; color: #ffd27d; margin-bottom: 3px; letter-spacing: -.2px; }
 #barTip span { display: block; font-size: 11.5px; line-height: 1.6; color: #d7e1f0; word-break: keep-all; }
 
-/* 단계 그룹 — 심플/프리미엄 */
-.group-block { margin-bottom: 24px; }
-.group-head { margin: 0 2px 11px; }
-.stage-badge { display: flex; align-items: center; gap: 9px; width: 100%; box-sizing: border-box; font-size: 13px; font-weight: 800; color: var(--navy); letter-spacing: -.2px; background: transparent; border: 0; padding: 2px 0 9px; text-align: left; line-height: 1.3; border-bottom: 1px solid var(--line); }
-.stage-badge::before { content: ''; flex: none; width: 9px; height: 9px; border-radius: 50%; background: #c7cfdb; }
+/* 단계 그룹 — 세련된 미니멀 */
+.group-block { margin-bottom: 26px; }
+.group-head { margin: 0 2px 12px; }
+.stage-badge { display: flex; align-items: center; gap: 9px; width: 100%; box-sizing: border-box; font-size: 12px; font-weight: 800; color: var(--navy); letter-spacing: .1px; background: transparent; border: 0; padding: 1px 1px 10px; text-align: left; line-height: 1.3; border-bottom: 1.5px solid var(--line); }
+.stage-badge::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: #c7cfdb; box-shadow: 0 0 0 3px rgba(199,207,219,.22); }
 .stage-badge .sb-name { flex: 1; word-break: keep-all; text-align: left; }
-.stage-badge .sb-count { flex: none; font-size: 11px; font-weight: 800; color: var(--soft); background: #eef2f7; border-radius: 20px; padding: 2px 9px; white-space: nowrap; }
+.stage-badge .sb-count { flex: none; font-size: 10.5px; font-weight: 800; color: var(--soft); background: transparent; border-radius: 0; padding: 0; white-space: nowrap; }
+.stage-badge .sb-count::after { content: ' 개'; font-weight: 600; opacity: .7; }
+.stage-badge.stage-s1::before { box-shadow: 0 0 0 3px rgba(37,99,235,.16); }
+.stage-badge.stage-s2::before { box-shadow: 0 0 0 3px rgba(22,163,74,.16); }
+.stage-badge.stage-s3::before { box-shadow: 0 0 0 3px rgba(234,88,12,.16); }
+.stage-badge.stage-s4::before { box-shadow: 0 0 0 3px rgba(220,38,38,.16); }
 .stage-badge.stage-s0::before { background: #475569; }
 .stage-badge.stage-s1::before { background: #2563eb; }
 .stage-badge.stage-s2::before { background: #16a34a; }
 .stage-badge.stage-s3::before { background: #ea580c; }
 .stage-badge.stage-s4::before { background: #dc2626; }
 .stage-badge.stage-none::before { background: #94a3b8; }
-.stage-badge.stage-s1 .sb-count { color: #1d4ed8; background: #eaf1fe; }
-.stage-badge.stage-s2 .sb-count { color: #15803d; background: #e8f6ec; }
-.stage-badge.stage-s3 .sb-count { color: #c2410c; background: #fdf0e7; }
-.stage-badge.stage-s4 .sb-count { color: #b91c1c; background: #fdeaea; }
-.stage-badge.stage-s0 .sb-count { color: #475569; background: #eef2f6; }
+.stage-badge.stage-s1 .sb-count { color: #1d4ed8; }
+.stage-badge.stage-s2 .sb-count { color: #15803d; }
+.stage-badge.stage-s3 .sb-count { color: #c2410c; }
+.stage-badge.stage-s4 .sb-count { color: #b91c1c; }
+.stage-badge.stage-s0 .sb-count { color: #475569; }
 .group-badge { font-size: 10.5px; font-weight: 700; color: #fff; background: #1a1a1a; border-radius: 6px; padding: 2px 7px; vertical-align: middle; }
 .group-desc { font-size: 11.5px; color: var(--soft); flex: 1; word-break: keep-all; }
 .rf-grouptag { display: inline-block; font-size: 12px; font-weight: 800; color: var(--blue); background: #eaf1fd; border-radius: 7px; padding: 4px 10px; margin: 0 0 6px; }
 
-/* 사업소 카드 — 심플/프리미엄 */
+/* 전략 탭 — 관리소장 교육자료 */
+.edu-head { margin-top: 22px; }
+.edu-tabs { display: flex; gap: 7px; margin: 12px 0 4px; }
+.edu-tab { flex: 1; font-size: 13px; font-weight: 800; color: var(--soft); background: #f1f4f8; border: 1px solid var(--line); border-radius: 10px; padding: 9px 0; }
+.edu-tab.active { color: #fff; background: var(--navy); border-color: var(--navy); }
+.edu-stage { background: #fff; border: 1px solid #eef1f5; border-radius: 14px; padding: 14px 15px; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+.edu-tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.edu-tasks li { display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; line-height: 1.55; color: #303a47; word-break: keep-all; }
+.edu-no { flex: none; min-width: 30px; height: 21px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--navy); background: #eef2f7; border-radius: 6px; padding: 0 6px; }
+.edu-t { flex: 1; padding-top: 1px; }
+.edu-arrow { text-align: center; color: #c2c9d4; font-size: 12px; margin: 7px 0; }
+
+/* 사업소 카드 — 세련된 미니멀 */
 .b-card {
-  width: 100%; text-align: left; background: #fff; border: 1px solid #edf1f6;
-  border-left: 3px solid #e2e8f0; border-radius: 12px; padding: 14px 15px; margin-bottom: 8px;
-  box-shadow: 0 1px 3px rgba(16,24,40,.05); transition: transform .12s, box-shadow .15s;
+  width: 100%; text-align: left; background: #fff; border: 1px solid #eef1f5;
+  border-radius: 14px; padding: 15px 16px; margin-bottom: 9px; position: relative; overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16,24,40,.04); transition: transform .14s ease, box-shadow .18s ease;
 }
-.b-card:active { transform: scale(.995); }
-.b-card.st-s0 { border-left-color: #475569; }
-.b-card.st-s1 { border-left-color: #2563eb; }
-.b-card.st-s2 { border-left-color: #16a34a; }
-.b-card.st-s3 { border-left-color: #ea580c; }
-.b-card.st-s4 { border-left-color: #dc2626; }
-.b-card.st-none { border-left-color: #cbd5e1; }
+.b-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #d8dee7; }
+.b-card:active { transform: scale(.995); box-shadow: 0 6px 18px rgba(16,24,40,.09); }
+.b-card.st-s0::before { background: #475569; }
+.b-card.st-s1::before { background: #2563eb; }
+.b-card.st-s2::before { background: #16a34a; }
+.b-card.st-s3::before { background: #ea580c; }
+.b-card.st-s4::before { background: #dc2626; }
+.b-card.st-none::before { background: #cbd5e1; }
 .b-top { display: flex; align-items: center; gap: 7px; }
 .b-name { font-size: 15.5px; font-weight: 700; color: var(--navy); letter-spacing: -.3px; }
-.b-count { margin-left: auto; font-size: 12.5px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
+.b-count { margin-left: auto; display: inline-flex; align-items: center; gap: 1px; font-size: 12px; font-weight: 600; color: #9aa3b2; white-space: nowrap; }
+.b-count b { font-weight: 800; color: var(--navy); margin: 0 1px; }
+.b-chev { font-style: normal; font-size: 16px; color: #c2c9d4; margin-left: 5px; line-height: 1; }
 
 /* 사업소 상세 — 보고 이력 리스트 */
 .bh-list { display: flex; flex-direction: column; gap: 8px; }

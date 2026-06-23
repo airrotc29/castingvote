@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v38 · 2026.06.23 (단계 막대그래프 · 심플 리디자인)';
+  const APP_VERSION = 'v39 · 2026.06.23 (군표시 제거·세련화 · 전략 교육자료)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -410,8 +410,8 @@
         const card = document.createElement('button');
         card.type = 'button'; card.className = `b-card ${stc}` + (newB ? ' is-new' : ''); card.dataset.id = b.id;
         card.innerHTML =
-          `<div class="b-top"><span class="b-name">${esc(b.name)}</span> <span class="group-badge g${b.group}">${b.group}군</span>${dot}` +
-          `<span class="b-count">보고 ${cnt}건 ›</span></div>`;
+          `<div class="b-top"><span class="b-name">${esc(b.name)}</span>${dot}` +
+          `<span class="b-count">보고 <b>${cnt}</b>건<i class="b-chev">›</i></span></div>`;
         block.appendChild(card);
       });
       wrap.appendChild(block);
@@ -935,9 +935,9 @@
     setAdmin(true);
     hint($('loginHint'), '', ''); closeModal('loginModal');
     reportFilter = ''; renderReportFilter();
-    REPORTS = await loadReports(); renderReports(); renderStatus(); refreshNote();
+    REPORTS = await loadReports(); renderReports(); renderStatus(); refreshNote(); updateEduForUser();
   });
-  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); localStorage.removeItem('ace_branch'); setAdmin(false); closeModal('loginModal'); reportFilter = ''; renderReportFilter(); refreshNote(); renderReports(); renderStatus(); });
+  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); localStorage.removeItem('ace_branch'); setAdmin(false); closeModal('loginModal'); reportFilter = ''; renderReportFilter(); refreshNote(); renderReports(); renderStatus(); eduGroup = 1; updateEduForUser(); });
 
   // ---------- 아이디/비밀번호 변경 ----------
   function curRole() { return localStorage.getItem('ace_role') || ''; }
@@ -1013,6 +1013,31 @@
   ];
 
   // ---------- 초기화 ----------
+  // ---------- 전략 탭: 관리소장 교육자료 (군별·단계별 과제) ----------
+  let eduGroup = 1;
+  function syncEduTabs() { document.querySelectorAll('#eduTabs .edu-tab').forEach((x) => x.classList.toggle('active', parseInt(x.dataset.g, 10) === eduGroup)); }
+  function renderEduGuide() {
+    const wrap = $('eduGuide'); if (!wrap) return;
+    const stages = stagesForGroup(eduGroup);
+    let h = '';
+    stages.forEach((s, si) => {
+      h += `<div class="edu-stage"><div class="rd-stage ${stageColorClass(s.name)}" style="margin:0 0 10px;">${esc(s.name)}</div><ul class="edu-tasks">`;
+      s.tasks.forEach((t) => { h += `<li><span class="edu-no">${esc(t.no)}</span><span class="edu-t">${esc(t.t)}</span></li>`; });
+      h += '</ul></div>';
+      if (si < stages.length - 1) h += '<div class="edu-arrow">▼</div>';
+    });
+    wrap.innerHTML = h;
+  }
+  function updateEduForUser() {
+    const myb = lockedBranchId();
+    if (myb) { const bb = BRANCHES.find((x) => x.id === myb); if (bb && bb.group) eduGroup = bb.group; }
+    syncEduTabs(); renderEduGuide();
+  }
+  $('eduTabs') && $('eduTabs').addEventListener('click', (e) => {
+    const b = e.target.closest('.edu-tab'); if (!b) return;
+    eduGroup = parseInt(b.dataset.g, 10); syncEduTabs(); renderEduGuide();
+  });
+
   async function init() {
     try {
       const meta = await fetch(BRANCHES_PATH + '?_cb=' + Date.now(), { cache: 'no-store' }).then((r) => r.json());
@@ -1028,6 +1053,7 @@
     renderReports();
     renderStatus(); // 보고 건수 반영
     refreshNote();
+    updateEduForUser(); // 교육자료 — 로그인한 사업소의 군 기본 선택
   }
   init();
 
