@@ -145,10 +145,14 @@
     const local = getLocal(); local.reports.push(report); setLocal(local); sendReportMail(report); return null;
   }
   async function addComment(reportId, comment) {
+    // 로컬에만 있는 보고는 토큰/엔드포인트 여부와 무관하게 로컬에 저장(중앙엔 그 보고가 없어 유실되던 문제 방지)
+    const local0 = getLocal();
+    const ownLocal = local0.reports.find((r) => r.id === reportId);
+    if (ownLocal) { ownLocal.comments = (ownLocal.comments || []).concat([comment]); setLocal(local0); return null; }
     if (hasToken()) return mutateReports((items) => items.map((r) => (r.id === reportId ? Object.assign({}, r, { comments: (r.comments || []).concat([comment]) }) : r)), '보고 댓글');
     if (hasEndpoint()) return callEndpoint('addComment', { reportId, comment });
-    const local = getLocal(); const own = local.reports.find((r) => r.id === reportId);
-    if (own) own.comments = (own.comments || []).concat([comment]); else (local.comments[reportId] = local.comments[reportId] || []).push(comment);
+    const local = getLocal();
+    (local.comments[reportId] = local.comments[reportId] || []).push(comment);
     setLocal(local); return null;
   }
   async function deleteReport(report) {
@@ -158,10 +162,12 @@
     throw new Error('삭제 권한이 없습니다 (본사 로그인 필요).');
   }
   async function deleteComment(reportId, commentId) {
+    const local0 = getLocal();
+    const ownLocal = local0.reports.find((r) => r.id === reportId);
+    if (ownLocal) { ownLocal.comments = (ownLocal.comments || []).filter((c) => c.id !== commentId); setLocal(local0); return null; }
     if (hasToken()) return mutateReports((items) => items.map((r) => (r.id === reportId ? Object.assign({}, r, { comments: (r.comments || []).filter((c) => c.id !== commentId) }) : r)), '댓글 삭제');
     if (hasEndpoint()) return callEndpoint('deleteComment', { reportId, commentId });
-    const local = getLocal(); const own = local.reports.find((r) => r.id === reportId);
-    if (own) own.comments = (own.comments || []).filter((c) => c.id !== commentId);
+    const local = getLocal();
     if (local.comments[reportId]) local.comments[reportId] = local.comments[reportId].filter((c) => c.id !== commentId);
     setLocal(local); return null;
   }
