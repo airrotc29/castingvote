@@ -196,7 +196,23 @@
       <div class="field"><label>비밀번호</label><input type="password" id="loginPw" placeholder="비밀번호" autocomplete="off" /></div>
       <p class="hint" id="loginHint"></p>
       <button type="button" class="btn block" id="loginSubmit">로그인</button>
+      <button type="button" class="btn ghost block" id="changeCredBtn" style="margin-top:8px;display:none;">아이디·비밀번호 변경</button>
       <button type="button" class="btn ghost block" id="logoutBtn" style="margin-top:8px;display:none;">로그아웃</button>
+    </div>
+  </div>
+
+  <!-- 아이디/비밀번호 변경 모달 -->
+  <div class="modal" id="changeCredModal" aria-hidden="true">
+    <div class="modal-box">
+      <button type="button" class="modal-close" data-close>×</button>
+      <h2>아이디·비밀번호 변경</h2>
+      <p class="login-help">현재 로그인한 계정의 아이디와 비밀번호를 변경합니다. 변경 내용은 모든 기기에 공유됩니다.</p>
+      <div class="field"><label>아이디</label><input type="text" id="ccNewId" autocomplete="off" autocapitalize="off" /></div>
+      <div class="field"><label>새 비밀번호</label><input type="password" id="ccNewPw" autocomplete="off" placeholder="새 비밀번호" /></div>
+      <div class="field"><label>새 비밀번호 확인</label><input type="password" id="ccNewPw2" autocomplete="off" placeholder="한 번 더 입력" /></div>
+      <p class="hint" id="ccHint"></p>
+      <button type="button" class="btn block" id="ccSubmit">변경 저장</button>
+      <button type="button" class="btn ghost block" id="resetCredBtn" style="margin-top:8px;display:none;color:var(--red);">전체 계정 초기화 (본사)</button>
     </div>
   </div>
 

@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v20 · 2026.06.23 (GitHub 저장 활성화)';
+  const APP_VERSION = 'v21 · 2026.06.23 (계정 변경·초기화)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -15,11 +15,13 @@
   const ENDPOINT = (window.ACE_REPORT_ENDPOINT || localStorage.getItem('ace_report_endpoint') || '').trim();
 
   // ---------- 로그인 (아이디/비밀번호) ----------
-  // 소장: 소장/ace, 본사: 본사/본사
-  const LOGINS = [
-    { id: '소장', pw: 'ace', role: 'site' },
-    { id: '본사', pw: 'ace01', role: 'hq' },
+  // 계정은 assets/data/auth.json 에 저장(비밀번호는 SHA-256 해시). 없으면 아래 기본값.
+  const AUTH_PATH = 'assets/data/auth.json';
+  const DEFAULT_ACCOUNTS = [
+    { id: '소장', role: 'site', pwHash: '2a0b6287a0e65cff2844cf0887b1c19d960385071c4a0da3d90cfea2c3824e3f' }, // ace
+    { id: '본사', role: 'hq', pwHash: 'b89a1c3aae305aeca883f51f8e2442b9b5eb6178dfc845c751b7dcf952ac8b9e' }, // ace01
   ];
+  let AUTH = DEFAULT_ACCOUNTS.slice();
   const LOGIN_FLAG = 'ace_logged_in';
   // 비밀번호 로그인 시 GitHub 저장에 쓸 토큰(난독화 문자열). 비우면 로컬 저장만 됨.
   // 값 생성: 브라우저 콘솔에서 obfHelper('your_github_token') 실행 → 결과를 아래에 붙여넣기.
@@ -50,6 +52,10 @@
   function b64ToUtf8(b64) { const bin = atob(b64.replace(/\s/g, '')); return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))); }
   function uid(p) { return p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
   function todayStr(d) { d = d || new Date(); return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`; }
+  async function sha256hex(s) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
 
   // ---------- GitHub Contents API (본사 토큰 모드) ----------
   async function getContent(path) {
@@ -105,6 +111,32 @@
       const { obj, sha } = await getBranchesObj();
       const next = mutator(obj);
       try { await putContent(BRANCHES_PATH, utf8ToB64(JSON.stringify(next, null, 2)), message, sha); return next; }
+      catch (e) { lastErr = e; if (String(e.message).includes('(409)')) { await new Promise((r) => setTimeout(r, 700)); continue; } throw e; }
+    }
+    throw lastErr;
+  }
+
+  // ---------- 계정(auth.json) ----------
+  async function loadAuth() {
+    try {
+      const a = await fetch(AUTH_PATH + '?_cb=' + Date.now(), { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
+      if (a && Array.isArray(a.accounts) && a.accounts.length) return a.accounts;
+    } catch (e) {}
+    return DEFAULT_ACCOUNTS.slice();
+  }
+  async function getAuthObj() {
+    const data = await getContent(AUTH_PATH);
+    if (!data) return { obj: { accounts: DEFAULT_ACCOUNTS.slice() }, sha: null };
+    let obj = {}; try { obj = JSON.parse(b64ToUtf8(data.content)); } catch (e) { obj = {}; }
+    if (!obj || typeof obj !== 'object' || !Array.isArray(obj.accounts)) obj = { accounts: DEFAULT_ACCOUNTS.slice() };
+    return { obj, sha: data.sha };
+  }
+  async function mutateAuth(mutator, message) {
+    let lastErr;
+    for (let i = 0; i < 4; i++) {
+      const { obj, sha } = await getAuthObj();
+      const next = mutator(obj);
+      try { await putContent(AUTH_PATH, utf8ToB64(JSON.stringify(next, null, 2)), message, sha); return next; }
       catch (e) { lastErr = e; if (String(e.message).includes('(409)')) { await new Promise((r) => setTimeout(r, 700)); continue; } throw e; }
     }
     throw lastErr;
@@ -621,6 +653,7 @@
     pill.classList.toggle('on', on);
     pill.textContent = on ? '로그인 ✓' : '로그인';
     $('logoutBtn').style.display = on ? 'block' : 'none';
+    if ($('changeCredBtn')) $('changeCredBtn').style.display = on ? 'block' : 'none';
     if ($('addBranchBtn')) $('addBranchBtn').style.display = on ? 'inline-flex' : 'none';
   }
 
@@ -657,18 +690,71 @@
   $('loginSubmit').addEventListener('click', async () => {
     const id = ($('loginId').value || '').trim();
     const pw = $('loginPw').value || '';
-    const match = LOGINS.find((c) => c.id === id && c.pw === pw);
-    if (!match) { hint($('loginHint'), '아이디 또는 비밀번호가 올바르지 않습니다.', 'error'); return; }
-    // 비밀번호로 푸는 내장 토큰이 있으면 GitHub 저장 활성화
+    hint($('loginHint'), '확인 중…', '');
+    AUTH = await loadAuth();
+    const acc = AUTH.find((a) => a.id === id);
+    const ok = acc && (await sha256hex(pw)) === acc.pwHash;
+    if (!ok) { hint($('loginHint'), '아이디 또는 비밀번호가 올바르지 않습니다.', 'error'); return; }
+    // 내장 토큰이 있으면 GitHub 저장 활성화
     const tok = EMBED_TOKEN_OBF ? deobf(EMBED_TOKEN_OBF) : '';
     if (tok) localStorage.setItem(TOKEN_KEY, tok); else localStorage.removeItem(TOKEN_KEY);
     localStorage.setItem(LOGIN_FLAG, '1');
-    localStorage.setItem('ace_role', match.role);
+    localStorage.setItem('ace_acct', acc.id);
+    localStorage.setItem('ace_role', acc.role);
     setAdmin(true);
     hint($('loginHint'), '', ''); closeModal('loginModal');
     REPORTS = await loadReports(); renderReports(); renderStatus(); refreshNote();
   });
-  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); setAdmin(false); closeModal('loginModal'); refreshNote(); renderReports(); renderStatus(); });
+  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); setAdmin(false); closeModal('loginModal'); refreshNote(); renderReports(); renderStatus(); });
+
+  // ---------- 아이디/비밀번호 변경 ----------
+  function curRole() { return localStorage.getItem('ace_role') || ''; }
+  function curAcct() { return localStorage.getItem('ace_acct') || ''; }
+  $('changeCredBtn') && $('changeCredBtn').addEventListener('click', () => {
+    if (!isAdmin()) { alert('로그인 후 변경할 수 있습니다.'); return; }
+    $('ccNewId').value = curAcct();
+    $('ccNewPw').value = ''; $('ccNewPw2').value = '';
+    $('resetCredBtn').style.display = curRole() === 'hq' ? 'block' : 'none';
+    hint($('ccHint'), '', ''); closeModal('loginModal'); openModal('changeCredModal');
+  });
+  $('ccSubmit') && $('ccSubmit').addEventListener('click', async () => {
+    if (!hasToken()) { hint($('ccHint'), '저장 권한이 없습니다(토큰 필요).', 'error'); return; }
+    const newId = ($('ccNewId').value || '').trim();
+    const newPw = $('ccNewPw').value || '';
+    const newPw2 = $('ccNewPw2').value || '';
+    const oldId = curAcct();
+    if (!newId) { hint($('ccHint'), '아이디를 입력해 주세요.', 'error'); return; }
+    if (!newPw) { hint($('ccHint'), '새 비밀번호를 입력해 주세요.', 'error'); return; }
+    if (newPw !== newPw2) { hint($('ccHint'), '새 비밀번호가 일치하지 않습니다.', 'error'); return; }
+    const btn = $('ccSubmit'); btn.disabled = true;
+    try {
+      hint($('ccHint'), '저장 중…', '');
+      const hash = await sha256hex(newPw);
+      const next = await mutateAuth((o) => {
+        const accs = o.accounts || [];
+        if (newId !== oldId && accs.some((a) => a.id === newId)) throw new Error('이미 있는 아이디입니다.');
+        o.accounts = accs.map((a) => (a.id === oldId ? Object.assign({}, a, { id: newId, pwHash: hash }) : a));
+        return o;
+      }, '계정 변경: ' + newId);
+      AUTH = next.accounts;
+      localStorage.setItem('ace_acct', newId);
+      hint($('ccHint'), '변경되었습니다! (반영까지 1~2분)', 'success');
+      setTimeout(() => closeModal('changeCredModal'), 1200);
+    } catch (e) { hint($('ccHint'), '오류: ' + e.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
+  $('resetCredBtn') && $('resetCredBtn').addEventListener('click', async () => {
+    if (curRole() !== 'hq') { alert('본사만 초기화할 수 있습니다.'); return; }
+    if (!confirm('모든 계정을 기본값(소장/ace, 본사/ace01)으로 초기화할까요?')) return;
+    const btn = $('resetCredBtn'); btn.disabled = true;
+    try {
+      hint($('ccHint'), '초기화 중…', '');
+      const next = await mutateAuth((o) => { o.accounts = DEFAULT_ACCOUNTS.slice(); return o; }, '계정 초기화');
+      AUTH = next.accounts;
+      hint($('ccHint'), '초기화되었습니다. 기본: 소장/ace, 본사/ace01 (반영 1~2분)', 'success');
+    } catch (e) { hint($('ccHint'), '오류: ' + e.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
 
   function refreshNote() {
     const note = $('reportNote');
@@ -705,6 +791,7 @@
     renderStatus();
     renderReportFilter();
     if (localStorage.getItem(LOGIN_FLAG) === '1') { if (EMBED_TOKEN_OBF && !hasToken()) localStorage.setItem(TOKEN_KEY, deobf(EMBED_TOKEN_OBF)); setAdmin(true); }
+    loadAuth().then((a) => { AUTH = a; });
     REPORTS = await loadReports();
     renderReports();
     renderStatus(); // 보고 건수 반영
