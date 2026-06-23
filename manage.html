@@ -168,6 +168,23 @@
     </div>
   </div>
 
+  <!-- 사업소 전략 정보 수정 모달 (본사 담당자) -->
+  <div class="modal" id="branchEditModal" aria-hidden="true">
+    <div class="modal-box">
+      <button type="button" class="modal-close" data-close>×</button>
+      <h2 id="beTitle">전략 정보 수정</h2>
+      <p class="login-help">본사 담당자 전용. 저장하면 모든 사용자에게 공유됩니다.</p>
+      <div class="field"><label>현재 상황 <span class="hintlabel">(사업소 전략 정보 — 📌 한 줄)</span></label><input type="text" id="beStatus" autocomplete="off" placeholder="예: 관리단 집회(26.6.24. 14:30) 추진 중" /></div>
+      <div class="field"><label>지분율 현황 <span class="hintlabel">— 한 줄에 하나: 구분 | 인원 | 지분율</span></label><textarea id="beOwnership" rows="4" placeholder="구분소유 | 65 | 55.6&#10;시행사 | 2 | 19.5&#10;신탁사 | 2 | 24.9"></textarea></div>
+      <div class="field"><label>지분율 합계(계)</label><input type="text" id="beOwnTotal" autocomplete="off" placeholder="예: 69명 (100%)" /></div>
+      <div class="field"><label>현황 · 핵심 이슈</label><textarea id="beSituation" rows="4" placeholder="핵심 상황·이슈를 적어 주세요"></textarea></div>
+      <div class="field"><label>관리소장 대응방안 <span class="hintlabel">— 한 줄에 한 항목</span></label><textarea id="beMgr" rows="4" placeholder="항목별로 줄바꿈"></textarea></div>
+      <div class="field"><label>본사 대응방안 <span class="hintlabel">— 한 줄에 한 항목</span></label><textarea id="beHq" rows="4" placeholder="항목별로 줄바꿈"></textarea></div>
+      <p class="hint" id="beHint"></p>
+      <button type="button" class="btn block" id="beSubmit">저장</button>
+    </div>
+  </div>
+
   <!-- 본사 로그인 모달 -->
   <div class="modal" id="loginModal" aria-hidden="true">
     <div class="modal-box">

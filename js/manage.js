@@ -293,8 +293,9 @@
       }
     }
 
-    // 본사 담당자 — 군 이동
+    // 본사 담당자 — 전략 정보 수정 + 군 이동
     if (isAdmin()) {
+      h += '<button type="button" class="btn ghost block" id="branchEditBtn" style="margin-top:16px;">✏️ 전략 정보 수정 (본사)</button>';
       h += '<div class="d-sec-title" style="margin-top:18px;">본사 — 분류(군) 이동</div>' +
         '<div class="group-move" id="groupMove">' +
           [1, 2, 3].map((g) => `<button type="button" class="gm-btn${b.group === g ? ' active' : ''}" data-g="${g}">${g}군</button>`).join('') +
@@ -303,6 +304,7 @@
 
     $('branchDetail').innerHTML = h;
     $('branchReportBtn').addEventListener('click', () => { closeModal('branchModal'); openReportForm(b.id); });
+    if ($('branchEditBtn')) $('branchEditBtn').addEventListener('click', () => openBranchEdit(b.id));
     // 보고 이력 항목 클릭 → 해당 보고 상세(+댓글)
     $('branchDetail').querySelectorAll('.bh-item').forEach((it) => {
       it.addEventListener('click', () => { closeModal('branchModal'); openReportDetail(it.dataset.rid); });
@@ -328,6 +330,54 @@
       openBranch(id); // 상세 갱신(이동 결과 반영)
     } catch (e) { if (hintEl) hint(hintEl, '오류: ' + e.message, 'error'); else alert('오류: ' + e.message); }
   }
+
+  // ---------- 사업소 전략 정보 수정 (본사 담당자) ----------
+  let editBranchId = null;
+  function openBranchEdit(id) {
+    const b = BRANCHES.find((x) => x.id === id); if (!b) return;
+    if (!hasToken()) { alert('전략 정보 수정은 본사 담당자 로그인이 필요합니다.'); $('loginToken').value = token(); openModal('loginModal'); return; }
+    editBranchId = id;
+    $('beTitle').textContent = `${b.name} — 전략 정보 수정`;
+    $('beStatus').value = b.status || '';
+    $('beOwnership').value = (b.ownership || []).map((o) => `${o.type} | ${o.count != null ? o.count : ''} | ${o.ratio != null ? o.ratio : ''}`).join('\n');
+    $('beOwnTotal').value = b.ownershipTotal || '';
+    $('beSituation').value = b.situation || '';
+    $('beMgr').value = (b.managerActions || []).join('\n');
+    $('beHq').value = (b.hqActions || []).join('\n');
+    hint($('beHint'), '', '');
+    openModal('branchEditModal');
+  }
+  function parseLines(v) { return String(v || '').split('\n').map((s) => s.trim()).filter(Boolean); }
+  function parseOwnership(v) {
+    return parseLines(v).map((line) => {
+      const p = line.split('|').map((s) => s.trim());
+      const count = p[1] !== undefined && p[1] !== '' ? Number(p[1]) : null;
+      const ratio = p[2] !== undefined && p[2] !== '' ? Number(p[2]) : null;
+      return { type: p[0] || '', count: Number.isFinite(count) ? count : null, ratio: Number.isFinite(ratio) ? ratio : null };
+    }).filter((o) => o.type);
+  }
+  $('beSubmit') && $('beSubmit').addEventListener('click', async () => {
+    if (!editBranchId) return;
+    if (!hasToken()) { hint($('beHint'), '본사 담당자 로그인이 필요합니다.', 'error'); return; }
+    const patch = {
+      status: $('beStatus').value.trim(),
+      ownership: parseOwnership($('beOwnership').value),
+      ownershipTotal: $('beOwnTotal').value.trim(),
+      situation: $('beSituation').value.trim(),
+      managerActions: parseLines($('beMgr').value),
+      hqActions: parseLines($('beHq').value),
+    };
+    const btn = $('beSubmit'); btn.disabled = true;
+    try {
+      hint($('beHint'), '저장 중…', '');
+      const next = await mutateBranchesObj((o) => { o.branches = (o.branches || []).map((x) => (x.id === editBranchId ? Object.assign({}, x, patch) : x)); return o; }, '사업소 전략 정보 수정');
+      BRANCHES = next.branches;
+      hint($('beHint'), '저장되었습니다! (반영까지 1~2분)', 'success');
+      const id = editBranchId;
+      setTimeout(() => { closeModal('branchEditModal'); openBranch(id); }, 800);
+    } catch (e) { hint($('beHint'), '오류: ' + e.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
 
   // ---------- 보고 목록 ----------
   function renderReportFilter() {
