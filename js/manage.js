@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v14 · 2026.06.23 (소장/에이스 로그인·PDF수정)';
+  const APP_VERSION = 'v15 · 2026.06.23 (나가기 확인)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -719,4 +719,22 @@
     refreshNote();
   }
   init();
+
+  // ---------- 앱 나가기 확인 ----------
+  (function () {
+    let leaving = false;
+    // 모바일/데스크탑 뒤로가기 가로채기
+    try { history.pushState({ ace: 1 }, '', location.href); } catch (e) {}
+    window.addEventListener('popstate', function () {
+      if (leaving) return;
+      if (window.confirm('앱을 나가시겠습니까?')) { leaving = true; history.back(); }
+      else { try { history.pushState({ ace: 1 }, '', location.href); } catch (e) {} }
+    });
+    // 탭 닫기·새로고침·주소 이동 시 브라우저 확인창
+    window.addEventListener('beforeunload', function (e) {
+      if (leaving) return;
+      e.preventDefault();
+      e.returnValue = '';
+    });
+  })();
 })();
