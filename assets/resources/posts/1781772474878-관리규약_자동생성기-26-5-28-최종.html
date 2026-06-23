@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>집합건물 관리규약(관리위원회) 자동 생성기 v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1b2a4a;--navy2:#243659;--gold:#c9972b;--goldf:#f0d48a;
+  --paper:#f8f6f1;--white:#fff;--border:#ddd8ce;--muted:#8a8070;
+  --text:#1e1c18;--line:#ede8df;--tag:#eef2fb;--tagc:#2a4a8a;
+  --blue:#1a3a8a;--bluebg:#eef4ff;--bluebdr:#2d5cc8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--paper);color:var(--text);font-family:'Noto Sans KR',sans-serif;}
+.app{display:flex;height:100vh;overflow:hidden;}
+.lp{width:46%;min-width:300px;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;}
+.rp{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.lh{background:var(--navy);color:#fff;padding:16px 20px 12px;border-bottom:3px solid var(--gold);flex-shrink:0;}
+.lh h1{font-family:'Nanum Myeongjo',serif;font-size:15px;font-weight:800;margin-bottom:2px;}
+.lh p{font-size:10px;color:var(--goldf);font-weight:300;letter-spacing:.5px;}
+.rh{background:var(--navy2);color:#fff;padding:14px 20px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--gold);flex-shrink:0;}
+.rh h2{font-family:'Nanum Myeongjo',serif;font-size:13px;font-weight:700;}
+.rac{display:flex;gap:6px;}
+.btn{padding:5px 12px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;border-radius:2px;transition:all .15s;}
+.btn:hover,.btn:active{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.brow,.adrow{padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.blbl{font-size:10px;color:var(--muted);white-space:nowrap;font-weight:500;}
+.bi{flex:1;border:1px solid var(--border);padding:5px 9px;font-size:16px;font-family:'Noto Sans KR',sans-serif;color:var(--text);outline:none;background:var(--paper);border-radius:4px;}
+.bi:focus{border-color:var(--navy);}
+.sw{flex:1;overflow-y:auto;padding-bottom:60px;-webkit-overflow-scrolling:touch;}
+.sb{border:2.25px solid #000000;padding:12px 14px;margin:8px 10px;border-radius:8px;background:var(--white);}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.st{font-size:18.7px;font-weight:700;color:#1e5aa8;line-height:1.4;flex:1;}
+.lt{font-size:9px;background:var(--tag);color:var(--tagc);padding:2px 6px;border-radius:10px;white-space:nowrap;margin-left:6px;font-weight:500;flex-shrink:0;margin-top:2px;}
+.ol{display:flex;flex-direction:column;gap:6px;}
+.ob{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);background:var(--paper);cursor:pointer;text-align:left;transition:all .15s;border-radius:6px;width:100%;min-height:44px;}
+.ob:active{border-color:var(--navy);background:#f0f4fc;}
+.ob.sel{border-color:var(--navy);background:var(--navy);}
+.ob.sel .ol-label{color:#fff;}
+.ob.sel .ol-note{color:var(--goldf);font-weight:600;}
+.or{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;background:white;transition:all .15s;}
+.ob.sel .or{border-color:var(--gold);background:var(--gold);}
+.oc{flex:1;}
+.ol-label{font-size:13px;font-weight:500;color:var(--text);line-height:1.5;}
+.ol-note{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4;}
+.custom-wrap{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px dashed var(--gold);background:#fffdf5;border-radius:6px;transition:all .15s;}
+.custom-wrap.sel{border-style:solid;border-color:var(--navy);background:var(--navy);}
+.custom-wrap.sel .custom-label{color:#fff;}
+.custom-wrap.sel .custom-ta{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.4);color:#fff;}
+.custom-wrap.sel .custom-ta::placeholder{color:rgba(255,255,255,0.4);}
+.custom-wrap.sel .custom-hint{color:rgba(255,255,255,0.45);}
+.custom-wrap.sel .del-note{color:#ffaaaa;}
+.custom-or,.custom-or2{width:18px;height:18px;border-radius:50%;border:2px solid var(--gold);flex-shrink:0;margin-top:2px;background:white;transition:all .15s;cursor:pointer;}
+.custom-wrap.sel .custom-or,.custom-wrap.sel .custom-or2{background:var(--gold);border-color:var(--gold);}
+.custom-inner{flex:1;display:flex;flex-direction:column;gap:4px;}
+.custom-label{font-size:12px;font-weight:700;color:var(--gold);cursor:pointer;}
+.custom-row{display:flex;align-items:center;gap:8px;}
+.hang-lbl{font-size:10px;color:var(--muted);}
+.hang-sel{border:1px solid var(--border);background:var(--white);font-size:16px;font-family:'Noto Sans KR',sans-serif;color:var(--navy);padding:3px 6px;cursor:pointer;border-radius:4px;outline:none;font-weight:700;}
+.custom-wrap.sel .hang-lbl{color:rgba(255,255,255,0.55);}
+.custom-wrap.sel .hang-sel{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.35);color:#fff;}
+.hang-preview{font-size:18px;font-weight:700;color:var(--gold);min-width:22px;text-align:center;}
+.custom-wrap.sel .hang-preview{color:var(--goldf);}
+.custom-ta{width:100%;border:1px solid var(--border);padding:8px 10px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text);outline:none;background:var(--white);resize:vertical;min-height:60px;line-height:1.7;border-radius:4px;display:block;}
+.custom-ta:focus{border-color:var(--gold);}
+.custom-hint{font-size:10px;color:var(--muted);line-height:1.4;}
+.del-note{font-size:10px;color:#c0392b;margin-top:1px;}
+.prog{padding:10px 16px;border-top:1px solid var(--border);background:white;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.pl{font-size:14px;color:#e74c3c;font-weight:700;white-space:nowrap;}
+.pt{flex:1;height:18px;background:var(--border);border-radius:9px;overflow:hidden;}
+.pf{height:100%;background:#e74c3c;transition:width .3s;border-radius:9px;}
+.pc{font-size:14px;color:#e74c3c;font-weight:700;white-space:nowrap;}
+.legend{display:flex;gap:10px;padding:6px 16px;border-bottom:1px solid var(--border);background:var(--white);flex-shrink:0;flex-wrap:wrap;}
+.lg-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--muted);}
+.lg-dot{width:9px;height:9px;border-radius:2px;}
+.dot-sel{background:#eef4ff;border:2px solid #2d5cc8;}
+.dot-base{background:var(--white);border:1px solid var(--border);}
+/* 선거구 툴 */
+.district-wrap{padding:10px 0 4px;}
+.district-panel{margin:6px 10px 10px;padding:14px 14px 12px;border:1px solid #cfe0ff;border-radius:14px;background:linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%);box-shadow:0 10px 24px rgba(45,92,200,.08), inset 0 1px 0 rgba(255,255,255,.9);}
+.district-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.district-panel-copy{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.district-kicker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.district-kicker strong{font-size:15px;line-height:1.35;color:#1e5aa8;font-weight:800;letter-spacing:-0.02em;}
+.district-badge{font-size:10px;background:#dfeaff;color:#1f4f96;padding:3px 8px;border-radius:999px;font-weight:700;white-space:nowrap;}
+.district-sub{font-size:11px;color:#5f6f8c;line-height:1.55;}
+.district-add-btn{padding:9px 14px;border:1px solid #2d5cc8;background:linear-gradient(135deg,#2d5cc8 0%,#1e4ca8 100%);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;border-radius:10px;white-space:nowrap;box-shadow:0 8px 18px rgba(45,92,200,.2);transition:transform .15s, box-shadow .15s, filter .15s;}
+.district-add-btn:hover{filter:brightness(1.03);transform:translateY(-1px);box-shadow:0 12px 24px rgba(45,92,200,.24);}
+.district-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;padding:9px 12px;border:1px dashed #b9cdf7;border-radius:10px;background:rgba(255,255,255,.72);}
+.district-hint{font-size:10px;color:#60708d;line-height:1.5;}
+.district-count{font-size:10px;font-weight:800;color:#245ea9;background:#e7efff;border:1px solid #c9dafd;border-radius:999px;padding:3px 8px;white-space:nowrap;}
+.district-list{display:flex;flex-direction:column;gap:8px;margin-bottom:2px;}
+.district-empty{padding:14px 12px;border:1px dashed #c5d8fb;border-radius:12px;background:rgba(255,255,255,.68);text-align:center;color:#687891;}
+.district-empty strong{display:block;font-size:12px;color:#245ea9;margin-bottom:4px;}
+.district-empty span{font-size:10px;line-height:1.55;}
+.district-item{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.92);border-radius:12px;border:1px solid #d4e2ff;box-shadow:0 6px 14px rgba(62,105,181,.06);}
+.district-num{font-size:11px;font-weight:800;color:#245ea9;white-space:nowrap;min-width:72px;padding:8px 10px;border-radius:999px;background:linear-gradient(180deg,#edf4ff 0%,#dde9ff 100%);border:1px solid #c7d8fb;text-align:center;}
+.district-input{flex:1;border:1px solid #c9d7f2;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:var(--text);outline:none;background:#fff;border-radius:10px;box-shadow:inset 0 1px 2px rgba(27,42,74,.04);}
+.district-input:focus{border-color:#2d5cc8;box-shadow:0 0 0 3px rgba(45,92,200,.12);}
+.district-del{padding:8px 10px;border:1px solid #e3bfd0;background:#fff5f8;color:#b73962;font-size:11px;font-weight:700;cursor:pointer;border-radius:10px;white-space:nowrap;transition:all .15s;}
+.district-del:hover{background:#c0395c;color:#fff;border-color:#c0395c;}
+@media(max-width:680px){
+  .district-panel{padding:12px;}
+  .district-panel-head,.district-toolbar{flex-direction:column;align-items:stretch;}
+  .district-item{grid-template-columns:1fr;}
+  .district-num,.district-del{justify-self:start;}
+}
+
+/* 추가 조항 섹션 */
+.extra-section{padding:12px 16px;border:2.25px solid #000000;background:#f9f9ff;border-radius:8px;margin:8px 10px;}
+.extra-title{font-size:18.7px;font-weight:700;color:#4d7cc9;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.extra-title span{font-size:10px;background:#e8eeff;color:var(--navy);padding:1px 7px;border-radius:10px;font-weight:500;}
+.extra-row{display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;}
+.extra-art-num{width:80px;flex-shrink:0;border:1px solid var(--border);padding:6px 8px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text);outline:none;background:var(--paper);border-radius:4px;}
+.extra-art-num:focus{border-color:var(--navy);}
+.extra-art-ta{flex:1;border:1px solid var(--border);padding:6px 8px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text);outline:none;background:var(--white);resize:vertical;min-height:52px;line-height:1.6;border-radius:4px;}
+.extra-art-ta:focus{border-color:var(--navy);}
+.extra-add-btn{padding:5px 10px;border:1px solid var(--navy);background:var(--navy);color:#fff;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;border-radius:4px;white-space:nowrap;flex-shrink:0;}
+.extra-add-btn:hover{background:var(--navy2);}
+.extra-del-btn{padding:3px 7px;border:1px solid #c0392b;background:transparent;color:#c0392b;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;border-radius:4px;flex-shrink:0;}
+.extra-del-btn:hover{background:#c0392b;color:#fff;}
+.extra-item{display:flex;gap:6px;align-items:flex-start;margin-bottom:5px;padding:6px 8px;background:#eef4ff;border-radius:4px;border:1px solid #c8d8f8;}
+.extra-item-txt{flex:1;font-size:11px;color:var(--navy);line-height:1.5;}
+.extra-hint{font-size:9px;color:var(--muted);margin-top:2px;}
+.article-edit-section{padding:12px 16px;border:2.25px solid #1a3a8a;background:#f6f9ff;border-radius:8px;margin:8px 10px;display:none;}
+.article-edit-title{font-size:18.7px;font-weight:700;color:#1a3a8a;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.article-edit-title span{font-size:10px;background:#dfeaff;color:#1a3a8a;padding:1px 7px;border-radius:10px;font-weight:500;}
+.article-edit-hint{font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:8px;}
+.article-edit-list{display:flex;flex-direction:column;gap:8px;}
+.section-article-slot{margin-top:8px;display:flex;flex-direction:column;gap:8px;}
+.section-article-group-title{font-size:11px;font-weight:700;color:#1a3a8a;background:#eef4ff;border:1px solid #c8d8f8;border-radius:6px;padding:6px 8px;}
+.article-edit-item{padding:8px;border:1px solid #c8d8f8;background:#fff;border-radius:6px;transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;}
+.article-edit-item.other-edited{border-color:#9ccc65;background:#f8fdf4;box-shadow:0 0 0 2px rgba(156,204,101,.16);}
+.article-edit-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;}
+.article-edit-label{font-size:12px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.article-edit-mod-badge{display:none;font-size:10px;font-weight:700;color:#1b5e20;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:999px;padding:1px 7px;}
+.article-edit-item.other-edited .article-edit-mod-badge{display:inline-flex;align-items:center;}
+.article-edit-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.article-edit-add{padding:3px 8px;border:1px solid #2d5cc8;background:#eef4ff;color:#1a3a8a;font-size:11px;cursor:pointer;border-radius:4px;}
+.article-edit-add:hover{background:#2d5cc8;color:#fff;}
+.article-edit-reset{padding:3px 8px;border:1px solid #1a3a8a;background:transparent;color:#1a3a8a;font-size:11px;cursor:pointer;border-radius:4px;}
+.article-edit-reset:hover{background:#1a3a8a;color:#fff;}
+.article-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;}
+.article-edit-col{display:flex;flex-direction:column;gap:6px;}
+.article-edit-subtitle{font-size:11px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px;}
+.article-edit-subtitle span{font-size:9px;font-weight:500;color:var(--muted);background:#f2f5fb;padding:1px 6px;border-radius:999px;}
+.article-edit-ta{width:100%;border:1px solid var(--border);padding:8px 10px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text);outline:none;background:var(--white);resize:vertical;min-height:96px;line-height:1.7;border-radius:4px;}
+.article-edit-base{background:#f7f8fb;color:#4b5563;}
+.article-edit-input{background:#fffef8;}
+.article-edit-ta:focus{border-color:var(--bluebdr);}
+.article-edit-base:focus{border-color:#cbd5e1;}
+.article-edit-input:focus{background:#fff;}
+@media(max-width:680px){.article-edit-grid{grid-template-columns:1fr;}}
+.chapter-insert-section{padding:12px 16px;border:2.25px solid #7b4bb3;background:#faf6ff;border-radius:8px;margin:8px 10px;}
+.chapter-insert-title{font-size:18.7px;font-weight:700;color:#6b38a5;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.chapter-insert-title span{font-size:10px;background:#efe4ff;color:#6b38a5;padding:1px 7px;border-radius:10px;font-weight:500;}
+.chapter-insert-hint{font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:8px;}
+.chapter-insert-list{display:flex;flex-direction:column;gap:8px;}
+.chapter-insert-item{padding:8px;border:1px solid #d8c4f2;background:#fff;border-radius:6px;}
+.chapter-insert-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;}
+.chapter-insert-label{font-size:12px;font-weight:700;color:#6b38a5;}
+.chapter-insert-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.chapter-insert-add,.chapter-insert-del{padding:3px 8px;font-size:11px;cursor:pointer;border-radius:4px;}
+.chapter-insert-add{border:1px solid #6b38a5;background:#efe4ff;color:#6b38a5;}
+.chapter-insert-add:hover{background:#6b38a5;color:#fff;}
+.chapter-insert-del{border:1px solid #c0392b;background:transparent;color:#c0392b;}
+.chapter-insert-del:hover{background:#c0392b;color:#fff;}
+.chapter-insert-ta{width:100%;border:1px solid var(--border);padding:8px 10px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text);outline:none;background:var(--white);resize:vertical;min-height:74px;line-height:1.7;border-radius:4px;}
+.chapter-insert-ta:focus{border-color:#6b38a5;}
+.pw{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch;}
+
+.pb{background:white;border:1px solid var(--border);padding:22px 26px;font-family:'Nanum Myeongjo',serif;font-size:12px;line-height:2.05;color:var(--text);white-space:pre-wrap;min-height:400px;}
+.sel-block{display:block;color:var(--blue);font-family:'Noto Sans KR',sans-serif;font-weight:700;background:linear-gradient(90deg,var(--bluebg) 0%,#f6f9ff 100%);border-left:4px solid var(--bluebdr);padding-left:10px;margin-left:-10px;border-radius:0 4px 4px 0;white-space:pre-wrap;}
+.changed-char{color:#c62828;font-weight:800;background:#fde7ee;border-radius:4px;padding:0 .16em;box-decoration-break:clone;-webkit-box-decoration-break:clone;box-shadow:inset 0 0 0 1px rgba(198,40,40,.08);}
+.article-anchor{display:inline;scroll-margin-top:24px;border-radius:4px;transition:background-color .9s ease, box-shadow .9s ease, color .2s ease;}
+.article-anchor.sel-linked{display:block;color:var(--blue);font-family:'Noto Sans KR',sans-serif;font-weight:700;background:linear-gradient(90deg,var(--bluebg) 0%,#f6f9ff 100%);border-left:4px solid var(--bluebdr);padding-left:10px;margin-left:-10px;border-radius:0 4px 4px 0;white-space:pre-wrap;}
+.sel-block.other-edit-block{display:block;color:#111;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:linear-gradient(90deg,#eff9e9 0%,#f8fdf4 100%);border-left:4px solid #66bb6a;padding-left:10px;margin-left:-10px;border-radius:0 4px 4px 0;white-space:pre-wrap;}
+.article-anchor.other-edit-anchor,.article-anchor.other-edit-anchor.sel-linked{display:block;color:#111;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:linear-gradient(90deg,#eff9e9 0%,#f8fdf4 100%);border-left:4px solid #66bb6a;padding-left:10px;margin-left:-10px;border-radius:0 4px 4px 0;white-space:pre-wrap;}
+.changed-char-greenword{color:#1565c0;font-weight:800;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-color:#1565c0;}
+.article-anchor.flash-restored{background:#fff3a3;box-shadow:0 0 0 4px rgba(255,243,163,.65);}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:var(--muted);gap:10px;}
+.empty-icon{font-size:30px;opacity:.35;}
+.empty-text{font-size:11px;text-align:center;line-height:1.9;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2d6a4f;color:white;padding:10px 20px;font-size:13px;border-radius:20px;opacity:0;transition:opacity .3s;pointer-events:none;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;z-index:999;}
+.toast.show{opacity:1;}
+.legal-modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.56);display:flex;align-items:center;justify-content:center;padding:20px;z-index:2000;}
+.legal-modal-backdrop[hidden]{display:none !important;}
+.legal-modal{width:min(560px,100%);background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(15,23,42,.28);border:1px solid #dbe4f0;overflow:hidden;font-family:'Noto Sans KR',sans-serif;}
+.legal-modal-head{padding:18px 22px 10px;background:linear-gradient(180deg,#f8fbff 0%,#eef5ff 100%);border-bottom:1px solid #d8e3f2;}
+.legal-modal-kicker{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#285ea8;background:#e8f1ff;border-radius:999px;padding:4px 10px;margin-bottom:10px;}
+.legal-modal-title{font-size:20px;font-weight:800;color:#10243e;line-height:1.45;}
+.legal-modal-body{padding:20px 22px 22px;color:#243447;font-size:14px;line-height:1.9;background:#fff;}
+.legal-modal-message{margin:0 0 14px;white-space:pre-wrap;word-break:keep-all;}
+.legal-modal-sub{margin:0;color:#5b6b7f;font-size:12px;line-height:1.7;}
+.legal-modal-actions{display:flex;justify-content:flex-end;padding:0 22px 22px;background:#fff;}
+.legal-modal-confirm{border:none;background:linear-gradient(135deg,#1f5fbf 0%,#124a9c 100%);color:#fff;font-size:14px;font-weight:800;padding:12px 20px;border-radius:10px;cursor:pointer;box-shadow:0 8px 20px rgba(18,74,156,.22);}
+.legal-modal-confirm:hover{filter:brightness(1.03);}
+.legal-modal-confirm:focus{outline:3px solid rgba(31,95,191,.18);outline-offset:2px;}
+body.modal-open{overflow:hidden;}
+.mob-tab-bar{display:none;}
+@media(max-width:680px){
+  html,body{height:100%;overflow:hidden;}
+  .app{flex-direction:column;height:100vh;overflow:hidden;}
+  .mob-tab-bar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--navy);border-top:2px solid var(--gold);height:54px;flex-shrink:0;}
+  .mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);font-size:9px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;gap:3px;border:none;background:transparent;padding:6px 0;transition:color .15s;}
+  .mob-tab.active{color:var(--gold);}
+  .mob-tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+  .mob-tab-badge{background:var(--gold);color:var(--navy);font-size:9px;font-weight:700;border-radius:8px;padding:1px 5px;display:none;}
+  .mob-tab-badge.show{display:inline-block;}
+  .panel-hidden{opacity:0;pointer-events:none;transform:translateX(20px);}
+  .lp,.rp{position:absolute;top:0;left:0;right:0;height:calc(100vh - 54px);width:100%;transition:opacity .2s,transform .2s;display:flex;flex-direction:column;}
+  /* .panel-hidden은 @media 안에서만 적용 */
+  .lh h1{font-size:14px;}
+  .rh h2{font-size:12px;}
+  .pb{font-size:11.5px;padding:14px 12px;line-height:1.95;}
+  .btn{padding:6px 10px;font-size:10px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="lp" id="panelLeft">
+    <div class="lh">
+      <h1>집합건물 관리규약(관리위원회) 자동 생성기 v2</h1>
+      <p>법무부 표준관리규약(단동형·관리위원회) 자동 반영</p>
+    </div>
+    <div class="brow"><span class="blbl">건물명칭</span><input class="bi" id="building" placeholder="예: 에이스 아티스포럼"></div>
+    <div class="adrow"><span class="blbl">소재지</span><input class="bi" id="addr" placeholder="예: 서울특별시 마포구 와우산로 94"></div>
+    <div class="sw" id="sw">
+      <div id="sections-wrap"></div>
+      <div class="article-edit-section" id="article-edit-wrap">
+        <div class="article-edit-title">📝 기타 조문 전체 수정 <span>1~18 선택 외 조문</span></div>
+        <div class="article-edit-hint">1~18번 선택지에 연결된 조문은 각 항목 아래에서 수정하고, 그 외 조문은 여기서 예전처럼 한꺼번에 수정할 수 있습니다.</div>
+        <div class="article-edit-list" id="article-edit-list"></div>
+      </div>
+      <div class="chapter-insert-section" id="chapter-insert-wrap">
+        <div class="chapter-insert-title">➕ 장 위 조문 추가 <span>각 장 제목 바로 위 삽입</span></div>
+        <div class="chapter-insert-hint">예: 제6장 관리인 및 관리단 임원 위에 추가 조문을 넣고 싶을 때 사용합니다. 버튼을 누르면 이전 조문 번호 기준으로 추가 번호가 자동 생성됩니다.</div>
+        <div class="chapter-insert-list" id="chapter-insert-list"></div>
+      </div>
+      <!-- 추가 조항: sections-wrap 아래, sw 스크롤 안에 포함 -->
+      <div class="extra-section" id="extra-section-wrap">
+        <div class="extra-title">
+          ✚ 추가 조항 직접 입력
+          <span>규약 전문 말미에 반영</span>
+        </div>
+        <div class="extra-hint" style="margin-bottom:6px;font-size:10px;color:var(--muted);">조문 번호(예: 제89조)와 내용을 입력하면 우측 전문 말미에 추가됩니다.</div>
+        <div id="extra-list"></div>
+        <div class="extra-row">
+          <input class="extra-art-num" id="extra-num" placeholder="제89조" />
+          <textarea class="extra-art-ta" id="extra-ta" placeholder="(제목) 내용을 입력하세요&#10;예) 제89조(분쟁해결) ① 이 규약에..."></textarea>
+          <button class="extra-add-btn" onclick="addExtraArt()">+ 추가</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="prog">
+      <span class="pl">선택 진행률</span>
+      <div class="pt"><div class="pf" id="pf" style="width:0%"></div></div>
+      <span class="pc" id="pc">0 / 10</span>
+    </div>
+  </div>
+  <div class="rp" id="panelRight">
+    <div class="rh">
+      <h2>법무부 표준관리규약 전문 (집합건물)</h2>
+      <div class="rac">
+        <button class="btn" onclick="resetAll()">초기화</button>
+        <button class="btn" onclick="copyText()">전문 복사</button>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="lg-item"><div class="lg-dot dot-sel"></div><span>선택·입력된 조항 (파란 고딕)</span></div>
+      <div class="lg-item"><div class="lg-dot dot-base"></div><span>표준규약 원문</span></div>
+    </div>
+    <div class="pw"><div id="preview"></div></div>
+  </div>
+</div>
+<nav class="mob-tab-bar">
+  <button class="mob-tab active" id="tabLeft" onclick="switchTab('left')">
+    <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+    항목 선택
+    <span class="mob-tab-badge" id="selBadge">0</span>
+  </button>
+  <button class="mob-tab" id="tabRight" onclick="switchTab('right')">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    규약 전문
+  </button>
+</nav>
+<div class="toast" id="toast">전문이 클립보드에 복사되었습니다.</div>
+<div class="legal-modal-backdrop" id="legalNoticeModal" role="dialog" aria-modal="true" aria-labelledby="legalNoticeTitle">
+  <div class="legal-modal">
+    <div class="legal-modal-head">
+      <div class="legal-modal-kicker">⚖️ 법률 검토 안내</div>
+      <div class="legal-modal-title" id="legalNoticeTitle">규약 작성 전 확인사항</div>
+    </div>
+    <div class="legal-modal-body">
+      <p class="legal-modal-message" id="legalNoticeMessage"></p>
+      <p class="legal-modal-sub">확인을 누르면 자동생성기 화면이 활성화되고 이후부터 규약 작성 작업을 진행할 수 있습니다.</p>
+    </div>
+    <div class="legal-modal-actions">
+      <button type="button" class="legal-modal-confirm" id="legalNoticeConfirmBtn">확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const HANG=['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
+const CLAUSE_MARKERS=['①','②','③','④','⑤','⑥','⑦','⑧','⑨','⑩','⑪','⑫','⑬','⑭','⑮','⑯','⑰','⑱','⑲','⑳'];
+function hangIdx(c){return HANG.indexOf(c);}
+function hangCh(n){return HANG[n]||String(n+1);}
+function escHtmlPreview(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function splitItems(text){
+  const lines=text.split('\n'), items=[];
+  for(const line of lines){
+    const m=line.match(/^([①②③④⑤⑥⑦⑧⑨⑩])\s*([\s\S]*)/);
+    if(m) items.push({hang:m[1],body:m[2]});
+    else if(items.length>0) items[items.length-1].body+='\n'+line;
+    else items.push({hang:null,body:line});
+  }
+  return items;
+}
+function renumber(items){
+  const fixed=items.filter(it=>it.hang===null);
+  const numbered=items.filter(it=>it.hang!==null);
+  numbered.sort((a,b)=>hangIdx(a.hang)-hangIdx(b.hang));
+  const out=numbered.map((it,i)=>{
+    const lines=it.body.split('\n');
+    return hangCh(i)+' '+lines[0]+(lines.length>1?'\n'+lines.slice(1).join('\n'):'');
+  });
+  return [...fixed.map(it=>it.body),...out].join('\n');
+}
+function applyCustom2(secId, baseText){
+  const t=(customTexts2[secId]||'').trim();
+  if(!t) return baseText;
+  const insertHang=customHangs2[secId]||'②';
+  const idx=hangIdx(insertHang);
+  let items=splitItems(baseText);
+  items=items.filter(it=>it.hang===null||hangIdx(it.hang)!==idx);
+  items.push({hang:insertHang,body:t});
+  return renumber(items);
+}
+
+function applyCustom(secId, baseText){
+  const t=(customTexts[secId]||'').trim();
+  if(!t) return baseText;
+  const insertHang=customHangs[secId]||'①';
+  const idx=hangIdx(insertHang);
+  let items=splitItems(baseText);
+  items=items.filter(it=>it.hang===null||hangIdx(it.hang)!==idx);
+  items.push({hang:insertHang,body:t});
+  return renumber(items);
+}
+
+/* ── 선택항목 정의 (PDF 기준 공동주택) ── */
+const SECTIONS=[
+  {id:"s1",law:"24조②③",title:"관리인 임기 및 선임방법",customHint:"예) 임기 3년, 구분소유자 총회에서 선임",
+   options:[
+    {id:"s1_a",label:"임기 2년, 관리단집회에서 선임·해임 (원칙)",note:"집합건물법 24조③ 본문."},
+    {id:"s1_b",label:"임기 1년, 관리위원회에서 선임·해임",note:"24조③ 단서. 임기 1년 단축."},
+    {id:"s1_c",label:"임기 2년, 관리위원회에서 선임·해임",note:"24조③ 단서. 임기 2년 유지."},
+  ]},
+  {id:"s2",law:"26조의4③",title:"관리위원 임기",customHint:"예) 관리위원의 임기는 1년 6개월로 한다.",
+   options:[
+    {id:"s2_a",label:"임기 2년 (표준, 최대)",note:"집합건물법 26조의4③."},
+    {id:"s2_b",label:"임기 1년",note:"1년으로 단축 가능."},
+  ]},
+  {id:"s3",law:"26조의4①",title:"관리위원 자격 요건",customHint:"예) 직접 입주하여 1년 이상 거주한 구분소유자",
+   options:[
+    {id:"s3_a",label:"구분소유자이면 가능 (표준)",note:"64조① 표준규약 기본 요건."},
+    {id:"s3_b",label:"직접 입주하여 거주하는 구분소유자",note:"64조①. 임대만 놓은 소유자 배제."},
+    {id:"s3_c",label:"직접 입주하여 6개월 이상 거주한 구분소유자",note:"64조①. 가장 강화된 자격 요건."},
+  ]},
+  {id:"s4",law:"26조의3③",title:"관리인 단독 집행 한도",customHint:"예) 200만원 이상 수선 단독 집행",
+   options:[
+    {id:"s4_a",label:"별도 정하지 않음 (모든 사항 위원회 결의 필요)",note:"26조의3③ 원칙."},
+    {id:"s4_b",label:"50만원 이하 수선 + 3개월 체납자 채권관리 단독 집행",note:"가장 많이 채택."},
+    {id:"s4_c",label:"100만원 이하 수선 + 3개월 체납자 채권관리 단독 집행",note:"재량 100만원으로 확대."},
+  ]},
+  {id:"s5",law:"37조①",title:"의결권 면적 기준",customHint:"예) 전유부분 면적과 분양면적 비율을 병행 적용",
+   options:[
+    {id:"s5_a",label:"지분비율(전유부분 면적 비율) — 원칙",note:"37조① 원칙."},
+    {id:"s5_b",label:"분양면적 기준",note:"37조① 단서. 규약으로 변경 가능."},
+  ]},
+  {id:"s6",law:"16조②③",title:"임차인(점유자) 의결권 행사 범위",customHint:"예) 점유자는 공용부분 관리 안건에 한하여 의결권 행사",
+   options:[
+    {id:"s6_a",label:"법 원칙 적용 (공용부분 관리 등 4개 사항 행사 가능)",note:"16조② 원칙."},
+    {id:"s6_b",label:"임차인의 공용부분 의결권 제한 (구분소유자만 행사)",note:"16조③에 따라 규약으로 제한 가능."},
+  ]},
+  {id:"s7",law:"33조②",title:"임시집회 소집 청구 정수",customHint:"예) 구분소유자의 7분의 1 이상",
+   options:[
+    {id:"s7_a",label:"1/5 이상 (법 원칙)",note:"33조② 원칙."},
+    {id:"s7_b",label:"1/10 이상으로 완화",note:"33조② 단서."},
+  ]},
+  {id:"s8",law:"34조①",title:"소집 통보 기간",customHint:"예) 집회일 10일 전 통지",
+   options:[
+    {id:"s8_a",label:"7일 전 통지 (법 원칙)",note:"34조① 원칙."},
+    {id:"s8_b",label:"5일 전 통지로 단축",note:"34조① 단서."},
+    {id:"s8_c",label:"14일 전 통지로 연장",note:"34조① 단서."},
+  ]},
+  {id:"s9",law:"41조⑥",title:"건물 내 게시로 소집통지 갈음",customHint:"예) 1층 게시판 및 각 층 엘리베이터 앞 게시",
+   options:[
+    {id:"s9_a",label:"규약으로 정하지 않음 (개별 통지 필수)",note:"모든 구분소유자 개별 통지 의무."},
+    {id:"s9_b",label:"건물 내 적당한 장소에 게시로 갈음 가능",note:"34조④."},
+  ]},
+  {id:"s10",law:"38조①",title:"일반 결의 요건",customHint:"예) 구분소유자 과반수 출석 + 출석자 2/3 이상 찬성",
+   options:[
+    {id:"s10_a",label:"구분소유자 과반수 + 의결권 과반수 (표준)",note:"38조① 원칙."},
+    {id:"s10_b",label:"과반수 출석 + 출석 인원·의결권 과반수 찬성",note:"법무부 권고 방식."},
+    {id:"s10_c",label:"구분소유자 및 의결권의 각 1/3 이상 찬성 (완화)",note:"소규모 건물 효율화."},
+  ]},
+  {id:"s11",law:"28조",title:"관리비 체납자 제재 조치",customHint:"예) 6개월 이상 체납 시 공용부분 사용 제한",
+   options:[
+    {id:"s11_a",label:"규약으로 별도 제재 없음",note:"법정 절차(지급명령 등)만 가능."},
+    {id:"s11_b",label:"3개월 이상 체납 시 단전·단수 및 차량 출입 제한 가능",note:"28조에 따라 규약으로 설정 가능."},
+  ]},
+  {id:"s12",law:"26조의2",title:"회계감사 방식",customHint:"예) 전유부분 100호 이상: 매년 의무 외부감사",
+   options:[
+    {id:"s12_a",label:"150호 이상: 매년 의무 외부감사 (법 원칙)",note:"전유부분 150호 이상 건물 적용."},
+    {id:"s12_b",label:"50호 이상 150호 미만: 구분소유자 1/5 요구 시 감사",note:"50호 이상 150호 미만 건물."},
+  ]},
+  {id:"s13",law:"38조③",title:"관리위탁계약 수의계약 가능 여부",customHint:"예) 관리위원회 결의 시 수의계약 허용, 단 계약내용 공고 의무",
+   options:[
+    {id:"s13_a",label:"공개경쟁 입찰만 가능 (원칙)",note:"38조② 원칙. 모든 관리위탁계약은 공개경쟁 입찰."},
+    {id:"s13_b",label:"관리위원회 결의 시 수의계약 가능",note:"38조③. 관리위원회 결의를 거쳐 수의계약 체결 허용."},
+  ]},
+  {id:"s14",law:"30조④",title:"공용부분 변경 공개경쟁 입찰 기준금액",customHint:"예) 500만원 이상 공사는 공개경쟁 입찰",
+   options:[
+    {id:"s14_a",label:"100만원 이상",note:"30조④. 100만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_b",label:"200만원 이상",note:"30조④. 200만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_c",label:"300만원 이상",note:"30조④. 300만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_d",label:"400만원 이상",note:"30조④. 400만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_e",label:"500만원 이상",note:"30조④. 500만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_f",label:"600만원 이상",note:"30조④. 600만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_g",label:"700만원 이상",note:"30조④. 700만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_h",label:"800만원 이상",note:"30조④. 800만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_i",label:"900만원 이상",note:"30조④. 900만원 이상 공사·용역은 공개경쟁 입찰."},
+    {id:"s14_j",label:"1000만원 이상",note:"30조④. 1000만원 이상 공사·용역은 공개경쟁 입찰."},
+  ]},
+  {id:"s15",law:"34조",title:"기관 및 임원 구성·부관리인 명칭 변경",customHint:"예) 관리단은 관리단집회와 관리인 이외에 관리위원회 및 감사를 두고, 부관리인 명칭을 총무로 변경할 수 있다.",
+   options:[],
+  },
+  {id:"s16",law:"52조③",title:"관리인의 겸직 여부",customHint:"예) 관리인은 관리위원을 겸직할 수 있다.",
+   options:[
+    {id:"s16_a",label:"관리인은 관리위원·감사·선거관리위원 겸직 불가 (원칙)",note:"52조③ 원칙."},
+    {id:"s16_b",label:"관리인은 관리위원·감사·선거관리위원 겸직할 수 있다 [대안]",note:"52조③ 대안."},
+  ]},
+  {id:"s17",law:"64조②",title:"관리위원의 겸직 여부",customHint:"예) 관리위원은 관리인을 겸직할 수 있다.",
+   options:[
+    {id:"s17_a",label:"관리위원은 관리인·부관리인·감사·선거관리위원 겸직 불가 (원칙)",note:"64조② 원칙."},
+    {id:"s17_b",label:"관리위원은 관리인·부관리인·감사·선거관리위원 겸직 가능 [대안]",note:"64조② 대안. 겸직 허용."},
+  ]},
+  {id:"s18",law:"전문",title:"부관리인 명칭 변경",customHint:"예) 부관리인 대신 다른 명칭 사용",
+   options:[
+    {id:"s18_a",label:"부관리인 (원칙)",note:"표준규약 원문 그대로 사용."},
+    {id:"s18_b",label:"총무 (변경)",note:"전문의 모든 '부관리인'을 '총무'로 변경."},
+  ]},
+];
+
+const selections={}, customTexts={}, customHangs={};
+const customTexts2={}, customHangs2={}; // 두번째 직접입력
+const extraArts=[];  // 추가 조항 [{num:'제89조', text:'...'}]
+const districts=[];  // 선거구 [{desc:'○층~○층'}]
+const chapterInsertions={};
+const articleOverrides={};
+const articleDirty={};
+const articleOverrideSource={};
+const SECTION_ARTICLES={
+  s1:['제52조'], s2:['제63조'], s3:['제64조'], s4:['제57조'], s5:['제43조'], s6:['제44조'],
+  s7:['제40조'], s8:['제41조'], s9:['제41조'], s10:['제42조'], s11:['제87조'], s12:['제84조'],
+  s13:['제38조'], s14:['제30조'], s15:['제34조'], s16:['제52조'], s17:['제64조'], s18:['제34조']
+};
+let suspendArticleOverrides=false;
+let suspendChapterInsertions=false;
+let currentArticleKey=null;
+let lastSelectedSec=null;
+
+function renderSections(){
+  const sw=document.getElementById('sections-wrap');
+  const visibleSections=SECTIONS.filter(sec=>sec.id!=='s18');
+  sw.innerHTML=visibleSections.map((sec,secIdx)=>{
+    const selId=selections[sec.id]||null;
+    const optBtns=sec.options.map(opt=>`
+      <button class="ob${selId===opt.id?' sel':''}" data-sec="${sec.id}" data-opt="${opt.id}">
+        <div class="or"></div>
+        <div class="oc"><div class="ol-label">${opt.label}</div><div class="ol-note">${opt.note}</div></div>
+      </button>`).join('');
+    const districtHtml = sec.id==='s2' ? `
+      <div class="district-panel" id="district-section-wrap">
+        <div class="district-panel-head">
+          <div class="district-panel-copy">
+            <div class="district-kicker"><strong>🗳 선거구 설정</strong><span class="district-badge">제63조① 대안 반영</span></div>
+            <div class="district-sub">선거구를 설정하면 관리위원 구성 문구가 자동으로 선거구별 선출 방식에 맞춰 우측 전문에 반영됩니다.</div>
+          </div>
+          <button class="district-add-btn" onclick="addDistrict()">+ 선거구 추가</button>
+        </div>
+        <div class="district-toolbar">
+          <span class="district-hint">예) 1층~3층, 제1라인~제2라인, A동 저층부</span>
+          <span class="district-count">현재 <b>${districts.length}</b>개 설정</span>
+        </div>
+        <div id="district-list" class="district-list"></div>
+      </div>` : '';
+    const deputyRenameHtml = sec.id==='s15' ? (()=>{
+      const s18=SECTIONS.find(s=>s.id==='s18');
+      const s18Sel=selections['s18']||null;
+      const s18Btns=(s18&&s18.options?s18.options:[]).map(opt=>`
+        <button class="ob${s18Sel===opt.id?' sel':''}" data-sec="s18" data-opt="${opt.id}">
+          <div class="or"></div>
+          <div class="oc"><div class="ol-label">${opt.label}</div><div class="ol-note">${opt.note}</div></div>
+        </button>`).join('');
+      return `
+      <div class="extra-section" id="merged-s18-wrap" style="margin:8px 10px 8px;border:2.25px solid #d7e7ff;border-radius:8px;">
+        <div class="extra-title" style="color:#245ea9;">18. 부관리인 명칭 변경 <span style="background:#eef5ff;color:#245ea9;">15번에 통합</span></div>
+        <div class="extra-hint" style="margin-bottom:6px;font-size:10px;color:var(--muted);">15번 기관 및 임원 구성 안에서 부관리인 명칭을 함께 설정합니다.</div>
+        <div class="ol">${s18Btns}</div>
+      </div>`;
+    })() : '';
+    return `<div class="sb" style="">
+      <div class="sh"><div class="st">${secIdx+1}. ${sec.title}</div><span class="lt">${sec.law}</span></div>
+      <div class="ol">${optBtns}</div>
+      ${districtHtml}
+      ${deputyRenameHtml}
+      <div class="section-article-slot" id="section-article-${sec.id}"></div>
+    </div>`;
+  }).join('');
+
+  sw.querySelectorAll('button.ob').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const sec=btn.dataset.sec;
+      selections[sec]=btn.dataset.opt;
+      activateSectionContext(sec, getPrimaryArticleKeyForSec(sec));
+      clearSectionAutoOverrides(sec);
+      syncManagedSharedOverride(sec);
+      syncSectionOverrideSource(sec);
+      refreshSec(sec);
+      updateProgress();
+      renderDistricts();
+      rerenderArticlePreview();
+      if(window.innerWidth<=680) switchTab('right');
+    });
+  });
+  renderDistricts();
+}
+
+function refreshSec(id){
+  const sw=document.getElementById('sections-wrap');
+  const sel=selections[id]||null;
+  sw.querySelectorAll(`button.ob[data-sec="${id}"]`).forEach(b=>b.classList.toggle('sel',b.dataset.opt===sel));
+}
+function updateProgress(){
+  const c=Object.keys(selections).length;
+  document.getElementById('pf').style.width=Math.round(c/18*100)+'%';
+  document.getElementById('pc').textContent=c+' / 18';
+  const badge=document.getElementById('selBadge');
+  if(badge){badge.textContent=c;badge.classList.toggle('show',c>0);}
+}
+function g(id){return selections[id]||null;}
+
+/* custom2 체인 적용: custom 후 custom2도 순차 적용 */
+function blk2(secId, base){
+  // custom(1번) 적용
+  let result = g(secId)==='custom' ? applyCustom(secId, base) : base;
+  // custom2(2번) 적용 - 내용이 있으면 추가
+  const t2=(customTexts2[secId]||'').trim();
+  if(t2){
+    result = applyCustom2(secId, result);
+  }
+  return result;
+}
+
+function normalizeSelArtifacts(s){
+  return (s||'')
+    .replace(/(^|[^%])%SEL:([^%]+)%%/g,'$1%%SEL:$2%%')
+    .replace(/(^|[^%])%\/SEL%%/g,'$1%%/SEL%%');
+}
+function stripSelArtifacts(s){
+  return normalizeSelArtifacts(s)
+    .replace(/%%SEL:[^%]+%%|%%\/SEL%%/g,'')
+    .replace(/%SEL:[^%]+%%|%\/SEL%%/g,'');
+}
+function stripSelMarkers(s){
+  return stripSelArtifacts(s);
+}
+function articleSortTuple(key){
+  const m=(key||'').match(/^제(\d+)조(?:의(\d+))?/);
+  return m?[parseInt(m[1],10),parseInt(m[2]||'0',10)]:[9999,9999];
+}
+function getUniqueSectionIdForArticleKey(key){
+  const matched=Object.keys(SECTION_ARTICLES).filter(sec=> (SECTION_ARTICLES[sec]||[]).includes(key));
+  return matched.length===1 ? matched[0] : null;
+}
+function parseArticleBlocks(text){
+  const src=text||'';
+  const re=/^제\d+조(?:의\d+)?\([^)]+\)/gm;
+  const matches=[...src.matchAll(re)];
+  const chapterBlocks=parseChapterBlocks(src);
+  return matches.map((m,idx)=>{
+    const start=m.index;
+    const nextArticleStart=idx+1<matches.length?matches[idx+1].index:src.length;
+    const nextChapter=chapterBlocks.find(ch=>ch.start>start);
+    const nextChapterStart=nextChapter?nextChapter.start:src.length;
+    const end=Math.min(nextArticleStart,nextChapterStart);
+    const raw=src.slice(start,end).replace(/^\n+|\n+$/g,'');
+    const key=(m[0].match(/^제\d+조(?:의\d+)?/)||[''])[0];
+    return {key,start,end,raw};
+  });
+}
+function parseChapterBlocks(text){
+  const src=text||'';
+  const lines=src.split('\n');
+  const blocks=[];
+  let offset=0;
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i];
+    const trimmed=(line||'').trim();
+    if(/^제\d+장\s+/.test(trimmed)){
+      let start=offset;
+      if(i>0 && /^═+/.test((lines[i-1]||'').trim())){
+        start-=lines[i-1].length+1;
+      }
+      const key=(trimmed.match(/^제\d+장/)||[''])[0];
+      blocks.push({key,title:trimmed,start});
+    }
+    offset+=line.length+1;
+  }
+  return blocks;
+}
+function applyChapterInsertions(text){
+  if(suspendChapterInsertions) return text;
+  const chapters=parseChapterBlocks(text);
+  if(!chapters.length) return text;
+  let out='', pos=0, changed=false;
+  for(const chapter of chapters){
+    out+=text.slice(pos, chapter.start);
+    const row=chapterInsertions[chapter.key];
+    const inserted=(row&&row.text?row.text:'').trim();
+    if(inserted){
+      out+=inserted+'\n\n';
+      changed=true;
+    }
+    pos=chapter.start;
+  }
+  out+=text.slice(pos);
+  return changed?out:text;
+}
+function applyArticleOverrides(text){
+  if(suspendArticleOverrides) return text;
+  const blocks=parseArticleBlocks(text);
+  if(!blocks.length) return text;
+  let out='', pos=0, changed=false;
+  for(const block of blocks){
+    out+=text.slice(pos,block.start);
+    if(block.key==='제34조'){
+      out+=text.slice(block.start,block.end);
+      pos=block.end;
+      continue;
+    }
+    const edited=(articleOverrides[block.key]||'').trim();
+    if(edited){
+      const markerSec=articleOverrideSource[block.key] || getUniqueSectionIdForArticleKey(block.key) || ('edit_'+block.key);
+      const editedText = applyDeputyManagerTerm(edited);
+      const headMatch=editedText.match(/^(제\d+조(?:의\d+)?\([^)]+\))(.*)$/s);
+      if(headMatch && headMatch[2]){
+        out+=`${headMatch[1]}%%SEL:${markerSec}%%${headMatch[2]}%%/SEL%%`;
+      }else{
+        out+=`%%SEL:${markerSec}%%${editedText}%%/SEL%%`;
+      }
+      changed=true;
+    }else{
+      out+=text.slice(block.start,block.end);
+    }
+    pos=block.end;
+  }
+  out+=text.slice(pos);
+  return changed?out:text;
+}
+function getBaseKyuryakText(){
+  suspendArticleOverrides=true;
+  suspendChapterInsertions=true;
+  try{return buildKyuryak();}
+  finally{
+    suspendArticleOverrides=false;
+    suspendChapterInsertions=false;
+  }
+}
+function getActiveArticleKeys(){
+  const blocks=parseArticleBlocks(stripSelMarkers(getBaseKyuryakText()));
+  const set=new Set(blocks.map(b=>b.key));
+  Object.keys(articleOverrides).forEach(key=>set.add(key));
+  return Array.from(set).sort((a,b)=>{
+    const aa=articleSortTuple(a), bb=articleSortTuple(b);
+    return aa[0]-bb[0] || aa[1]-bb[1];
+  });
+}
+function getBaseArticleText(key){
+  const blocks=parseArticleBlocks(stripSelMarkers(getBaseKyuryakText()));
+  const found=blocks.find(b=>b.key===key);
+  return found ? (found.raw||'').trim() : '';
+}
+function stripArticleHeading(text){
+  return (text||'').replace(/^제\d+조(?:의\d+)?\([^)]+\)\s*/, '');
+}
+let pristineArticleBaseCache=null;
+function clonePlain(v){
+  return JSON.parse(JSON.stringify(v));
+}
+function restorePlainObject(target, src){
+  Object.keys(target).forEach(k=>delete target[k]);
+  Object.assign(target, src||{});
+}
+function restorePlainArray(target, src){
+  target.length=0;
+  (src||[]).forEach(v=>target.push(v));
+}
+function getPristineArticleBaseMap(){
+  if(pristineArticleBaseCache) return pristineArticleBaseCache;
+  const snap={
+    selections:clonePlain(selections),
+    customTexts:clonePlain(customTexts),
+    customHangs:clonePlain(customHangs),
+    customTexts2:clonePlain(customTexts2),
+    customHangs2:clonePlain(customHangs2),
+    articleOverrides:clonePlain(articleOverrides),
+    articleDirty:clonePlain(articleDirty),
+    articleOverrideSource:clonePlain(articleOverrideSource),
+    chapterInsertions:clonePlain(chapterInsertions),
+    extraArts:clonePlain(extraArts),
+    districts:clonePlain(districts),
+    suspendArticleOverrides,
+    suspendChapterInsertions
+  };
+  try{
+    restorePlainObject(selections, {});
+    restorePlainObject(customTexts, {});
+    restorePlainObject(customHangs, {});
+    restorePlainObject(customTexts2, {});
+    restorePlainObject(customHangs2, {});
+    restorePlainObject(articleOverrides, {});
+    restorePlainObject(articleDirty, {});
+    restorePlainObject(articleOverrideSource, {});
+    restorePlainObject(chapterInsertions, {});
+    restorePlainArray(extraArts, []);
+    restorePlainArray(districts, []);
+    suspendArticleOverrides=true;
+    suspendChapterInsertions=true;
+    const pristine=stripSelMarkers(buildKyuryak());
+    const map={};
+    parseArticleBlocks(pristine).forEach(b=>{ map[b.key]=stripArticleHeading((b.raw||'').trim()); });
+    pristineArticleBaseCache=map;
+    return pristineArticleBaseCache;
+  }finally{
+    restorePlainObject(selections, snap.selections);
+    restorePlainObject(customTexts, snap.customTexts);
+    restorePlainObject(customHangs, snap.customHangs);
+    restorePlainObject(customTexts2, snap.customTexts2);
+    restorePlainObject(customHangs2, snap.customHangs2);
+    restorePlainObject(articleOverrides, snap.articleOverrides);
+    restorePlainObject(articleDirty, snap.articleDirty);
+    restorePlainObject(articleOverrideSource, snap.articleOverrideSource);
+    restorePlainObject(chapterInsertions, snap.chapterInsertions);
+    restorePlainArray(extraArts, snap.extraArts);
+    restorePlainArray(districts, snap.districts);
+    suspendArticleOverrides=snap.suspendArticleOverrides;
+    suspendChapterInsertions=snap.suspendChapterInsertions;
+  }
+}
+function getSectionBaselineText(secId){
+  if(!secId || secId==='bld' || !/^s\d+$/.test(secId)) return '';
+  const key=getPrimaryArticleKeyForSec(secId);
+  if(!key) return '';
+  const map=getPristineArticleBaseMap();
+  return map[key]||'';
+}
+function highlightChangedChars(baseText, nextText, className='changed-char'){
+  const esc=escHtmlPreview;
+  const baseArr=Array.from(baseText||'');
+  const nextArr=Array.from(nextText||'');
+  if(!nextArr.length) return '';
+  if((baseText||'')===(nextText||'')) return esc(nextText||'');
+  let prefix=0;
+  while(prefix<baseArr.length && prefix<nextArr.length && baseArr[prefix]===nextArr[prefix]) prefix++;
+  let suffix=0;
+  while(suffix<baseArr.length-prefix && suffix<nextArr.length-prefix && baseArr[baseArr.length-1-suffix]===nextArr[nextArr.length-1-suffix]) suffix++;
+  const prefixText=nextArr.slice(0,prefix).join('');
+  const suffixText=suffix?nextArr.slice(nextArr.length-suffix).join(''):'';
+  const aMid=baseArr.slice(prefix, baseArr.length-suffix);
+  const bMid=nextArr.slice(prefix, nextArr.length-suffix);
+  if(!bMid.length) return esc(prefixText)+esc(suffixText);
+  if(aMid.length*bMid.length>1500000){
+    return esc(prefixText)+'<span class="'+className+'">'+esc(bMid.join(''))+'</span>'+esc(suffixText);
+  }
+  const n=aMid.length, m=bMid.length;
+  const dp=Array.from({length:n+1},()=>new Uint16Array(m+1));
+  for(let i=n-1;i>=0;i--){
+    for(let j=m-1;j>=0;j--){
+      dp[i][j]=aMid[i]===bMid[j] ? dp[i+1][j+1]+1 : Math.max(dp[i+1][j], dp[i][j+1]);
+    }
+  }
+  let i=0,j=0,midHtml='',changedBuf='';
+  const flushChanged=()=>{
+    if(changedBuf){
+      midHtml+='<span class="'+className+'">'+changedBuf+'</span>';
+      changedBuf='';
+    }
+  };
+  while(i<n && j<m){
+    if(aMid[i]===bMid[j]){
+      flushChanged();
+      midHtml+=esc(bMid[j]);
+      i++; j++;
+    }else if(dp[i+1][j] >= dp[i][j+1]){
+      i++;
+    }else{
+      changedBuf+=esc(bMid[j]);
+      j++;
+    }
+  }
+  while(j<m){
+    changedBuf+=esc(bMid[j]);
+    j++;
+  }
+  flushChanged();
+  return esc(prefixText)+midHtml+esc(suffixText);
+}
+function getOtherEditorBaseText(key){
+  const baseEls=[...document.querySelectorAll('#article-edit-list .article-edit-base[data-key="'+key+'"]')];
+  if(!baseEls.length) return '';
+  return (baseEls[baseEls.length-1].value||'').trim();
+}
+function renderOtherEditedBlockHtml(key, nextText){
+  const editorBase=(getOtherEditorBaseText(key)||'').trim();
+  const fallbackBase=(getBaseArticleText(key)||'').trim();
+  const baseFull=(editorBase||fallbackBase).trim();
+  const baseMatch=baseFull.match(/^(제\d+조(?:의\d+)?\([^)]+\))(.*)$/s);
+  const baseline=/^제\d+조(?:의\d+)?\([^)]+\)/.test(nextText)
+    ? baseFull
+    : (baseMatch ? baseMatch[2] : stripArticleHeading(baseFull));
+  const baseLines=(baseline||'').split('\n');
+  const nextLines=(nextText||'').split('\n');
+  let prefix=0;
+  while(prefix<baseLines.length && prefix<nextLines.length && baseLines[prefix]===nextLines[prefix]) prefix++;
+  let suffix=0;
+  while(suffix<baseLines.length-prefix && suffix<nextLines.length-prefix && baseLines[baseLines.length-1-suffix]===nextLines[nextLines.length-1-suffix]) suffix++;
+  const parts=[];
+  for(let i=0;i<prefix;i++) parts.push(escHtmlPreview(nextLines[i]||''));
+  const baseMid=baseLines.slice(prefix, baseLines.length-suffix);
+  const nextMid=nextLines.slice(prefix, nextLines.length-suffix);
+  const midLen=Math.max(baseMid.length, nextMid.length);
+  for(let i=0;i<midLen;i++){
+    const a=baseMid[i]||'';
+    const b=nextMid[i]||'';
+    if(!b) continue;
+    if(!a){
+      parts.push('<span class="changed-char-greenword">'+escHtmlPreview(b)+'</span>');
+    }else if(a===b){
+      parts.push(escHtmlPreview(b));
+    }else{
+      parts.push(highlightChangedChars(a, b, 'changed-char-greenword'));
+    }
+  }
+  if(suffix){
+    for(let i=nextLines.length-suffix;i<nextLines.length;i++) parts.push(escHtmlPreview(nextLines[i]||''));
+  }
+  return parts.join('\n');
+}
+function renderChangedSelectionHtml(secId, text){
+  if(!secId || secId==='bld') return escHtmlPreview(text||'');
+  const nextText=text||'';
+  if(/^edit_/.test(secId)){
+    const key=secId.slice(5);
+    return renderOtherEditedBlockHtml(key, nextText);
+  }
+  if(!/^s\d+$/.test(secId)) return escHtmlPreview(nextText);
+  const baseline=getSectionBaselineText(secId);
+  return highlightChangedChars(baseline, nextText);
+}
+function syncArticleOverridesFromInputs(){
+  document.querySelectorAll('.article-edit-input[data-key]').forEach(ta=>{
+    const key=ta.dataset.key;
+    if(!key) return;
+    const nextValue=(ta.value||'').trim();
+    const baseValue=(getBaseArticleText(key)||'').trim();
+    if(nextValue && nextValue!==baseValue){
+      articleOverrides[key]=ta.value;
+      articleDirty[key]=true;
+      if(ta===document.activeElement && (ta.dataset.sec||'')) articleOverrideSource[key]=ta.dataset.sec;
+    }else{
+      delete articleOverrides[key];
+      delete articleDirty[key];
+      if(!articleDirty[key]) delete articleOverrideSource[key];
+    }
+  });
+}
+function clearAutoArticleOverride(key){
+  if(articleDirty[key]) return;
+  delete articleOverrides[key];
+  delete articleOverrideSource[key];
+}
+function clearSectionAutoOverrides(sec){
+  (SECTION_ARTICLES[sec]||[]).forEach(clearAutoArticleOverride);
+}
+function syncSectionOverrideSource(sec){
+  (SECTION_ARTICLES[sec]||[]).forEach(key=>{
+    if(articleOverrides[key]!==undefined || articleDirty[key]) articleOverrideSource[key]=sec;
+  });
+}
+function replaceManagedExactLine(text, variants, nextLine){
+  let out=text||'';
+  (variants||[]).forEach(line=>{
+    if(!line) return;
+    if(out.includes(line)) out=out.replace(line, nextLine);
+  });
+  return out;
+}
+function applyDeputyManagerTerm(text){
+  if(g('s18')==='s18_b') return (text||'').replace(/부관리인/g, '총무');
+  return (text||'').replace(/총무/g, '부관리인');
+}
+function shiftLineClauseMarkers(text, startMarker, delta){
+  const startIdx=CLAUSE_MARKERS.indexOf(startMarker);
+  if(startIdx<0 || !delta) return text||'';
+  return (text||'').replace(/^([①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳])(?=\s)/gm, m=>{
+    const idx=CLAUSE_MARKERS.indexOf(m);
+    if(idx<startIdx) return m;
+    return CLAUSE_MARKERS[idx+delta] || m;
+  });
+}
+function syncSharedArticle52(text){
+  const next1 = (g('s1')==='s1_b'||g('s1')==='s1_c')
+    ? '① 관리인은 관리위원회의 결의로 선임되거나 해임된다.'
+    : '① 관리인은 관리단집회의 결의로 선임되거나 해임된다.';
+  const next2 = g('s1')==='s1_b'
+    ? '② 관리인의 임기는 1년이며, 연임하거나 중임할 수 있다.'
+    : '② 관리인의 임기는 2년이며, 연임하거나 중임할 수 있다.';
+  const next3 = g('s16')==='s16_b'
+    ? '③ 관리인은 관리위원, 감사, 선거관리위원을 겸직할 수 있다.'
+    : '③ 관리인은 관리위원, 감사, 선거관리위원을 겸직할 수 없다.';
+  text=replaceManagedExactLine(text, [
+    '① 관리인은 관리위원회의 결의로 선임되거나 해임된다.',
+    '① 관리인은 관리단집회의 결의로 선임되거나 해임된다.'
+  ], next1);
+  text=replaceManagedExactLine(text, [
+    '② 관리인의 임기는 1년이며, 연임하거나 중임할 수 있다.',
+    '② 관리인의 임기는 2년이며, 연임하거나 중임할 수 있다.'
+  ], next2);
+  text=replaceManagedExactLine(text, [
+    '③ 관리인은 관리위원, 감사, 선거관리위원을 겸직할 수 있다.',
+    '③ 관리인은 관리위원, 감사, 선거관리위원을 겸직할 수 없다.'
+  ], next3);
+  return text;
+}
+function syncSharedArticle64(text){
+  const next1 = g('s3')==='s3_b'
+    ? '① 관리위원은 직접 입주하여 거주하는 구분소유자 중에서 선출한다.'
+    : g('s3')==='s3_c'
+    ? '① 관리위원은 직접 입주하여 6개월 이상 거주하고 있는 구분소유자 중에서 선출한다.'
+    : '① 관리위원의 자격에 관하여는 제54조를 준용한다.';
+  const next4 = g('s17')==='s17_b'
+    ? '④ 관리위원은 관리인, 부관리인, 감사 및 선거관리위원회 위원을 겸직할 수 있다.'
+    : '④ 관리위원은 관리인, 부관리인, 감사 및 선거관리위원회 위원을 겸직할 수 없다.';
+  text=replaceManagedExactLine(text, [
+    '① 관리위원은 직접 입주하여 거주하는 구분소유자 중에서 선출한다.',
+    '① 관리위원은 직접 입주하여 6개월 이상 거주하고 있는 구분소유자 중에서 선출한다.',
+    '① 관리위원의 자격에 관하여는 제54조를 준용한다.'
+  ], next1);
+  text=replaceManagedExactLine(text, [
+    '④ 관리위원은 관리인, 부관리인, 감사 및 선거관리위원회 위원을 겸직할 수 있다.',
+    '④ 관리위원은 관리인, 부관리인, 감사 및 선거관리위원회 위원을 겸직할 수 없다.'
+  ], next4);
+  return text;
+}
+function syncSharedArticle34(text){
+  return applyDeputyManagerTerm(text);
+}
+function syncSharedArticle41(text){
+  const next1 = (g('s8')==='s8_b')
+    ? '① 관리인은 관리단집회를 소집하려면 관리단집회일 5일 전에 각 구분소유자에게 다음 각 호의 사항이 포함된 통지서를 발송하고, 구분소유자들이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.'
+    : (g('s8')==='s8_c')
+    ? '① 관리인은 관리단집회를 소집하려면 관리단집회일 14일 전에 각 구분소유자에게 다음 각 호의 사항이 포함된 통지서를 발송하고, 구분소유자들이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.'
+    : '① 관리인은 관리단집회를 소집하려면 관리단집회일 1주일 전에 각 구분소유자에게 다음 각 호의 사항이 포함된 통지서를 발송하고, 구분소유자들이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.';
+  const s9line = '⑥ 제1항에 따라 소집통지 내용을 건물내의 적당한 장소(현관, 승강기 등)에 게시한 경우 모든 구분소유자에게 관리단집회 소집통보가 완료된 것으로 본다.';
+  text=replaceManagedExactLine(text, [
+    '① 관리인은 관리단집회를 소집하려면 관리단집회일 5일 전에 각 구분소유자에게 다음 각 호의 사항이 포함된 통지서를 발송하고, 구분소유자들이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.',
+    '① 관리인은 관리단집회를 소집하려면 관리단집회일 14일 전에 각 구분소유자에게 다음 각 호의 사항이 포함된 통지서를 발송하고, 구분소유자들이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.',
+    '① 관리인은 관리단집회를 소집하려면 관리단집회일 1주일 전에 각 구분소유자에게 다음 각 호의 사항이 포함된 통지서를 발송하고, 구분소유자들이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.'
+  ], next1);
+  if(g('s9')==='s9_b'){
+    if(!text.includes(s9line)){
+      if(/\n⑥\s/.test(text)) text=shiftLineClauseMarkers(text, '⑥', 1);
+      if(/\n⑦\s/.test(text)) text=text.replace(/\n⑦\s/, '\n'+s9line+'\n⑦ ');
+      else text += '\n'+s9line;
+    }
+  }else{
+    const hadS9=text.includes(s9line);
+    text=text.replace('\n'+s9line,'').replace(s9line,'');
+    if(hadS9) text=shiftLineClauseMarkers(text, '⑦', -1);
+  }
+  return text;
+}
+const SHARED_ARTICLE_SYNC_HANDLERS={
+  '제34조': syncSharedArticle34,
+  '제41조': syncSharedArticle41,
+  '제52조': syncSharedArticle52,
+  '제64조': syncSharedArticle64
+};
+function syncManagedSharedOverride(sec){
+  const managed=(SECTION_ARTICLES[sec]||[]);
+  managed.forEach(key=>{
+    if(!articleDirty[key] || articleOverrides[key]===undefined) return;
+    const handler=SHARED_ARTICLE_SYNC_HANDLERS[key];
+    if(!handler) return;
+    articleOverrides[key]=handler(articleOverrides[key]||'');
+  });
+}
+function rerenderArticlePreview(){
+  renderArticleEditors();
+  renderPreview();
+}
+function rerenderSectionsAndPreview(){
+  renderSections();
+  renderDistricts();
+  updateProgress();
+  renderArticleEditors();
+  renderChapterInsertions();
+  renderPreview();
+}
+function activateSectionContext(sec, key=''){
+  if(sec){
+    lastSelectedSec=sec;
+    currentArticleKey=null;
+  }else if(key){
+    currentArticleKey=key;
+  }
+}
+function syncMirroredArticleInputs(key, value, sourceEl=null){
+  document.querySelectorAll('.article-edit-input[data-key="'+key+'"]').forEach(el=>{
+    if(el!==sourceEl) el.value=value;
+  });
+}
+function getPrimaryArticleKeyForSec(sec){
+  const arr=SECTION_ARTICLES[sec]||[];
+  return arr[0]||null;
+}
+function getSectionIdsForArticleKey(key){
+  return Object.keys(SECTION_ARTICLES).filter(sec=> (SECTION_ARTICLES[sec]||[]).includes(key));
+}
+function findPreviewTargetBySection(preview, sec){
+  if(!preview || !sec) return null;
+  let target=preview.querySelector('.sel-block[data-sec="'+sec+'"]');
+  if(target) return target;
+  const mappedKey=getPrimaryArticleKeyForSec(sec);
+  if(!mappedKey) return null;
+  target=preview.querySelector('.other-edit-block[data-article="'+mappedKey+'"]');
+  if(target) return target;
+  const relatedSecs=getSectionIdsForArticleKey(mappedKey);
+  for(const rel of relatedSecs){
+    target=preview.querySelector('.sel-block[data-sec="'+rel+'"]');
+    if(target) return target;
+  }
+  return preview.querySelector('.article-anchor[data-article="'+mappedKey+'"]');
+}
+function setCurrentArticleBySection(sec){
+  currentArticleKey=getPrimaryArticleKeyForSec(sec);
+}
+function getArticleInputsByKeyAndSec(key, sec){
+  const all=[...document.querySelectorAll('.article-edit-input[data-key="'+key+'"]')];
+  if(!sec) return all;
+  const scoped=all.filter(el=>(el.dataset.sec||'')===sec);
+  return scoped.length ? scoped : all;
+}
+function updateOtherArticleBadgeState(key){
+  document.querySelectorAll('#article-edit-list .article-edit-item').forEach(item=>{
+    const ta=item.querySelector('.article-edit-input[data-key]');
+    if(!ta) return;
+    if(key && ta.dataset.key!==key) return;
+    const articleKey=ta.dataset.key||'';
+    const nextValue=(ta.value||'').trim();
+    const baseValue=(getBaseArticleText(articleKey)||'').trim();
+    item.classList.toggle('other-edited', !!nextValue && nextValue!==baseValue);
+  });
+}
+function handleArticleFieldActivate(el){
+  const secId=el.dataset.sec||'';
+  const key=el.dataset.key||'';
+  if(secId){
+    activateSectionContext(secId, key);
+    renderPreview();
+  }else{
+    focusArticlePreview(key);
+  }
+}
+function applyArticleInputValue(ta){
+  const key=ta.dataset.key;
+  const secId=ta.dataset.sec||'';
+  if(!key) return;
+  activateSectionContext(secId, key);
+  const nextValue=ta.value;
+  const baseValue=(getBaseArticleText(key)||'').trim();
+  syncMirroredArticleInputs(key, nextValue, ta);
+  if((nextValue||'').trim() && (nextValue||'').trim()!==baseValue){
+    articleOverrides[key]=nextValue;
+    articleDirty[key]=true;
+    if(secId) articleOverrideSource[key]=secId; else delete articleOverrideSource[key];
+  }else{
+    delete articleOverrides[key];
+    delete articleDirty[key];
+    delete articleOverrideSource[key];
+  }
+  renderPreview();
+  updateOtherArticleBadgeState(key);
+  if(secId) scrollToSelected(); else focusArticlePreview(key);
+}
+function resetArticleOverride(key, sourceSec=''){
+  syncArticleOverridesFromInputs();
+  delete articleOverrides[key];
+  delete articleDirty[key];
+  delete articleOverrideSource[key];
+  activateSectionContext(sourceSec, key);
+  const base=getBaseArticleText(key);
+  const inputTas=document.querySelectorAll('.article-edit-input[data-key="'+key+'"]');
+  const baseTas=document.querySelectorAll('.article-edit-base[data-key="'+key+'"]');
+  baseTas.forEach(el=>{ el.value=base; });
+  inputTas.forEach(el=>{ el.value=base; });
+  const scopedInputs=getArticleInputsByKeyAndSec(key, sourceSec);
+  const inputTa=scopedInputs[0]||inputTas[0]||null;
+  renderPreview();
+  updateOtherArticleBadgeState(key);
+  if(inputTa){
+    inputTa.focus();
+    try{ inputTa.setSelectionRange(0,0); }catch(e){}
+  }
+  flashRestoredArticle(key);
+}
+function flashRestoredArticle(key){
+  setTimeout(()=>{
+    const preview=document.getElementById('preview');
+    if(!preview) return;
+    const el=preview.querySelector('.article-anchor[data-article="'+key+'"]');
+    if(!el) return;
+    el.classList.remove('flash-restored');
+    void el.offsetWidth;
+    el.classList.add('flash-restored');
+    setTimeout(()=>el.classList.remove('flash-restored'), 1000);
+  }, 80);
+}
+function focusArticlePreview(key){
+  currentArticleKey=key;
+  if(window.innerWidth<=680) switchTab('right');
+  scrollToSelected();
+}
+function extractArticleKey(text){
+  return ((text||'').match(/제\d+조(?:의\d+)?/)||[])[0]||null;
+}
+function getSuggestedInsertedArticleNum(chapterKey){
+  const base=stripSelMarkers(getBaseKyuryakText());
+  const chapter=parseChapterBlocks(base).find(ch=>ch.key===chapterKey);
+  if(!chapter) return '';
+  const articles=parseArticleBlocks(base);
+  let prev=null;
+  for(const article of articles){
+    if(article.start<chapter.start) prev=article;
+    else break;
+  }
+  return prev ? prev.key+'의2' : '';
+}
+function addChapterInsertion(chapterKey){
+  const suggested=getSuggestedInsertedArticleNum(chapterKey);
+  if(!suggested) return;
+  if(!chapterInsertions[chapterKey]){
+    chapterInsertions[chapterKey]={text:`${suggested}(추가 조문) `};
+  }
+  currentArticleKey=extractArticleKey(chapterInsertions[chapterKey].text)||suggested;
+  renderChapterInsertions();
+  renderPreview();
+  setTimeout(()=>{
+    const ta=document.querySelector('.chapter-insert-ta[data-chapter="'+chapterKey+'"]');
+    if(ta){
+      ta.focus();
+      const pos=ta.value.length;
+      try{ ta.setSelectionRange(pos,pos); }catch(e){}
+    }
+  },0);
+}
+function removeChapterInsertion(chapterKey){
+  delete chapterInsertions[chapterKey];
+  renderChapterInsertions();
+  renderPreview();
+}
+function renderChapterInsertions(){
+  const list=document.getElementById('chapter-insert-list');
+  if(!list) return;
+  const base=stripSelMarkers(getBaseKyuryakText());
+  const chapters=parseChapterBlocks(base).filter(ch=>getSuggestedInsertedArticleNum(ch.key));
+  list.innerHTML=chapters.map(ch=>{
+    const row=chapterInsertions[ch.key];
+    const suggested=getSuggestedInsertedArticleNum(ch.key);
+    return `<div class="chapter-insert-item">
+      <div class="chapter-insert-head">
+        <div class="chapter-insert-label">${ch.title} 위 추가 조문</div>
+        <div class="chapter-insert-actions">
+          <button type="button" class="chapter-insert-add" data-chapter="${ch.key}">+ 조문 추가</button>
+          ${row?`<button type="button" class="chapter-insert-del" data-chapter="${ch.key}">삭제</button>`:''}
+        </div>
+      </div>
+      ${row?`<textarea class="chapter-insert-ta" data-chapter="${ch.key}" placeholder="예) ${suggested}(추가 조문) ① 내용을 입력하세요">${escHtmlPreview(row.text||'')}</textarea>`:`<div class="chapter-insert-hint">추가번호 예시: ${suggested}</div>`}
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.chapter-insert-add').forEach(btn=>{
+    btn.addEventListener('click',()=>addChapterInsertion(btn.dataset.chapter));
+  });
+  list.querySelectorAll('.chapter-insert-del').forEach(btn=>{
+    btn.addEventListener('click',()=>removeChapterInsertion(btn.dataset.chapter));
+  });
+  list.querySelectorAll('.chapter-insert-ta').forEach(ta=>{
+    ta.addEventListener('focus',()=>{ currentArticleKey=extractArticleKey(ta.value)||getSuggestedInsertedArticleNum(ta.dataset.chapter); scrollToSelected(); });
+    ta.addEventListener('click',()=>{ currentArticleKey=extractArticleKey(ta.value)||getSuggestedInsertedArticleNum(ta.dataset.chapter); scrollToSelected(); });
+    ta.addEventListener('input',()=>{
+      const chapterKey=ta.dataset.chapter;
+      chapterInsertions[chapterKey]={text:ta.value};
+      currentArticleKey=extractArticleKey(ta.value)||getSuggestedInsertedArticleNum(chapterKey);
+      renderPreview();
+    });
+  });
+}
+function getNextClauseMarker(text){
+  const found=[...(text||'')].filter(ch=>CLAUSE_MARKERS.includes(ch));
+  if(!found.length) return '①';
+  const idx=CLAUSE_MARKERS.indexOf(found[found.length-1]);
+  return CLAUSE_MARKERS[idx+1]||String(idx+2);
+}
+function appendClauseToArticle(key, sourceEl){
+  const scope=sourceEl ? sourceEl.closest('.article-edit-item') : null;
+  const ta=scope ? scope.querySelector('.article-edit-input[data-key="'+key+'"]') : document.querySelector('.article-edit-input[data-key="'+key+'"]');
+  if(!ta) return;
+  const secId=(scope&&scope.dataset&&scope.dataset.sec)||ta.dataset.sec||'';
+  const base=(ta.value||'').replace(/\s+$/,'');
+  const next=getNextClauseMarker(base);
+  const insertText=(base?'\n':'')+next+' ';
+  const nextValue=base+insertText;
+  ta.value=nextValue;
+  syncMirroredArticleInputs(key, nextValue, ta);
+  activateSectionContext(secId, key);
+  articleOverrides[key]=nextValue;
+  articleDirty[key]=true;
+  if(secId) articleOverrideSource[key]=secId; else delete articleOverrideSource[key];
+  renderPreview();
+  updateOtherArticleBadgeState(key);
+  if(secId) scrollToSelected(); else focusArticlePreview(key);
+  ta.focus();
+  const pos=base.length + (base?1:0) + next.length + 1;
+  try{ ta.setSelectionRange(pos,pos); }catch(e){}
+  ta.scrollTop=ta.scrollHeight;
+}
+
+function renderArticleEditors(){
+  const wrap=document.getElementById('article-edit-wrap');
+  const list=document.getElementById('article-edit-list');
+  if(wrap) wrap.style.display='none';
+  if(list) list.innerHTML='';
+  const blocks=parseArticleBlocks(stripSelMarkers(getBaseKyuryakText()));
+  const baseMap={};
+  blocks.forEach(b=>{baseMap[b.key]=b.raw;});
+  const allKeys=getActiveArticleKeys();
+  const assignedKeys=new Set(Object.values(SECTION_ARTICLES).flat());
+  function itemHtml(key, secId=''){
+    const base=(baseMap[key]||'').trim();
+    const value=(articleOverrides[key]!==undefined?articleOverrides[key]:base);
+    const isOtherEdited=!secId && (value||'').trim()!==base;
+    return `<div class="article-edit-item${isOtherEdited?' other-edited':''}" data-sec="${secId}">
+      <div class="article-edit-head">
+        <div class="article-edit-label">${key} 전문 수정${!secId?'<span class="article-edit-mod-badge">수정됨</span>':''}</div>
+        <div class="article-edit-actions">
+          <button type="button" class="article-edit-add" data-key="${key}" data-sec="${secId}">+ 조항 추가</button>
+          <button type="button" class="article-edit-reset" data-key="${key}" data-sec="${secId}">기본값 복원</button>
+        </div>
+      </div>
+      <div class="article-edit-grid">
+        <div class="article-edit-col">
+          <div class="article-edit-subtitle">원문 <span>읽기 전용</span></div>
+          <textarea class="article-edit-ta article-edit-base" data-key="${key}" data-sec="${secId}" readonly>${escHtmlPreview(base||'')}</textarea>
+        </div>
+        <div class="article-edit-col">
+          <div class="article-edit-subtitle">직접수정 <span>우측 전문 즉시 반영</span></div>
+          <textarea class="article-edit-ta article-edit-input" data-key="${key}" data-sec="${secId}" placeholder="${key} 조문 전체를 입력하세요">${escHtmlPreview(value||'')}</textarea>
+        </div>
+      </div>
+    </div>`;
+  }
+  SECTIONS.forEach(sec=>{
+    const slot=document.getElementById('section-article-'+sec.id);
+    if(!slot) return;
+    const keys=(SECTION_ARTICLES[sec.id]||[]).filter((key,idx,arr)=>arr.indexOf(key)===idx);
+    if(!keys.length){
+      slot.innerHTML='';
+      return;
+    }
+    slot.innerHTML=`<div class="section-article-group-title">해당 전문 수정</div>${keys.map(key=>itemHtml(key, sec.id)).join('')}`;
+  });
+  const otherKeys=allKeys.filter(key=>!assignedKeys.has(key));
+  if(wrap&&list&&otherKeys.length){
+    wrap.style.display='block';
+    list.innerHTML=otherKeys.map(key=>itemHtml(key, '')).join('');
+  }
+  document.querySelectorAll('.article-edit-add').forEach(btn=>{
+    btn.addEventListener('click',()=>appendClauseToArticle(btn.dataset.key, btn));
+  });
+  document.querySelectorAll('.article-edit-reset').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      resetArticleOverride(btn.dataset.key, btn.dataset.sec||'');
+    });
+  });
+  document.querySelectorAll('.article-edit-base').forEach(ta=>{
+    ta.addEventListener('focus',()=>handleArticleFieldActivate(ta));
+    ta.addEventListener('click',()=>handleArticleFieldActivate(ta));
+  });
+  document.querySelectorAll('.article-edit-input').forEach(ta=>{
+    ta.addEventListener('focus',()=>handleArticleFieldActivate(ta));
+    ta.addEventListener('click',()=>handleArticleFieldActivate(ta));
+    ta.addEventListener('input',()=>applyArticleInputValue(ta));
+  });
+  updateOtherArticleBadgeState();
+}
+
+/* ── buildKyuryak ── */
+function buildKyuryak(){
+  const bld=document.getElementById('building').value||'○○○○';
+  const adr=document.getElementById('addr').value||'○○특별시 ○○구 ○○로 ○○';
+
+  function isSectionActive(id){
+    if(id==='s2') return !!(selections[id] || (districts && districts.length>0));
+    return !!selections[id];
+  }
+  function getSectionMarkerId(ids){
+    const active=(ids||[]).filter(isSectionActive);
+    if(!active.length) return '';
+    if(lastSelectedSec && active.includes(lastSelectedSec)) return lastSelectedSec;
+    return active[active.length-1];
+  }
+  function hasEditedContext(ids, key){
+    return !!(key && lastSelectedSec && (ids||[]).includes(lastSelectedSec) && articleOverrides[key]!==undefined);
+  }
+  function sel(ids){
+    const sec=getSectionMarkerId(ids);
+    return sec ? '%%SEL:'+sec+'%%' : '';
+  }
+  function selE(ids){return (ids||[]).some(isSectionActive)?'%%/SEL%%':'';}
+  function selArticle(ids, key){
+    const sec=getSectionMarkerId(ids);
+    if(sec) return '%%SEL:'+sec+'%%';
+    return hasEditedContext(ids, key) ? '%%SEL:'+lastSelectedSec+'%%' : '';
+  }
+  function selArticleE(ids, key){
+    return ((ids||[]).some(isSectionActive) || hasEditedContext(ids, key)) ? '%%/SEL%%' : '';
+  }
+  function selBld(){return (document.getElementById('building').value||'')?'%%SEL:bld%%':'';}
+  function selBldE(){return (document.getElementById('building').value||'')?'%%/SEL%%':'';}
+
+  /* s1 - 관리인 임기 및 선임 (제52조) */
+  const s1=g('s1');
+  const b52_sel = s1==='s1_b'||s1==='s1_c'
+    ? '① 관리인은 관리위원회의 결의로 선임되거나 해임된다.'
+    : '① 관리인은 관리단집회의 결의로 선임되거나 해임된다.';
+  const b52_term = s1==='s1_b'
+    ? '② 관리인의 임기는 1년이며, 연임하거나 중임할 수 있다.'
+    : '② 관리인의 임기는 2년이며, 연임하거나 중임할 수 있다.';
+  const b52_3 = g('s16')==='s16_b'
+    ? '③ 관리인은 관리위원, 감사, 선거관리위원을 겸직할 수 있다.'
+    : '③ 관리인은 관리위원, 감사, 선거관리위원을 겸직할 수 없다.';
+  const b52_base = b52_sel+'\n'+b52_term+'\n'+b52_3;
+  const a52 = s1==='custom' ? applyCustom('s1', b52_base) : b52_base;
+
+  /* s2 - 관리위원 임기 (제63조③) */
+  const s2=g('s2');
+  const b63_3 = s2==='s2_b'
+    ? '③ 관리위원의 임기는 1년이며, 연임하거나 중임할 수 있다.'
+    : '③ 관리위원의 임기는 2년이며, 연임하거나 중임할 수 있다.';
+
+  /* s3 - 관리위원 자격 (제64조①) */
+  const s3=g('s3');
+  const b64_1 = s3==='s3_b'
+    ? '① 관리위원은 직접 입주하여 거주하는 구분소유자 중에서 선출한다.'
+    : s3==='s3_c'
+    ? '① 관리위원은 직접 입주하여 6개월 이상 거주하고 있는 구분소유자 중에서 선출한다.'
+    : '① 관리위원의 자격에 관하여는 제54조를 준용한다.';
+  // b64_겸직: s17 선택에 따라 겸직 조항 결정 (템플릿에서 별도 표시)
+  const b64_겸직 = g('s17')==='s17_b'
+    ? '④ 관리위원은 관리인, 부관리인, 감사 및 선거관리위원회 위원을 겸직할 수 있다.'
+    : '④ 관리위원은 관리인, 부관리인, 감사 및 선거관리위원회 위원을 겸직할 수 없다.';
+  // b64_base: 자격요건만 포함 (겸직조항 제외 → 템플릿에서 별도 마커로 표시)
+  const b64_base = b64_1+'\n② 관리위원은 선거관리위원회의 관리 하에 구분소유자들의 직접투표로 선출한다.\n③ 다음 각 호의 어느 하나에 해당하는 사람은 관리위원이 될 수 없다.\n    1. 피성년후견인 또는 피한정후견인\n    2. 파산선고를 받고 복권되지 아니한 자\n    3. 금고 이상의 실형을 선고받고 그 집행이 끝나거나 면제된 날부터 3년이 지나지 아니한 자';
+  const a64 = s3==='custom' ? applyCustom('s3', b64_base) : b64_base;
+
+  /* s4 - 관리인 단독 집행 한도 (제57조③) */
+  const s4=g('s4');
+  /* 제57조 원문: 관리인의 권한과 의무 */
+  const b57_원문 = '① 관리인은 제28조제1항의 관리단 사무를 집행할 권한과 의무를 가진다.\n② 관리인은 제1항에 따른 관리단의 사무 집행과 관련하여 관리단을 대표하여 재판상 또는 재판 외의 행위를 할 수 있다. 다만, 관리인의 대표권은 관리단집회의 결의로 제한할 수 있다.\n③ 관리인의 권한과 의무에 관하여 규약에서 정하지 않은 사항에 관하여는 민법상 위임에 관한 규정을 준용한다.';
+  /* s4(관리인 단독집행 한도)에 따라 추가 항 삽입 */
+  let b57_s4 = '';
+  if(s4==='s4_b') b57_s4='④ 관리인은 다음 각 호의 행위에 대하여 관리위원회의 결의 없이 단독으로 집행할 수 있다.\n    1. 공용부분의 소규모 수선으로서 50만원 이하의 수선공사\n    2. 관리비등을 3개월 이상 연속하여 체납한 자에 대한 지급명령 신청 등 채권관리 행위';
+  else if(s4==='s4_c') b57_s4='④ 관리인은 다음 각 호의 행위에 대하여 관리위원회의 결의 없이 단독으로 집행할 수 있다.\n    1. 공용부분의 소규모 수선으로서 100만원 이하의 수선공사\n    2. 관리비등을 3개월 이상 연속하여 체납한 자에 대한 지급명령 신청 등 채권관리 행위';
+  const b57_full = b57_원문 + (b57_s4 ? '\n'+b57_s4 : '');
+  const a57 = s4==='custom' ? applyCustom('s4', b57_full) : b57_full;
+
+  /* s5 - 의결권 면적 기준 (제43조①) */
+  const s5=g('s5');
+  const b43_base = (s5==='s5_b'
+    ? '① 각 구분소유자의 의결권은 별표 7과 같이 분양면적 비율로 한다.'
+    : '① 각 구분소유자의 의결권은 별표 7과 같다.')
+    + '\n② 구분소유자 1인이 2개 이상의 전유부분을 소유하더라도 하나의 의결권만을 가진다.\n③ 전유부분을 여럿이 공유하는 경우에 공유자는 관리단집회에서 의결권을 행사할 1인을 정한다.\n④ 구분소유자는 서면이나 전자적 방법 또는 대리인을 통하여 의결권을 행사할 수 있다.';
+  const a43 = s5==='custom' ? applyCustom('s5', b43_base) : b43_base;
+
+  /* s6 - 점유자 의결권 (제44조) */
+  const s6=g('s6');
+  const b44_base = s6==='s6_b'
+    /* s6_b: 임차인 공용부분 의결권 제한 - ①항만 표시 */
+    ? '① 점유자는 공용부분의 관리에 관한 의결권을 행사할 수 없다. 공용부분의 관리에 관한 의결권은 구분소유자만이 행사한다.'
+    /* s6_a(원칙): PDF 원문 ①②③④항 완전 반영 */
+    : '① 점유자는 공용부분의 관리(법 제16조제2항), 관리인의 선임 또는 해임(법 제24조제4항), 회계감사의 실시여부(법 제26조의2제2항, 제3항), 관리위원의 선임 또는 해임(법 제26조의4제5항)에 관하여 구분소유자의 의결권을 행사할 수 있다. 다만, 다음 각 호의 어느 하나에 해당하는 경우에는 그러하지 아니하다.\n    1. 구분소유자와 점유자의 합의로 구분소유자가 의결권을 행사하기로 정하여 관리단에 통지한 경우\n    2. 구분소유자의 권리·의무에 특별한 영향을 미치는 공용부분의 관리행위에 관하여 점유자가 사전에 구분소유자의 동의를 받지 못한 경우\n    3. 관리인의 선임 또는 해임, 회계감사의 실시여부, 관리위원의 선임 또는 해임에 관하여 구분소유자가 집회 이전에 직접 의결권을 행사할 것을 관리단에 통지한 경우\n② 동일한 전유부분의 점유자가 여럿인 경우에는 해당 구분소유자의 의결권을 행사할 1명을 정하여 관리단에 통지하여야 한다.\n③ 여러 개의 전유부분을 소유한 구분소유자가 하나 이상의 전유부분을 점유하고 있는 경우 구분소유자만 의결권을 행사할 수 있다.\n④ 여러 개의 전유부분을 소유한 구분소유자가 전유부분을 모두 점유하고 있지 않는 경우 점유자들은 의결권을 행사할 1명을 정하여 관리단에 통지하여야 한다.';
+  const a44 = s6==='custom' ? applyCustom('s6', b44_base) : b44_base;
+
+  /* s7 - 임시집회 청구 정수 (제40조③) */
+  const s7=g('s7');
+  const frac7 = s7==='s7_b' ? '10분의 1' : '5분의 1';
+  const b40_base = '① 관리인은 매년 회계연도 종료 후 3개월 이내에 정기 관리단집회를 소집하여야 한다.\n② 관리인은 필요하다고 인정할 때에는 관리위원회의 결의를 거쳐 임시 관리단집회를 소집할 수 있다.\n③ 다음 각 호의 청구가 있은 후 1주일 내에 관리인은 청구일부터 2주일 이내의 날을 관리단집회일로 하는 소집통지 절차를 밟아야 한다.\n    1. 구분소유자의 '+frac7+' 이상이 회의의 목적사항을 구체적으로 밝혀 관리단집회의 소집을 청구하는 경우\n    2. 관리위원 과반수가 회의의 목적사항을 구체적으로 밝혀 관리단집회의 소집을 청구하는 경우\n    3. 감사를 둔 경우 감사가 관리단의 사무를 감사한 후 법령 또는 규약 위반사항에 관한 보고를 회의의 목적사항으로 밝혀 관리단집회의 소집을 청구하는 경우\n④ 제3항에도 불구하고 1주일 내에 관리인이 관리단집회의 소집통지 절차를 밟지 아니하면 소집을 청구한 구분소유자는 법원의 허가를 받아 관리단집회를 소집할 수 있다.\n⑤ 제3항과 제4항에 따라 관리단집회를 개최하는 경우, 관리위원회는 관리단집회의 목적사항에 관하여 미리 검토하고 관리단집회에서 그 결과를 보고할 수 있다.';
+  const a40 = s7==='custom' ? applyCustom('s7', b40_base) : b40_base;
+
+  /* s8 - 소집 통보 기간 (제41조①) */
+  const s8=g('s8');
+  const days8 = s8==='s8_b' ? '5일' : s8==='s8_c' ? '14일' : '1주일';
+  const b41_base = '① 관리인은 관리단집회를 소집하려면 관리단집회일 '+days8+' 전에 각 구분소유자에게 다음 각 호의 사항이 포함된 통지서를 발송하고, 구분소유자들이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.\n    1. 회의의 일시, 장소 및 목적사항\n    2. 회의의 목적사항이 공용부분의 변경(법 제15조제1항), 권리변동이 있는 공용부분의 변경(법 제15조의2제1항), 규약의 설정·변경·폐지(법 제29조제1항), 건물의 재건축(법 제47조제1항), 건물의 복구(법 제50조제4항)인 경우\n       가. 의결이 필요한 이유\n       나. 공사계획, 각 구분소유자의 비용부담내역 및 재원조달계획(공용부분의 변경, 권리변동 있는 공용부분의 변경, 건물의 재건축, 건물의 복구 시)\n       다. 규약안(규약의 설정·변경·폐지 시)\n    3. 서면으로 의결권을 행사할 경우, 서면의 제출 장소, 제출 기간, 서면의 양식 등 서면 의결권 행사에 필요한 자료\n    4. 전자적 방식으로 의결권을 행사할 경우 전자투표를 할 인터넷 주소, 전자투표를 할 기간, 그 밖에 구분소유자의 전자투표에 필요한 기술적인 사항\n    5. 의결권을 대리행사하는 경우 대리권을 증명하는 서면의 제출 방법, 그 밖에 대리행사에 필요한 사항\n    6. 회의결과의 공고방법\n② 제1항의 통지서는 구분소유자의 전유부분으로 발송한다. 다만, 구분소유자가 관리단에 제24조제1항에 따라 다른 주소지를 신고한 경우에는 신고한 주소지로 발송한다.\n③ 공용부분의 관리(법 제16조제2항), 관리인의 선임 또는 해임(법 제24조제4항), 회계감사의 실시여부(법 제26조의2제2항), 관리위원의 선임 또는 해임과 관련하여 점유자가 의결권을 행사할 수 있는 경우(법 제26조의4제5항)에 관리인은 점유자에게도 전유부분으로 제1항의 통지서를 발송하여야 한다.\n④ 관리단집회는 구분소유자 전원이 동의하면 소집절차를 거치지 아니하고 소집할 수 있다.\n⑤ 관리단집회는 구분소유자등에게 통지한 사항에 관하여만 결의할 수 있다. 다만, 제4항에 따른 관리단집회에서는 그러하지 아니하다.';
+
+  /* s9 - 게시로 소집통지 갈음 (제41조⑥) */
+  const s9=g('s9');
+  const gesite9 = s9==='s9_b'
+    ? '\n⑥ 제1항에 따라 소집통지 내용을 건물내의 적당한 장소(현관, 승강기 등)에 게시한 경우 모든 구분소유자에게 관리단집회 소집통보가 완료된 것으로 본다.'
+    : '';
+  const b41_full = b41_base + gesite9;
+  // s8, s9 둘 다 직접입력인 경우 순차 적용
+  let a41 = s8==='custom' ? applyCustom('s8', b41_full) : b41_full;
+  if(s9==='custom') a41 = applyCustom('s9', a41);
+
+  /* s10 - 일반 결의 요건 (제42조④) */
+  const s10=g('s10');
+  const b42_4 = s10==='s10_b'
+    ? '④ 제1항부터 제3항까지 각 호 이외의 경우, 관리단집회는 구분소유자의 과반수 이상이 출석하고, 출석한 구분소유자의 과반수 및 그 의결권의 과반수로써 의결한다.'
+    : s10==='s10_c'
+    ? '④ 제1항부터 제3항까지 각 호 이외의 경우, 관리단집회는 구분소유자의 3분의 1 이상 및 의결권의 3분의 1 이상의 찬성으로 의결한다.'
+    : '④ 제1항부터 제3항까지 각 호 이외의 경우, 관리단집회는 구분소유자의 과반수 및 의결권의 과반수로써 의결한다.';
+  const b42_base = '① 다음 각 호의 경우 관리단집회는 구분소유자의 3분의 2 이상 및 의결권의 3분의 2 이상으로 의결한다.\n    1. 법 제15조제1항 본문 및 법 제19조에 따른 대지 및 공용부분등의 변경\n    2. 법 제26조의2제1항에 따른 회계감사의 미실시\n② 다음 각 호의 경우 관리단집회는 구분소유자의 4분의 3 이상 및 의결권의 4분의 3 이상으로 의결한다.\n    1. 법 제29조제1항에 따른 규약의 설정·변경·폐지\n    2. 법 제44조, 제45조, 제46조에 따른 사용금지, 경매, 계약해제 청구\n③ 다음 각 호의 경우 관리단집회는 구분소유자의 5분의 4 이상 및 의결권의 5분의 4 이상으로 의결한다.\n    1. 법 제15조의2에 따른 권리변동이 있는 공용부분등의 변경\n    2. 법 제47조에 따른 재건축 결의\n    3. 법 제50조제4항에 따른 복구\n'+b42_4+'\n⑤ 관리단집회를 소집한 결과 의결 정족수에 미달하는 경우 관리단집회를 재소집하여야 한다.\n⑥ 관리단집회를 재소집한 결과에도 의결 정족수에 미달하는 경우 관리위원회의 결의로 관리단집회의 결의를 갈음할 수 있다. 다만, 제1항부터 제3항까지의 경우에는 그러하지 아니하다.';
+  const a42 = s10==='custom' ? applyCustom('s10', b42_base) : b42_base;
+
+  /* s11 - 체납 제재 (제87조) */
+  const s11=g('s11');
+  const b87_base = s11==='s11_b'
+    ? '① 구분소유자등이 법 제5조제1항, 제2항의 행위를 한 경우 또는 그 행위를 할 우려가 있는 경우, 관리인 또는 관리단집회의 결의로 지정된 구분소유자는 법 제43조부터 제46조까지의 규정에 따라 필요한 조치를 할 수 있다.\n② 구분소유자등이 관리비등을 3개월 이상 연속하여 체납한 경우, 관리단은 관리위원회의 결의를 거쳐 다음 각 호의 조치를 할 수 있다.\n    1. 전기·수도 공급의 중단\n    2. 차량 출입 제한'
+    : '① 구분소유자등이 법 제5조제1항, 제2항의 행위를 한 경우 또는 그 행위를 할 우려가 있는 경우, 관리인 또는 관리단집회의 결의로 지정된 구분소유자는 법 제43조부터 제46조까지의 규정에 따라 필요한 조치를 할 수 있다.';
+  const a87 = s11==='custom' ? applyCustom('s11', b87_base) : b87_base;
+
+  /* s12 - 회계감사 (제84조) */
+  const s12=g('s12');
+  const b84_base = s12==='s12_b'
+    ? '① 관리인은 구분소유자의 5분의 1 이상이 연서하여 요구하는 경우에 다음 각 호의 재무제표와 관리비 운영의 적정성에 대하여 「주식회사의 외부감사에 관한 법률」 제2조제7호에 따른 감사인의 회계감사를 매년 1회 이상 받아야 한다. 점유자는 구분소유자를 대신하여 연서할 수 있다.\n    1. 재무상태표\n    2. 운영성과표\n    3. 이익잉여금처분계산서 또는 결손금처리계산서\n    4. 주석(註釋)\n② 관리인은 관리위원회의 결의를 거쳐 한국공인회계사회에 감사인의 추천을 의뢰할 수 있다.\n③ 관리인은 회계감사의 결과를 제출받은 날부터 1개월 이내에 감사 보고서 등 회계감사의 결과를 구분소유자 및 점유자에게 서면으로 보고하여야 한다.'
+    : '① 관리인은 관리위원회의 결의를 거쳐 매 회계연도 종료 후 3개월 이내에 해당 회계연도의 회계감사를 실시할 감사인을 선임하여야 하며, 매 회계연도 종료 후 9개월 내에 다음 각 호의 재무제표와 관리비 운영의 적정성에 대하여 「주식회사의 외부감사에 관한 법률」 제2조제7호에 따른 감사인의 회계감사를 매년 1회 이상 받아야 한다. 그러나 관리단집회에서 구분소유자의 3분의 2 이상 및 의결권의 3분의 2 이상이 회계감사를 받지 아니하기로 결의한 연도에는 그러하지 아니하다.\n    1. 재무상태표\n    2. 운영성과표\n    3. 이익잉여금처분계산서 또는 결손금처리계산서\n    4. 주석(註釋)\n② 점유자는 제1항 단서에 따른 관리단집회에 참석하여 그 구분소유자의 의결권을 행사할 수 있다.\n③ 관리인은 관리위원회의 결의를 거쳐 한국공인회계사회에 감사인의 추천을 의뢰할 수 있다.\n④ 관리인은 회계감사의 결과를 제출받은 날부터 1개월 이내에 감사 보고서 등 회계감사의 결과를 구분소유자 및 점유자에게 서면으로 보고하여야 한다.\n⑤ 회계감사와 관련하여 관리인은 정당한 사유 없이 감사인의 자료열람·등사·제출 요구 또는 조사를 거부·방해·기피하거나, 감사인에게 거짓 자료를 제출하는 등 부정한 방법으로 회계감사를 방해하는 행위를 하여서는 아니 된다.';
+  const a84_body = s12==='custom' ? applyCustom('s12', b84_base) : b84_base;
+
+  // 63조 전체 (관리위원회 구성)
+  const b63_base = '① 관리위원회는 관리단집회에서 선출된 3명 이상의 관리위원으로 구성된다.\n② 관리위원은 선출과 동일한 방법에 의하여 해임된다.\n'+b63_3+'\n④ 관리위원회 위원장이 관리단집회에서 선출되지 않은 때에는 관리위원들의 투표로 선출한다.';
+  // 선거구가 설정된 경우 제63조① 대안 자동 적용
+  let a63_base2 = b63_base;
+  if(districts && districts.length>0){
+    const distLines = districts.map((d,i)=>'    '+(i+1)+'. 제'+(i+1)+'선거구'+(d.desc?' ('+d.desc+')':'')+' : 1명').join('\n');
+    a63_base2 = '① 관리위원회는 관리단집회에서 선출된 '+districts.length+'명의 관리위원으로 구성된다.\n② 관리위원은 다음 각 호의 선거구별로 선출한다.\n'+distLines+'\n③ 관리위원은 선출과 동일한 방법에 의하여 해임된다.\n'+b63_3.replace(/^③/,'④')+'\n⑤ 관리위원회 위원장이 관리단집회에서 선출되지 않은 때에는 관리위원들의 투표로 선출한다.';
+  }
+  const a63 = s2==='custom' ? applyCustom('s2', a63_base2) : a63_base2;
+
+  // a61 - 위 s3 블록에서 이미 정의됨
+
+  // a77 - 위 s9 블록에서 이미 정의됨
+
+  // a41 - 위 s8/s9 블록에서 이미 정의됨
+
+  /* ── 누락 변수 보완 ── */
+
+  /* a61 - 부관리인·감사 선임 (제61조) */
+  const _b61_base = '① 부관리인과 감사는 관리단집회의 결의로 선임되거나 해임된다.\n② 감사는 구분소유자 중에서 선임한다.\n③ 부관리인과 감사의 임기는 2년으로 하며, 연임할 수 있다.\n④ 부관리인과 감사의 주의의무와 보수에 관하여는 제56조를 준용한다.';
+  const a61 = _b61_base;
+
+  /* a76_body - 관리비 항목 (제76조①) — s10 선택 반영 */
+  const _b76_std = '① 관리비는 다음 각 호의 경비를 말하며 항목별 세부명세는 별표 8과 같다.\n    1. 일반관리비\n    2. 청소비\n    3. 경비비\n    4. 소독비\n    5. 승강기유지비\n    6. 지능형 홈네트워크 설비 유지비\n    7. 난방비\n    8. 급탕비\n    9. 수선유지비(난방시설의 청소비를 포함한다)\n    10. 위탁관리수수료';
+  const _b76_cool = '① 관리비는 다음 각 호의 경비를 말하며 항목별 세부명세는 별표 8과 같다.\n    1. 일반관리비\n    2. 청소비\n    3. 경비비\n    4. 소독비\n    5. 승강기유지비\n    6. 지능형 홈네트워크 설비 유지비\n    7. 난방비\n    8. 급탕비\n    9. 냉방비\n    10. 수선유지비(난방시설의 청소비를 포함한다)\n    11. 위탁관리수수료';
+  const _b76_suffix = '\n② 관리단은 구분소유자등의 편의를 위하여 징수권자를 대행하여 전기료, 수도료, 가스사용료, 지역난방 방식인 주거용 건물의 난방비와 급탕비, 분뇨처리수수료, 폐기물처리수수료, 건물보험료, 관리단운영경비, 선거관리위원회 운영경비 등의 사용료를 관리비와 함께 징수하여 징수권자에게 납부할 수 있다.\n③ 관리비는 별표 9에 따라 산정하며, 사용료는 별표 10에 따라 산정한다.\n④ 구분소유자는 관리단에 주거용 건물의 유지·관리에 필요한 관리비와 사용료(이하 "관리비등"이라 한다)를 납부하여야 한다.\n⑤ 점유자는 전유부분의 점유기간 동안 발생한 관리비등에 대하여 구분소유자와 연대하여 책임을 진다.';
+  const _b76_base = (s10==='s10_b' ? _b76_cool : _b76_std) + _b76_suffix;
+  const a76_body = s10==='custom' ? applyCustom('s10', _b76_base) : _b76_base;
+
+  /* a77 - 수선적립금 (제77조) — s9 선택 반영 */
+  const _b77 = '① 관리단은 관리단집회의 결의로 건물이나 대지 또는 부속시설의 교체 및 보수에 관한 수선계획을 수립하며, 수선계획에는 다음 각 호의 사항이 포함되어야 한다.\n    1. 계획기간\n    2. 외벽 보수, 옥상 방수, 급수관·배수관 교체, 창·현관문 등의 개량 등 수선대상 및 수선방법\n    3. 수선대상별 예상 수선주기\n    4. 계획기간 내 수선비용 추산액 및 산출근거\n    5. 수선계획의 재검토주기\n    6. 수선적립금의 사용절차\n    7. 그 밖에 관리단집회의 결의에 따라 수선계획에 포함하기로 한 사항\n② 수선적립금은 법 제12조에 따른 구분소유자의 지분 비율에 따라 산출하여 징수하고, 관리단이 존속하는 동안 매달 적립한다.\n③ 수선적립금은 대지, 공용부분등과 관련하여 관리단집회의 결의를 거쳐 다음 각 호의 용도로 사용할 수 있다.\n    1. 관리단이 스스로 수립한 수선계획에 따른 조사 및 수선공사(보수, 교체 및 개량공사)\n    2. 자연재해 등 예상하지 못했던 사유로 인하여 필요하게 된 수선공사\n    3. 제1호 또는 제2호의 용도로 사용하기 위하여 빌린 돈의 변제';
+  const _b77_alt = _b77.replace('② 수선적립금은 법 제12조에 따른 구분소유자의 지분 비율에 따라 산출하여 징수하고, 관리단이 존속하는 동안 매달 적립한다.', '② 수선적립금은 전유부분의 면적 비율에 따라 산출하여 징수하고, 관리단이 존속하는 동안 매달 적립한다.');
+  const a77 = _b77;  /* 수선적립금: 기본(지분비율) 고정 - 별도 선택항목 없음 */
+
+  /* s16 - 관리인 겸직 여부 (제52조③) */
+  // b52_3에서 g('s16') 직접 참조하므로 별도 변수 불필요
+
+  /* s15 - 기관 및 임원 구성 (제34조) */
+  const s15=g('s15');
+  const _b34_base = '① 관리단은 관리단집회와 관리인 이외에 다음 각 호의 기관을 둘 수 있다.\n    1. 관리위원회\n    2. 감사\n    3. 선거관리위원회\n② 관리인, 부관리인, 관리위원, 감사를 관리단의 임원으로 한다.';
+  let a34 = s15==='custom' ? applyCustom('s15', _b34_base) : _b34_base;
+
+  /* s14 - 공용부분 변경 공개경쟁 입찰 기준금액 (제30조④) */
+  const s14=g('s14');
+  const _amt_map = {
+    's14_a':'100만원 이상','s14_b':'200만원 이상','s14_c':'300만원 이상','s14_d':'400만원 이상',
+    's14_e':'500만원 이상','s14_f':'600만원 이상','s14_g':'700만원 이상','s14_h':'800만원 이상',
+    's14_i':'900만원 이상','s14_j':'1000만원 이상'
+  };
+  const _amt = _amt_map[s14] || null;
+  // a30_4: 제30조④ 텍스트 (금액 반영 + custom/custom2 적용)
+  const _b30_4_txt = '④ 관리단은 제1항의 계획서에 따라 '+(_amt?_amt+'의 공사·용역을 발주하는 경우':'일정 금액 이상의 공사·용역을 발주하는 경우')+' 공개경쟁 입찰의 절차 및 방식에 따라 공사계약을 체결하여야 한다.';
+  const _b30_base = '① 법 제15조, 제19조에 따라 공용부분등을 변경하는 경우, 관리인은 미리 공용부분등의 변경을 위한 계획서를 작성하여야 하고, 관리위원회의 승인을 받아야 한다.\n② 제1항의 계획서에는 공사예정액, 구분소유자들의 비용부담, 공사업체 선정방법, 공사기간, 공사절차 등이 포함되어야 한다.\n③ 관리단은 구분소유자에게 적정한 방법으로 제1항의 계획서를 미리 공지하여야 한다.\n'+_b30_4_txt;
+  let a30_4 = s14==='custom' ? applyCustom('s14', _b30_base) : _b30_base;
+
+  /* s13 - 관리위탁계약 수의계약 (제38조③) */
+  const s13=g('s13');
+  const _b38_3 = '\n③ 제1항의 계약에 있어서 관리위원회의 결의를 거친 경우에는 수의계약으로 체결할 수 있다. 이 경우 관리단은 계약 체결 후 지체 없이 그 계약 내용을 구분소유자등에게 공고하여야 한다.';
+  const a38_3 = s13==='s13_b' ? _b38_3
+              : s13==='custom' ? (()=>{ const t=(customTexts['s13']||'').trim(); return t ? '\n'+hangCh(2)+' '+t : ''; })()
+              : '';
+
+  /* custom2 후처리: 두 번째 직접입력이 있으면 해당 조문 변수에 추가 적용 */
+  function applyC2(secId, val){
+    return (customTexts2[secId]||'').trim() ? applyCustom2(secId, val) : val;
+  }
+  // ── custom2(항목추가) 15개 항목 전체 적용 ──
+  const _a52 = applyC2('s1', a52);          // s1: 관리인 선임(제52조)
+  const _a63 = applyC2('s2', a63);          // s2: 관리위원 임기(제63조)
+  const _a64 = applyC2('s3', a64);          // s3: 관리위원 자격(제64조)
+  const _a61 = a61;                         // 제61조는 s3와 무관
+  const _a57 = applyC2('s4', a57);          // s4: 관리인 권한(제57조)
+  const _a43 = applyC2('s5', a43);          // s5: 의결권(제43조)
+  const _a44 = applyC2('s6', a44);          // s6: 점유자 의결권(제44조)
+  const _a40 = applyC2('s7', a40);          // s7: 집회 소집(제40조)
+  const _a41 = applyC2('s9', applyC2('s8', a41));  // s8+s9: 소집절차(제41조) - s9 항목추가도 반영
+  const _a42 = applyC2('s10', a42);         // s10: 결의 요건(제42조)
+  // s11_b 선택 시 custom2가 ②항을 덮어쓰지 않도록 별도 처리
+  const _a87 = (()=>{
+    const t2=(customTexts2['s11']||'').trim();
+    if(!t2) return a87; // custom2 없으면 그대로
+    if(g('s11')==='s11_b'){
+      // s11_b + custom2 공존: custom2를 ③항으로 추가
+      const h2=customHangs2['s11']||'③';
+      const hangIdx2=hangIdx(h2);
+      let items=splitItems(a87);
+      // ③이상 항은 제거 후 custom2 삽입
+      items=items.filter(it=>it.hang===null||hangIdx(it.hang)<hangIdx2);
+      items.push({hang:h2,body:t2});
+      return renumber(items);
+    }
+    return applyC2('s11', a87);
+  })();
+  const _a84 = applyC2('s12', a84_body);    // s12: 회계감사(제84조)
+  const _a76 = applyC2('s10', a76_body);    // s10: 관리비 항목(제76조)
+  const _a77 = applyC2('s9', a77);          // s9: 수선적립금(제77조)
+  const _a34 = applyC2('s15', a34);
+  const _a34_render = (()=>{
+    if(suspendArticleOverrides) return _a34;
+    const edited=(articleOverrides['제34조']||'').trim();
+    if(!edited) return _a34;
+    const normalized=applyDeputyManagerTerm(edited);
+    const m=normalized.match(/^제34조\([^)]+\)\s*([\s\S]*)$/);
+    return m ? m[1] : normalized;
+  })();
+  const _a30_4 = applyC2('s14', a30_4);  // s14: 공개경쟁 입찰 기준금액+항목추가(제30조④)         // s15: 기관 및 임원(제34조)
+  // s13: 수의계약 → a38_3에 custom2 적용
+  const _a38_3 = (()=>{
+    const t2=(customTexts2['s13']||'').trim();
+    if(!t2) return a38_3;
+    const h2=customHangs2['s13']||'③';
+    // ①② 고정 + a38_3(③) 에 추가 항 삽입
+    const base = '① 제37조에 따라 관리단 사무를 위탁하기로 한 경우, 관리단은 위탁관리회사 등과 관리위탁계약을 체결하여야 한다.\n② 제1항의 경우 공개경쟁 입찰의 절차 및 방식에 따라 관리위탁계약을 체결하여야 한다.'+(a38_3?'\n'+a38_3:'');
+    const idx2=hangIdx(h2);
+    let items=splitItems(base);
+    items=items.filter(it=>it.hang===null||hangIdx(it.hang)!==idx2);
+    items.push({hang:h2,body:t2});
+    const full=renumber(items);
+    // ①② 제외하고 ③ 이후만 반환
+    return full.split('\n').filter(l=>{const m=l.match(/^([①②③④⑤⑥⑦⑧⑨⑩])/);return !m||hangIdx(m[1])>=2;}).join('\n');
+  })();
+  // s14: 금액 선택 → custom2 직접입력 대상 아님 (금액만 선택)
+
+  const summary=SECTIONS.map(sec=>{
+    const s=selections[sec.id];
+    if(!s) return null;
+    const opt=sec.options.find(o=>o.id===s);
+    return `  • ${sec.title} (${sec.law})\n    → ${opt?opt.label:'미선택'}`;
+  }).filter(Boolean).join('\n');
+
+  // ── s18: 부관리인 → 총무 치환 후처리 ──
+  function applyS18(text){
+    return applyDeputyManagerTerm(text);
+  }
+  const finalText=applyS18(`${selBld()}${bld}${selBldE()} 집합건물 관리규약
+(관리위원회가 있는 단동형 집합건물 · 법무부 표준관리규약)
+
+════════════════════════════════════════
+제1장 총칙
+════════════════════════════════════════
+
+${selBld()}제1조(목적) 이 규약은 「집합건물의 소유 및 관리에 관한 법률」(이하 "법"이라 한다)의 적용을 받는 ${adr} 소재 ${bld}의 건물과 대지 및 부속시설의 관리 또는 사용에 필요한 사항을 규정함을 목적으로 한다.${selBldE()}
+
+제2조(정의) 규약에서 사용하는 용어의 정의는 다음 각 호와 같다.
+1. "구분소유자"란 법 제2조제2호의 구분소유자를 말한다.
+2. "점유자"란 구분소유자의 승낙을 받아 전유부분을 점유하는 자를 말한다.
+3. "구분소유자등"이란 제1호의 구분소유자 및 제2호의 점유자를 말한다.
+4. "전유부분"이란 법 제2조제3호의 전유부분을 말한다.
+5. "공용부분"이란 법 제2조제4호의 공용부분을 말한다.
+6. "공용부분등"이란 제5호의 공용부분 및 부속시설을 말한다.
+7. "일부공용부분"이란 법 제10조제1항 단서에 따라 일부의 구분소유자만이 공용하도록 제공된 것임이 명백한 공용부분을 말한다.
+8. "대지"란 법 제2조제5호의 건물의 대지를 말한다.
+9. "전용사용권"이란 대지 및 공용부분 등의 일부를 특정 구분소유자가 배타적으로 사용할 수 있는 권리를 말한다.
+10. "전용사용부분"이란 전용사용권의 대상이 되는 대지 및 공용부분 등의 일부를 말한다.
+11. "관리단"은 법 제23조제1항에 따라 설립된 관리단을 말한다.
+12. "관리인"은 법 제24조에 따라 선임된 관리인을 말한다.
+13. "관리위원회"는 법 제26조의3에 따라 설치된 관리위원회를 말한다.
+14. "관리위원"은 법 제26조의4제1항에 따라 선출된 관리위원회의 위원을 말한다.
+15. 그 밖에 용어는 법에서 사용하는 용어의 정의와 같다.
+
+제3조(적용범위) 이 규약은 별표 1에 기재된 대지, 건물 및 부속시설(이하 "관리대상물"이라 한다)의 관리 및 사용에 관하여 적용한다.
+
+제4조(규약 등의 효력) ① 규약과 관리단집회의 결의는 구분소유자의 지위를 승계한 자에 대하여도 효력이 있다.
+② 점유자는 구분소유자가 관리대상물의 사용과 관련하여 규약과 관리단집회의 결의에 따라 부담하는 의무와 동일한 의무를 진다.
+
+제5조(규약의 설정·변경·폐지) ① 규약의 설정·변경 및 폐지는 관리단집회에서 구분소유자의 4분의 3 이상 및 의결권의 4분의 3 이상의 찬성을 받아야 한다. 이 경우 규약의 설정·변경 및 폐지가 일부 구분소유자의 권리에 특별한 영향을 미칠 때에는 그 구분소유자의 승낙을 받아야 한다.
+② 구분소유자의 5분의 1 이상 또는 관리위원회는 규약의 설정·변경 및 폐지를 위한 안건을 관리단집회에서 발의할 수 있다.
+
+제6조(대지와 공용부분등의 귀속) ① 관리대상물 중 대지와 부속시설, 공용부분은 전체 구분소유자의 공유로 한다.
+② 일부공용부분은 이를 공용하는 구분소유자들의 공유로 한다.
+③ 구분소유자들의 공유지분은 별표 2와 같다.
+
+제7조(지방자치단체 등과의 협정 준수) 구분소유자등은 관리단이 지방자치단체 또는 다른 주민과 체결한 협정을 성실히 준수하여야 한다.
+
+제8조(규약의 보충) 관리단은 관리단집회의 결의로 관리단집회의 운영, 관리위원회의 운영, 회계관리 및 주차장 이용·흡연·동물 관리 등 관리대상물의 사용 등에 관한 세칙 등을 정할 수 있다.
+
+제9조(법령에 따른 규약의 변경) 관계 법령이 개정되어 규약을 변경하여야 하는 경우, 관리단집회에서 규약을 변경하지 않더라도 규약의 내용이 관계 법령의 내용과 같이 변경된 것으로 본다.
+
+════════════════════════════════════════
+제2장 집합건물의 사용·수익
+════════════════════════════════════════
+
+제10조(전유부분의 사용) 구분소유자등은 전유부분을 주거용으로 사용하여야 하며, 다른 용도로 사용하여서는 아니 된다.
+
+제11조(전유부분의 내부공사) ① 전유부분을 수선하려는 경우, 구분소유자는 관리인에게 서면으로 통지하여야 한다.
+② 제1항의 공사를 위하여 공용부분에 대해 공사가 수반되는 때에는 법 제15조 및 제16조에 따라 관리단집회의 결의를 거쳐야 한다.
+③ 제1항의 통지를 하거나 제2항의 결의를 받고자 할 경우, 구분소유자는 관리인 또는 관리단집회에 설계도, 시방서 또는 공사일정표 등 공사내역을 제출하여야 한다.
+④ 제1항 및 제2항의 공사를 하는 경우, 구분소유자는 다른 구분소유자등에게 입히는 피해를 최소화할 수 있는 방법을 선택하여야 한다.
+⑤ 제1항에 따라 통지받거나 제2항에 따라 결의한 내용대로 공사가 진행되고 있는지 여부를 확인하기 위하여 필요한 경우, 관리인(관리인의 위임을 받은 자를 포함한다)은 전유부분을 출입할 수 있다. 이 경우 구분소유자는 정당한 이유가 없는 한 출입을 거부할 수 없고, 정당한 이유 없이 출입을 거부한 경우 그로 인한 손해를 배상하여야 한다.
+
+제12조(전유부분의 임대) 구분소유자는 타인에게 전유부분을 임대하는 경우, 관리대상물의 사용에 관한 규약과 세칙을 준수한다는 내용의 임차인 의무규정을 임대차계약의 내용으로 포함하여야 하며, 임차인으로 하여금 관리단에 관리대상물의 사용에 관한 규약과 세칙을 준수하겠다는 서약서를 제출하도록 하여야 한다.
+
+제13조(대지와 공용부분등의 사용) 구분소유자등은 대지와 공용부분등을 그 용도에 따라 사용하여야 하며, 다른 구분소유자등의 사용을 방해하여서는 아니 된다.
+
+제14조(전용사용권) ① 구분소유자는 별표 3에 규정된 바와 같이 베란다, 주거용 건물 앞 대지와 옥상 등 전용사용부분에 대하여 전용사용권을 가진다.
+② 주거용 건물 앞 대지와 옥상에 대해 전용사용권을 가지고 있는 자는 사용세칙이 정하는 바에 따라 관리단에 사용료를 납부하여야 한다.
+③ 점유자는 구분소유자의 전용사용부분을 전용사용할 수 있다.
+
+제15조(주차장의 사용) ① 구분소유자등은 분양계약과 규약에서 달리 정하지 않는 한 주거생활에 필요한 범위에서 주차장을 사용할 수 있다.
+② 제1항의 규정에도 불구하고 관리단은 관리위원회의 결의를 거쳐 특정 구분소유자등과 주차장 사용에 관하여 별도의 계약을 체결할 수 있고, 계약에 따라 주차장을 사용하는 구분소유자등은 관리단에 사용료를 납부하여야 한다. 이 경우 관리단은 체결된 계약 내용을 공고하여야 한다.
+③ 구분소유자등이 전유부분을 양도 또는 임대한 경우, 특별한 약정이 없는 한 종전의 주차장 사용에 관한 계약은 효력을 상실한다.
+④ 관리단은 주차장 사용의 정도를 고려하여 구분소유자등의 주차장 사용료를 달리 정할 수 있다.
+⑤ 구분소유자등이 아닌 자가 주차장을 사용하는 경우, 관리단은 주차장 사용료를 징수할 수 있다.
+
+제16조(대지와 공용부분등의 임대) ① 관리단은 관리위원회의 결의를 거쳐 구분소유자등의 사용을 방해하지 않는 범위에서 특정 구분소유자등이나 제3자에게 대지와 공용부분등을 임대할 수 있다.
+② 대지와 공용부분등의 임차인은 규약에 따른 사용방법을 준수하여야 한다.
+
+제17조(층간소음) ① 구분소유자등은 층간소음으로 인하여 이웃에게 피해를 끼치지 않도록 노력하여야 한다.
+② 관리단은 층간소음 예방과 분쟁 조정 등을 위하여 관리단집회의 결의로 "층간소음 방지 및 분쟁해결에 관한 세칙"을 정하여야 한다.
+
+════════════════════════════════════════
+제3장 집합건물의 관리
+════════════════════════════════════════
+
+제18조(구분소유자등의 책임) 구분소유자등은 항상 적정하게 관리대상물을 관리하여 그 가치와 기능이 유지, 증진될 수 있도록 노력하여야 한다.
+
+제19조(대지와 공용부분등의 관리) ① 대지와 공용부분등의 관리는 관리단의 책임과 부담으로 한다. 다만, 전용사용부분의 통상적인 사용에 따른 관리는 전용사용권을 가지는 구분소유자의 책임과 부담으로 한다.
+② 전유부분에 속하는 시설 중 대지 또는 공용부분등과 부합되어 훼손하지 않고 분리할 수 없거나 분리에 과다한 비용이 필요하여 대지 또는 공용부분등과 일체로 관리할 필요가 있는 시설은 관리단이 관리할 수 있다.
+
+제20조(전유부분에 부속된 공용부분의 개량) 전유부분에 부속된 공용부분의 성능(방재, 방범, 위생, 방음, 단열 등) 향상을 위한 개량공사는 관리단의 책임과 부담으로 공사계획을 수립하여 수행하여야 한다.
+
+제21조(전유부분의 출입) ① 제19조제2항의 시설관리를 위하여 필요한 경우 또는 제20조의 개량공사를 위하여 필요한 경우, 관리인(관리인의 위임을 받은 자를 포함)은 전유부분을 출입할 수 있다.
+② 제1항의 경우 구분소유자등은 정당한 이유가 없는 한 출입을 거부할 수 없고, 정당한 이유 없이 출입을 거부한 경우 그로 인하여 발생한 손해를 배상하여야 한다.
+③ 제1항에 따른 출입을 마친 경우, 관리인(관리인의 위임을 받은 자를 포함)은 지체 없이 전유부분을 원상으로 복구하여야 한다.
+
+제22조(보험계약의 체결) ① 관리단은 법령에서 의무적으로 가입하도록 한 보험 및 그 밖의 관리대상물에서 발생하는 안전사고에 대비하여 구분소유자등의 피해보상을 위한 보험에 가입하여야 한다.
+② 관리인은 제1항에 따른 보험계약의 체결 및 보험금의 청구·수령에 대하여 각 구분소유자등을 대리한다.
+③ 관리단은 위험시설을 설치하고자 하는 구분소유자등에게 개별 보험가입을 요구할 수 있고, 정당한 이유 없이 개별 보험가입을 거부한 구분소유자등에게 위험시설의 설치 중단 및 제거를 청구할 수 있다.
+④ 관리단은 위험시설을 설치한 구분소유자등에게 위험시설을 설치함으로써 증가된 보험료를 구상할 수 있다.
+
+════════════════════════════════════════
+제4장 관리단
+════════════════════════════════════════
+
+제23조(관리단의 구성) ① 구분소유자들은 주거용 건물의 관리 및 사용에 관한 공동의 이익을 위하여 구분소유자 전원을 구성원으로 한 관리단을 구성한다.
+② 구분소유자의 지위는 전유부분의 소유권이전등기를 하였을 때 취득한다. 다만, 전유부분을 최초로 분양받은 자는 소유권이전등기를 하기 전이라도 분양대금을 완납하고 전유부분을 인도받은 경우에는 구분소유자의 지위를 취득한 것으로 본다.
+
+제24조(신고의무) ① 구분소유자의 지위를 취득하거나 상실한 자는 별표 4 양식의 신고서를 작성하여 관리단에 제출하여야 한다.
+② 점유자의 지위를 취득하거나 상실한 자는 별표 5 양식의 신고서를 작성하여 관리단에 제출하여야 한다. 다만, 점유자의 지위를 상실한 자가 신고서를 작성하여 제출하지 않는 경우 구분소유자가 이를 대신할 수 있다.
+
+제25조(일부관리단) ① 일부공용부분을 공용하는 구분소유자는 법 제28조제2항에 따라 별도의 규약을 가진 관리단(이하 "일부관리단"이라 한다)을 구성할 수 있다.
+② 제1항의 일부관리단은 관리단에 일부관리단의 규약과 관리인, 구성원인 구분소유자를 신고하여야 한다.
+
+제26조(관리단과 일부관리단의 관계) 일부관리단은 관리단의 규약과 관리단집회의 결의에 반하지 않는 범위에서 일부공용부분을 관리할 수 있다.
+
+제27조(관리단의 사무소) ① 관리단의 사무소는 관리대상물 내에 둔다. 다만, 관리단집회의 결의로 다른 곳에 둘 수 있다.
+② 관리단의 사무소가 두 개 이상인 경우 주된 사무소의 소재지를 관리단의 주소로 본다.
+③ 관리인은 구분소유자등이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 관리단의 사무소 소재지를 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.
+
+제28조(관리단의 권한) ① 관리단은 다음 각 호의 사무를 수행한다.
+    1. 제5조에 따른 규약의 설정·변경·폐지
+    2. 제8조, 제86조에 따른 세칙, 회계세칙의 설정·변경·폐지
+    3. 제14조제2항에 따른 전용사용부분 사용료의 징수
+    4. 제15조제2항, 제4항, 제5항에 따른 주차장 사용계약의 체결 및 주차장 사용료의 징수
+    5. 제16조에 따른 대지와 공용부분등의 임대
+    6. 제19조에 따른 대지와 공용부분등의 관리
+    7. 제20조에 따른 전유부분에 부속된 공용부분의 개량공사
+    8. 제22조에 따른 보험계약의 체결
+    9. 제24조에 따른 구분소유자등의 신고 접수
+    10. 제25조제2항에 따른 일부관리단의 신고 접수
+    11. 제29조제2항에 따른 공용부분등의 보존행위에 관한 필요한 조치
+    12. 제32조에 따른 공동의 이익에 어긋나는 행위에 대한 시정권고 및 필요한 조치
+    13. 제33조에 따른 자료·장부·증빙자료의 보관 및 열람, 등본 발급
+    14. 제35조에 따른 직원의 고용 및 제36조에 따른 직무교육 지원
+    15. 제37조, 제38조에 따른 관리단 사무의 위탁 및 관리위탁계약의 체결
+    16. 제52조에 따른 관리인의 선임 또는 해임
+    17. 제76조제4항, 제77조에 따른 관리비 및 사용료, 수선적립금의 징수·지출·적립
+    18. 제77조제1항에 따른 수선계획의 수립
+    19. 제83조에 따른 예산안과 결산결과보고서의 검토
+    20. 제84조에 따른 회계감사의 실시
+    21. 그 밖에 주거용 건물의 관리를 위하여 필요한 사항
+② 관리단은 법 제23조의2에 따라 선량한 관리자의 주의로 제1항의 사무를 수행하여야 한다.
+
+제29조(공용부분등의 보존행위) ① 구분소유자등은 공용부분등의 보존행위를 하는 경우 관리인에게 미리 보존행위의 내용과 방법을 통지하여야 한다. 다만, 긴급을 요하는 때에는 보존행위를 한 후 지체 없이 이를 알려야 한다.
+② 관리단은 구분소유자등으로부터 제1항의 통지를 받은 후 직접 보존행위를 하는 등 필요한 조치를 할 수 있다.
+
+제30조(공용부분등의 변경) ${sel(['s14'])}${_a30_4}${selE(['s14'])}
+
+제31조(권리변동 있는 공용부분등의 변경) ① 법 제15조의2에 따라 건물의 노후화 억제 또는 기능 향상 등을 위하여 구분소유권 및 대지사용권의 범위나 내용에 변동을 일으키는 공용부분등의 변경의 경우, 관리인은 미리 공용부분등의 변경을 위한 계획서를 작성하여야 하고, 관리위원회의 승인을 받아야 한다.
+② 제1항의 계획서에는 다음 각 호의 사항이 포함되어야 한다.
+    1. 설계의 개요
+    2. 예상 공사 기간 및 예상 비용(특별한 손실에 대한 전보 비용을 포함한다)
+    3. 제2호에 따른 비용의 분담 방법
+    4. 변경된 부분의 용도
+    5. 전유부분 수의 증감이 발생하는 경우에는 변경된 부분의 귀속에 관한 사항
+    6. 전유부분이나 공용부분의 면적에 증감이 발생하는 경우에는 변경된 부분의 귀속에 관한 사항
+    7. 대지사용권의 변경에 관한 사항
+
+제32조(관리단의 시정권고 등) 구분소유자등이 건물의 보존에 해로운 행위나 그 밖에 건물의 관리 및 사용에 관하여 구분소유자등의 공동의 이익에 어긋나는 행위를 할 경우, 관리단은 구분소유자등에게 시정을 권고하고 필요한 조치를 할 수 있다.
+
+제33조(자료의 보관 및 열람 등) ① 관리단이 보관해야 하는 자료는 다음 각 호와 같다.
+    1. 정기 관리단집회의 소집에 관한 자료
+    2. 규약과 각종 세칙
+    3. 관리단집회의 의사록(제51조제4항의 녹화물 또는 녹음물을 포함한다)
+    4. 제75조의 관리비, 수선적립금, 사용료, 잡수입의 징수, 지출, 적립 현황과 관련된 회계서류
+    5. 제77조제1항의 수선계획서
+    6. 제84조에 따른 회계감사 보고서
+    7. 관리위탁계약(관리인의 선임·해임에 관한 계약을 포함한다) 등 관리단이 체결한 계약의 계약서
+    8. 제30조, 제31조에 따른 공용부분등의 변경을 위한 계획서
+    9. 구분소유자명부
+    10. 그 밖에 관리단의 사무에 필요한 자료
+② 관리인은 관리단의 사무 집행을 위한 비용과 분담금 등 금원의 징수·보관·사용·관리 등 모든 거래행위에 관하여 장부를 월별로 작성하여 그 증빙서류와 함께 해당 회계연도 종료일부터 5년간 보관하여야 한다.
+③ 구분소유자등은 서면으로 제1항 기재 자료와 제2항의 장부나 증빙서류의 열람을 청구하거나 자기 비용으로 등본의 발급을 청구할 수 있다. 다만 관리인은 「개인정보 보호법」 제24조에 따른 고유식별정보 등 개인의 사생활의 비밀 또는 자유를 침해할 우려가 있는 정보와 의사결정 과정 또는 내부검토 과정에 있는 사항 등으로서 공개될 경우 업무의 공정한 수행에 현저한 지장을 초래할 우려가 있는 정보를 제외하고 이에 응하여야 한다.
+④ 이해관계인은 별표 6의 서식으로 규약, 각종 세칙 또는 관리단집회 의사록 등의 열람을 청구하거나 자기 비용으로 등본의 발급을 청구할 수 있다.
+
+${selArticle(['s15','s18'],'제34조')}제34조(기관 및 임원) ${_a34_render}${selArticleE(['s15','s18'],'제34조')}
+
+제35조(직원 및 시설 등) ① 관리단은 관계 법령에 따라 자격을 가진 인력을 직원으로 고용할 수 있고, 필요한 시설과 장비를 갖추어야 한다.
+② 관리인, 부관리인, 관리위원, 감사 본인이나 그 배우자, 직계존비속은 관리단의 직원으로 고용될 수 없다.
+③ 관리단은 필요한 경우 외부 전문인력의 상담이나 조언, 지도, 그 밖에 지원을 받을 수 있다.
+④ 관리단 임원은 경비원, 미화원, 관리단의 직원 등 근로자의 처우개선과 인권존중을 위하여 노력하여야 하며, 근로자에게 업무 이외의 부당한 지시를 하거나 명령을 하여서는 아니 된다.
+
+제36조(직무교육 등) 관리단은 관리단 임원 및 직원이 법령에서 정한 교육이나 전문기관이 실시하는 직무교육을 받을 수 있도록 지원할 수 있다.
+
+제37조(사무의 위탁) 관리단은 관리위원회의 결의를 거쳐 관리단집회의 결의에 따라 제3자에게 관리단의 사무를 위탁할 수 있다.
+
+제38조(관리위탁계약의 체결) ${sel(['s13'])}① 제37조에 따라 관리단 사무를 위탁하기로 한 경우, 관리단은 위탁관리회사 등과 관리위탁계약을 체결하여야 한다.
+② 제1항의 경우 공개경쟁 입찰의 절차 및 방식에 따라 관리위탁계약을 체결하여야 한다.${_a38_3}${selE(['s13'])}
+
+════════════════════════════════════════
+제5장 관리단집회
+════════════════════════════════════════
+
+제39조(관리단집회의 권한) 관리단의 사무는 법 또는 규약으로 관리인이나 관리위원회에 위임한 사항 외에는 관리단집회의 결의에 따라 수행한다.
+
+제40조(소집권자 등) ${sel(['s7'])}${_a40}${selE(['s7'])}
+
+제41조(소집절차) ${sel(['s8','s9'])}${_a41}${selE(['s8','s9'])}
+
+제42조(개의 및 의결 정족수) ${sel(['s10'])}${_a42}${selE(['s10'])}
+
+제43조(의결권) ${sel(['s5'])}${_a43}${selE(['s5'])}
+
+제44조(점유자의 의결권 행사) ${sel(['s6'])}${_a44}${selE(['s6'])}
+
+제45조(점유자의 의견진술 등) ① 점유자는 집회의 목적사항에 관하여 이해관계가 있는 경우에는 집회에 출석하여 의견을 진술할 수 있다.
+② 관리인 또는 제40조제4항의 구분소유자는 필요하다고 인정하는 경우 관리단집회의 의결권이 없는 자로 하여금 집회에 참석하여 의견을 진술하도록 허용할 수 있다.
+
+제46조(서면에 의한 의결권 행사) 서면에 의한 의결권 행사는 관리단집회의 결의 전까지 할 수 있다.
+
+제47조(전자적 방법에 의한 의결권 행사) ① 법 제38조제2항에 따라 의결권을 전자적 방법으로 행사(이하 "전자투표"라 한다)하는 경우에 구분소유자는 다음 각 호의 어느 하나에 해당하는 방법으로 본인확인을 거쳐 전자투표를 하여야 한다.
+    1. 휴대전화를 통한 본인인증 등 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 제23조의3에 따른 본인확인기관에서 제공하는 본인확인의 방법
+    2. 「전자서명법」 제2조제2호에 따른 전자서명 또는 같은 법 제2조제6호에 따른 인증서를 통한 본인확인의 방법
+② 전자투표는 관리단집회일 전날까지 하여야 한다.
+③ 관리단은 전자투표를 관리하는 기관을 지정하여 본인 확인 등 의결권 행사 절차의 운영을 위탁할 수 있다.
+
+제48조(대리인에 의한 의결권 행사) ① 대리인은 의결권을 행사하기 이전에 의장에게 대리권을 증명하는 서면을 제출하여야 한다.
+② 대리인 1인이 수인의 구분소유자를 대리하는 경우에는 구분소유자의 과반수 또는 의결권의 과반수 이상을 대리할 수 없다.
+
+제49조(서면 또는 전자적 방법에 의한 결의) ① 법 또는 규약에 따라 관리단집회에서 결의할 것으로 정한 사항에 관하여 구분소유자의 4분의 3 이상 및 의결권의 4분의 3 이상이 서면이나 전자적 방법 또는 서면과 전자적 방법으로 합의하면 관리단집회에서 결의한 것으로 본다.
+② 제1항에도 불구하고 권리변동 있는 공용부분의 변경(법 제15조의2제1항 본문), 재건축 결의(법 제47조제2항 본문) 및 건물가격의 2분의 1을 초과하는 건물부분이 멸실한 경우의 복구(법 제50조제4항)의 경우에는 구분소유자의 5분의 4 이상 및 의결권의 5분의 4 이상이 서면이나 전자적 방법 또는 서면과 전자적 방법으로 합의하면 관리단집회를 소집하여 결의한 것으로 본다.
+
+제50조(집회의 운영) ① 관리인은 관리단집회의 의장이 된다. 다만, 제40조제4항에 따라 관리단집회가 소집된 경우, 법원의 허가를 받은 구분소유자는 관리단집회의 의장이 된다.
+② 제1항에 해당하는 자가 2인 이상인 경우 관리단집회의 의장은 상호 합의로 결정하고, 상호 합의가 이루어지지 않으면 연장자가 관리단집회의 의장이 된다.
+③ 관리단집회의 의장은 집회의 질서를 유지하고 의사를 정리하며, 고의로 의사진행을 방해하는 등 집회의 질서를 문란하게 하는 자에 대하여 발언의 제한, 퇴장 등 필요한 조치를 할 수 있다.
+
+제51조(의사록) ① 관리단집회의 의장은 집회가 끝난 후 관리단집회의 의사에 관하여 서면(전자문서를 포함한다)으로 의사록을 작성하여야 한다.
+② 의사록에는 다음 각 호의 사항을 기재하여야 한다.
+    1. 회의 일시, 장소 및 목적사항
+    2. 참가자 명단(서면이나 전자적 방법, 대리인에 의해 의결권을 행사한 경우를 포함한다)
+    3. 상정안건 및 상정안건에 대한 발언내용, 의결결과
+    4. 법 제15조의2에 따른 권리변동이 있는 공용부분의 변경과 법 제47조에 따른 재건축에 관한 결의에 있어서 각 구분소유자의 찬반의 의사
+    5. 그 밖에 관리단집회 의장이 필요하다고 인정한 사항
+③ 의사록은 관리단집회 의장과 의결권을 행사한 구분소유자 2인 이상이 서명날인 하여야 한다.
+④ 관리단집회의 의장이 필요하다고 인정하는 경우, 의장은 관리단집회를 녹화 또는 녹음하거나 구분소유자등에게 실시간으로 중계할 수 있다.
+⑤ 관리인은 관리단집회를 소집하면서 명시한 방법에 따라 관리단집회의 결과를 지체 없이 공고하여야 한다.
+
+════════════════════════════════════════
+제6장 관리인 및 관리단 임원
+════════════════════════════════════════
+
+제52조(관리인의 선임 등) ${sel(['s1','s16'])}${_a52}${selE(['s1','s16'])}
+
+제53조(관리인의 해임청구) 다음 각 호의 어느 하나에 해당하는 경우 구분소유자는 법 제24조제5항에 따라 관리인의 해임을 법원에 청구할 수 있다.
+1. 고의 또는 중대한 과실로 관리대상물을 멸실·훼손하여 구분소유자등에게 손해를 가한 경우
+2. 관리비, 수선적립금 등 관리단의 수입을 횡령한 경우
+3. 위탁관리회사 등의 선정 과정에서 입찰정보를 누설하는 등 입찰의 공정을 훼손하거나 금품을 수수한 경우
+4. 그 밖에 관리인에게 부정한 행위나 직무를 수행하기에 적합하지 아니한 사정이 있는 경우
+
+제54조(관리인의 자격) 다음 각 호의 어느 하나에 해당하는 사람은 관리인이 될 수 없다.
+1. 미성년자, 피성년후견인
+2. 파산선고를 받은 자로서 복권되지 않은 사람
+3. 금고 이상의 형을 선고받고 그 집행이 끝나거나 그 집행을 받지 않기로 확정된 후 5년이 지나지 않은 사람(과실범은 제외한다)
+4. 금고 이상의 형을 선고받고 그 집행유예 기간이 끝난 날부터 2년이 지나지 않은 사람(과실범은 제외한다)
+5. 집합건물의 관리와 관련하여 벌금 100만원 이상의 형을 선고받은 후 5년이 지나지 않은 사람
+6. 관리위탁계약 등 관리단의 사무와 관련하여 관리단과 계약을 체결한 자 또는 그 임직원
+7. 관리단에 매달 납부하여야 할 분담금을 3개월 연속하여 체납한 사람
+
+제55조(관리인의 직무대행) ① 관리인이 부득이한 사유로 일시적으로 직무를 수행할 수 없는 경우, 부관리인이 관리인의 직무를 대행한다.
+② 부관리인이 없거나 직무를 대행할 수 없는 경우, 관리단집회의 결의 또는 관리위원회의 결의로 직무대행자를 선임할 수 있다.
+
+제56조(관리인의 주의의무 등) ① 관리인은 주거용 건물의 관리 및 사용에 관한 공동이익을 위하여 선량한 관리자의 주의로 관리단의 사무를 집행하여야 한다.
+② 관리인은 관리단집회의 결의에 따라 필요한 경비와 보수를 지급받을 수 있다.
+
+제57조(관리인의 권한과 의무) ${sel(['s4'])}${_a57}${selE(['s4'])}
+
+제58조(자문위원회의 설치) ① 관리인은 필요하다고 인정할 때에는 제28조제1항의 관리단 사무를 집행하기 위한 범위에서 특정한 문제를 자문하기 위하여 다음 각 호의 자문위원회를 둘 수 있다.
+    1. 회계자문위원회
+    2. 법무자문위원회
+    3. 그 밖에 관리인이 필요하다고 인정하는 자문위원회
+② 관리인은 관리단집회에 제1항에 따른 자문 결과를 보고하여야 한다. 다만, 관리위원회에 대한 보고로서 관리단집회에 대한 보고를 갈음할 수 있다.
+
+제59조(관리인의 보고의무) ① 법 제26조제1항에 따라 관리인이 보고해야 하는 사무는 다음 각 호와 같다.
+    1. 관리단의 사무 집행을 위한 분담금액과 비용의 산정방법, 징수·지출·적립내역에 관한 사항
+    2. 제1호 이외에 관리단이 얻은 수입 및 사용내역에 관한 사항
+    3. 관리위탁계약 등 관리단이 체결하는 계약의 당사자 선정과정 및 계약조건에 관한 사항
+    4. 규약 및 규약에 기초하여 만든 규정의 설정·변경·폐지에 관한 사항
+    5. 관리단 임직원의 변동에 관한 사항
+    6. 대지, 공용부분 및 부속시설의 보존, 관리, 변경에 관한 사항
+    7. 관리단을 대표한 재판상 행위에 관한 사항
+    8. 제84조제1항에 따른 회계감사를 받은 경우 감사보고서 등 회계감사의 결과에 관한 사항
+    9. 그 밖에 규약 또는 규약에 기초하여 만든 규정이나 관리단집회의 결의에서 정하는 사항
+② 관리인은 위 제1항의 보고사항을 구분소유자등이 쉽게 식별할 수 있는 건물 내의 적당한 장소에 게시하여야 한다. 관리단의 인터넷 홈페이지가 있는 경우 인터넷 홈페이지에도 이를 게시하여야 한다.
+③ 관리인은 매월 1회 구분소유자 및 점유자에게 관리단의 사무집행을 위한 분담금액과 비용의 산정방법을 서면으로 보고하여야 한다.
+④ 관리인은 법 제32조에 따른 정기 관리단집회에 출석하여 관리단이 수행한 사무의 주요내용과 예·결산 내역을 보고하여야 한다.
+
+제60조(관리단 사무의 인수인계) 관리인이 변경된 경우, 전임 관리인은 후임 관리인에게 제33조제1항의 자료와 그 밖에 관리단의 사무에 필요한 물건을 전부 교부하는 등 후임 관리인이 관리단 사무를 원활히 수행할 수 있도록 협력하여야 한다.
+
+제61조(관리단 임원의 선임 등) ${_a61}
+
+제62조(감사의 권한과 의무) ① 감사는 관리단의 사무와 회계를 감사하며, 관리단집회와 관리위원회에 감사결과보고서를 제출하여야 한다.
+② 감사는 관리인에게 제1항의 감사를 위하여 필요한 자료의 제공을 요구할 수 있다.
+③ 관리단의 사무집행 또는 회계관리가 법령 또는 규약을 위반하였음을 발견한 경우, 감사는 관리인에게 제40조제3항제3호에 따라 관리단집회 또는 제66조제2항제4호에 따라 관리위원회의 소집을 청구할 수 있다.
+④ 감사는 관리단집회와 관리위원회에 출석하여 의견을 진술할 수 있다.
+⑤ 구분소유자의 10분의 1 이상이 관리단의 사무집행 또는 회계관리를 특정하여 감사를 요청한 경우, 감사는 이에 대한 감사를 실시한 후 감사를 요청한 구분소유자에게 감사 결과를 통지하여야 한다.
+
+════════════════════════════════════════
+제7장 관리위원회
+════════════════════════════════════════
+
+제63조(관리위원회의 구성) ${sel(['s2'])}${_a63}${selE(['s2'])}
+
+제64조(관리위원의 자격 등) ${sel(['s3'])}${_a64}${selE(['s3'])}${sel(['s17'])}${b64_겸직}${selE(['s17'])}
+
+제65조(관리위원회의 권한) 관리위원회는 이 규약에서 별도로 정하는 사항 외에 다음 각 호의 직무를 수행한다.
+1. 법 제26조의3제2항에 따른 관리인의 사무집행 감독
+2. 제5조제2항에 따른 규약의 설정·변경·폐지를 위한 안건의 발의
+3. 제16조제1항에 따른 대지와 공용부분등의 임대에 관한 결의
+4. 제30조제1항에 따른 공용부분등의 변경 계획서에 대한 승인
+5. 제31조제1항에 따른 권리변동이 있는 공용부분등의 변경 계획서에 대한 승인
+6. 제37조에 따른 관리단 사무의 위탁에 관한 결의
+7. 제40조제2항에 따른 임시 관리단집회의 소집에 관한 결의
+8. 제40조제3항제2호에 따른 임시 관리단집회의 소집 청구
+9. 제40조제5항에 따른 임시 관리단집회의 목적사항 검토 및 결과 보고
+10. 제42조제6항에 따른 관리단집회의 결의에 갈음한 결의
+11. 제55조에 따른 관리단집회의 결의에 갈음한 관리인의 직무대행자 선임
+12. 제77조제1항에 따른 수선계획서에 대한 승인
+13. 제84조제3항에 따른 감사인의 추천 의뢰 결의
+14. 그 밖에 관리단집회에서 위임한 사항
+
+제66조(관리위원회의 소집) ① 관리위원회 위원장은 필요하다고 인정할 때에는 관리위원회를 소집할 수 있다.
+② 다음 각 호의 경우 관리위원회 위원장은 관리위원회를 소집하여야 한다.
+    1. 관리위원의 5분의 1 이상이 청구하는 경우
+    2. 관리인이 청구하는 경우
+    3. 구분소유자 10분의 1 이상이 회의의 목적사항을 밝혀 청구하는 경우
+    4. 감사가 제62조제1항의 감사결과보고서 제출, 제62조제3항의 법령 또는 규약 위반사실 보고를 위해 청구하는 경우
+③ 제2항의 청구가 있은 후 관리위원회 위원장이 청구일부터 2주일 이내의 날을 회의일로 하는 소집통지절차를 1주일 이내에 밟지 않은 때에는 소집을 청구한 사람이 관리위원회를 소집할 수 있다.
+④ 관리위원회를 소집하려면 회의일 1주일 전에 회의의 일시, 장소 및 목적사항을 구체적으로 밝혀 각 관리위원에게 통지하여야 한다.
+⑤ 관리위원회는 관리위원 전원이 동의하면 소집절차를 거치지 않고 소집할 수 있다.
+
+제67조(관리위원회의 의결방법) ① 관리위원회의 의사는 관리위원회 재적위원 과반수의 동의로 의결한다.
+② 관리위원은 질병, 해외체류 등 부득이한 사유가 있는 경우 외에는 서면이나 대리인을 통하여 의결권을 행사할 수 없다.
+③ 관리위원회는 제66조제4항에 따라 통지한 사항에 관하여만 결의할 수 있다. 다만, 제66조제5항에 따른 관리위원회에서는 그러하지 아니하다.
+
+제68조(관리위원회의 운영) ① 다음 각 호의 순서에 따라 관리위원회 회의를 주재한다.
+    1. 관리위원회 위원장
+    2. 관리위원회 위원장이 지정한 관리위원
+    3. 관리위원 중 연장자
+② 관리위원회 회의를 주재한 자는 관리위원회의 의사에 관하여 의사록을 작성·보관하여야 한다.
+③ 이해관계인은 제2항에 따라 관리위원회 의사록을 보관하는 자에게 서면으로 관리위원회 의사록의 열람을 청구하거나 자기 비용으로 등본의 발급을 청구할 수 있다.
+
+제69조(관리위원회 회의규칙) 관리위원회는 효율적인 회의 진행을 위하여 의사진행, 방청, 의견진술 등에 관한 회의규칙을 정할 수 있다.
+
+════════════════════════════════════════
+제8장 선거관리위원회
+════════════════════════════════════════
+
+제70조(선거관리위원회 구성) ① 선거관리위원회는 구분소유자 중에서 선출된 3인 이상 7인 이내의 위원으로 구성한다.
+② 선거관리위원회의 위원은 다음 각 호의 자 중 관리위원회의 결의로 선출한다.
+    1. 관리인이 추천한 자
+    2. 관리위원 3분의 1 이상이 추천한 자
+    3. 구분소유자의 20분의 1 이상(최소 5인 이상)이 추천한 자
+③ 제2항제2호 또는 제3호에 따른 추천권자가 관리인으로부터 선거관리위원 추천 통보를 받은 날부터 7일 이내에 추천을 하지 않거나 추천한 사람이 선거관리위원 정원의 2배를 초과하지 않은 때에는 관리인은 구분소유자등 중에서 희망하는 자를 공개모집하여 추천할 수 있다.
+④ 제2항에도 불구하고 선거관리위원회가 구성되지 않은 경우에는 시장·군수 또는 구청장은 구분소유자 중에서 학식과 사회경험이 풍부한 자를 위원으로 위촉할 수 있다.
+⑤ 위원장은 선거관리위원회 위원 중에서 위원들의 투표로 선출한다.
+
+제71조(임기 및 자격상실 등) ① 선거관리위원회 위원의 임기는 선출 또는 위촉받은 날부터 2년으로 하되 연임할 수 있으며, 위원장의 임기는 그 위원의 임기가 만료되는 날까지로 한다.
+② 선거관리위원은 구분소유자 지위를 상실한 때 그 자격을 상실한다.
+③ 다음 각 호의 어느 하나에 해당하는 사람은 선거관리위원회 위원이 될 수 없다.
+    1. 제54조 각 호의 어느 하나에 해당하는 사람
+    2. 관리인, 부관리인, 관리위원 및 감사 본인이나 그 배우자, 직계존비속
+④ 선거관리위원회 위원은 관리인, 부관리인, 관리위원 및 감사를 겸직할 수 없다.
+
+제72조(업무) 선거관리위원회는 다음 각 호의 업무를 수행한다.
+    1. 선거관리규정의 제정·개정. 다만 관리위원회의 승인을 받아야 한다.
+    2. 관리인, 부관리인, 관리위원회 위원장, 관리위원 및 감사의 선출 및 해임에 관한 선거관리
+    3. 관리인, 부관리인, 관리위원회 위원장, 관리위원 및 감사의 법 또는 규약에서 정한 결격사유 유무 확인
+    4. 관리단집회의 결의를 투표의 방식으로 하는 경우 그 투·개표업무
+    5. 당선확인 및 당선증 교부
+    6. 관리인, 부관리인, 관리위원회 위원장, 관리위원 및 감사의 사퇴 접수·처리
+    7. 그 밖에 선거관리에 관한 업무
+
+제73조(운영 등) ① 위원장은 선거관리위원회를 대표하고, 그 업무를 총괄한다.
+② 위원장이 부득이한 사유로 직무를 수행할 수 없는 경우에는 위원 중 과반수 결의로 그 직무를 대행할 자를 선출한다.
+③ 위원이 궐위된 경우에는 60일 이내에 다시 선출 또는 위촉한다. 보궐위원의 임기는 전임자의 잔여임기로 한다.
+④ 위원장은 선거관리위원회의 회의에 관하여 회의록을 작성하고, 위원장 및 위원 2명 이상이 서명날인 한 후 관리인이 보관하도록 하여야 한다.
+⑤ 이해관계인은 관리인에게 서면으로 선거관리위원회 의사록의 열람을 청구하거나 자기 비용으로 등본의 발급을 청구할 수 있다.
+
+제74조(선거관리위원의 해임 등) ① 선거관리위원이 직무를 유기하거나 법령 및 규약을 위반한 경우, 구분소유자 10분의 1 이상이 발의하고 관리위원회의 결의로 해임할 수 있다.
+② 위원장은 정당한 사유 없이 3회 연속하여 회의에 출석하지 아니한 자를 해임할 수 있다.
+
+════════════════════════════════════════
+제9장 회계
+════════════════════════════════════════
+
+제75조(관리단의 수입) ① 관리단의 수입은 다음 각 호와 같다.
+    1. 관리비
+    2. 수선적립금
+    3. 사용료
+    4. 잡수입
+② 관리비와 수선적립금은 구분하여 회계처리 하여야 한다.
+
+제76조(관리비등) ${sel(['s10'])}${_a76}${selE(['s10'])}
+
+제77조(수선적립금) ${_a77}
+
+제78조(관리비 예치방법 등) ① 관리단은 관리비등과 수선적립금을 「은행법」 제2조제1항제2호에 따른 은행 또는 우체국에 관리단의 명의로 계좌를 개설하여 예치하여 관리하여야 한다.
+② 관리단은 수선적립금을 관리비등과 구분하여 징수하여야 한다.
+③ 구분소유자가 관리비등과 수선적립금을 체납한 경우 구분소유자의 지위를 승계한 자가 이를 부담하여야 한다. 다만, 관리비등의 경우에는 공용부분의 관리비등에 한정한다.
+
+제79조(잡수입) ① 제14조에 따른 전용사용부분 사용료, 제15조에 따른 주차장 사용료 및 제16조에 따른 대지와 공용부분등 임대료, 그 밖에 주거용 건물의 관리 등으로 인하여 발생한 수입은 잡수입으로 한다.
+② 제1항의 잡수입은 관리비 예산 총액의 일정 비율까지 관리비로 충당하고, 나머지는 수선적립금으로 적립한다.
+
+제80조(관리비등의 징수) ① 관리단은 관리비등을 징수하기 위하여 납기일 10일 전까지 구분소유자등에게 다음 각 호의 사항을 명시한 고지서를 교부하여야 한다.
+    1. 전유부분의 표시
+    2. 관리비등의 산정기간, 비목별·세부내역별 금액 및 산정방법
+    3. 납부기한 및 연체료
+    4. 납부방법(납부할 예금계좌번호 등)
+② 관리비등의 산정기간은 매월 1일부터 말일까지로 한다. 다만, 사용료의 산정기간은 사용료 징수권자와 체결한 계약을 따를 수 있다.
+③ 관리비등의 납부기한은 다음 달 말일까지로 한다. 다만, 납기일이 공휴일인 경우 그 다음날까지로 한다.
+④ 구분소유자등이 납부기한까지 관리비등을 납부하지 아니한 경우, 관리단은 구분소유자등에게 제1항에 따라 고지한 연체료 및 연체로 인한 손해배상금(소송비용, 추심비용 등 포함)을 청구할 수 있다.
+⑤ 제4항 및 연체로 인한 손해배상금은 관리비 예산 총액의 일정 비율까지 관리비로 충당하고, 나머지는 수선적립금으로 적립한다.
+
+제81조(관리비등의 연체료) 관리비등을 기한 내에 납부하지 아니한 구분소유자등에 대하여는 별표 11의 이율에 따른 가산금을 부과한다.
+    연체개월 1~12개월: 연 12% / 1년 초과: 연 15%
+    ※ 연체요율 산정 시 연체일수를 반영하여 일할 계산한다.
+
+제82조(회계연도) 관리단의 회계연도는 매년 1월 1일부터 12월 31일까지로 한다.
+
+제83조(예산 및 결산) ① 관리인은 당해 회계연도의 예산안을 작성하여 정기 관리단집회에 보고하여야 한다.
+② 관리인은 직전 회계연도의 결산결과보고서를 작성하여 감사의 회계감사를 거쳐 정기 관리단집회에 보고하여야 한다.
+
+제84조(회계감사) ${sel(['s12'])}${_a84}${selE(['s12'])}
+
+제85조(회계장부 등) ① 관리인은 회계장부를 작성하여 보관하여야 한다.
+② 관리인은 회계업무의 수행을 위하여 관리단 명의의 예금계좌를 개설하여야 한다.
+③ 이해관계인은 서면으로 회계장부와 관리단 명의의 예금계좌의 열람을 청구하거나 자기 비용으로 등본의 발급을 청구할 수 있다.
+
+제86조(회계세칙) 관리단은 필요한 경우 관리단 회계를 위한 회계세칙을 정할 수 있다.
+
+════════════════════════════════════════
+제10장 의무위반자에 대한 조치
+════════════════════════════════════════
+
+제87조(의무위반자에 대한 조치) ${sel(['s11'])}${_a87}${selE(['s11'])}
+
+════════════════════════════════════════
+제11장 관할
+════════════════════════════════════════
+
+제88조(관할) 법 제43조부터 제46조까지의 규정에 따른 소송, 그 밖에 관리단과 구분소유자 사이의 소송은 주거용 건물 소재지의 관할법원에 제기하여야 한다.
+
+${extraArts.length>0?`════════════════════════════════════════
+추가 조항
+════════════════════════════════════════
+
+`+extraArts.map(a=>`${a.num} ${a.text}`).join('\n\n')+'\n\n':''}════════════════════════════════════════
+부칙
+════════════════════════════════════════
+
+제1조(규약의 효력) 이 규약은 ○년 ○월 ○일부터 시행한다.
+
+제2조(종전 행위의 효력) 관리단이 이 규약 시행 전에 종전의 규약에 따라 한 행위는 이 규약에 따라 한 것으로 본다.
+
+════════════════════════════════════════════════════
+[선택 항목 반영 요약]
+════════════════════════════════════════════════════
+${summary||'  (아직 선택된 항목이 없습니다)'}
+`);
+  return applyArticleOverrides(applyChapterInsertions(finalText));
+}
+
+/* ── renderPreview ── */
+function renderPreview(){
+  const bld=document.getElementById('building').value;
+  const cnt=Object.keys(selections).length;
+  const preview=document.getElementById('preview');
+  const hasArticleEdits=Object.keys(articleOverrides).length>0;
+  const hasChapterEdits=Object.keys(chapterInsertions).length>0;
+  const hasExtraEdits=extraArts && extraArts.length>0;
+  if(!bld&&cnt===0&&!districts.length&&!hasArticleEdits&&!hasChapterEdits&&!hasExtraEdits){
+    preview.innerHTML='<div class="empty"><div class="empty-icon">🏢</div><div class="empty-text">좌측에서 건물명칭을 입력하고<br>각 항목의 옵션을 선택하거나 조문을 직접수정하면<br>표준관리규약 전문이 실시간으로 반영됩니다.</div></div>';
+    return;
+  }
+  pristineArticleBaseCache=null;
+  const raw=normalizeSelArtifacts(buildKyuryak());
+  // %%SEL:secId%% ... %%/SEL%% 마커 → <span class="sel-block" data-sec="secId">
+  // 순차 치환 방식 - 정규식 인덱스 불일치 없음
+  let finalHtml='', remaining=raw;
+  while(true){
+    const ms=remaining.indexOf('%%SEL:');
+    if(ms===-1){finalHtml+=escHtmlPreview(remaining);break;}
+    finalHtml+=escHtmlPreview(remaining.slice(0,ms));
+    remaining=remaining.slice(ms+6);
+    const mc=remaining.indexOf('%%');
+    if(mc===-1){finalHtml+=escHtmlPreview('%%SEL:'+remaining);break;}
+    const secId=remaining.slice(0,mc);
+    remaining=remaining.slice(mc+2);
+    const me=remaining.indexOf('%%/SEL%%');
+    if(me===-1){finalHtml+=escHtmlPreview(remaining);break;}
+    const inside=remaining.slice(0,me);
+    remaining=remaining.slice(me+9);
+    const isOtherEdit=/^edit_/.test(secId);
+    const blockClass = isOtherEdit ? 'sel-block other-edit-block' : 'sel-block';
+    const dataArticle = isOtherEdit ? ' data-article="'+secId.slice(5)+'"' : '';
+    finalHtml+='<span class="'+blockClass+'" data-sec="'+secId+'"'+dataArticle+'>'+renderChangedSelectionHtml(secId, inside)+'</span>';
+  }
+  finalHtml=finalHtml.replace(/(제\d+조(?:의\d+)?)(\([^)]+\))/g, (m,key,title)=>`<span class="article-anchor" data-article="${key}">${key}${title}</span>`);
+  preview.innerHTML='<div class="pb">'+finalHtml+'</div>';
+  preview.querySelectorAll('.article-anchor').forEach(el=>el.classList.remove('sel-linked'));
+  preview.querySelectorAll('.sel-block').forEach(block=>{
+    const innerAnchor=block.querySelector('.article-anchor');
+    if(innerAnchor) innerAnchor.classList.add('sel-linked');
+    let prev=block.previousSibling;
+    while(prev && prev.nodeType===3 && !(prev.textContent||'').trim()) prev=prev.previousSibling;
+    if(prev && prev.nodeType===1 && prev.classList.contains('article-anchor')) prev.classList.add('sel-linked');
+    if((block.dataset.sec||'').indexOf('edit_')===0){
+      block.classList.add('other-edit-block');
+      if(innerAnchor) innerAnchor.classList.add('other-edit-anchor');
+      if(prev && prev.nodeType===1 && prev.classList.contains('article-anchor')) prev.classList.add('other-edit-anchor');
+    }
+  });
+  if(lastSelectedSec){
+    const mappedKey=getPrimaryArticleKeyForSec(lastSelectedSec);
+    if(mappedKey){
+      const anchor=preview.querySelector('.article-anchor[data-article="'+mappedKey+'"]');
+      if(anchor) anchor.classList.add('sel-linked');
+    }
+    const selectedTarget=findPreviewTargetBySection(preview, lastSelectedSec);
+    if(selectedTarget){
+      const inner=selectedTarget.querySelector ? selectedTarget.querySelector('.article-anchor') : null;
+      if(inner) inner.classList.add('sel-linked');
+      let prev=selectedTarget.previousSibling;
+      while(prev && prev.nodeType===3 && !(prev.textContent||'').trim()) prev=prev.previousSibling;
+      if(prev && prev.nodeType===1 && prev.classList.contains('article-anchor')) prev.classList.add('sel-linked');
+      if(selectedTarget.classList && selectedTarget.classList.contains('article-anchor')) selectedTarget.classList.add('sel-linked');
+    }
+  }
+  scrollToSelected();
+}
+
+function scrollToSelected(){
+  // 모바일: 탭 전환 애니메이션(200ms) 후에 스크롤
+  const delay = window.innerWidth<=680 ? 250 : 50;
+  setTimeout(()=>{
+    const pw=document.querySelector('.pw');
+    if(!pw) return;
+    const preview=document.getElementById('preview');
+    if(!preview) return;
+
+    // 직접 수정 중인 조문이 있으면 해당 조문으로 우선 스크롤
+    let target=null;
+    if(currentArticleKey){
+      target=preview.querySelector('.other-edit-block[data-article="'+currentArticleKey+'"]') || preview.querySelector('.article-anchor[data-article="'+currentArticleKey+'"]');
+    }
+
+    // lastSelectedSec 기준으로 해당 조문/선택 블록 찾기
+    if(!target && lastSelectedSec){
+      target=findPreviewTargetBySection(preview, lastSelectedSec);
+      // bld(건물명칭/소재지)는 제1조 sel-block
+      if(!target && lastSelectedSec==='bld')
+        target=preview.querySelector('.sel-block[data-sec="bld"]');
+    }
+    // fallback: 마지막 sel-block
+    if(!target){
+      const all=preview.querySelectorAll('.sel-block');
+      target=all[all.length-1]||null;
+    }
+    if(!target) return;
+
+    // pw 컨테이너 기준 정확한 scrollTop 계산
+    const pwRect=pw.getBoundingClientRect();
+    const tgRect=target.getBoundingClientRect();
+    const nextTop=tgRect.top - pwRect.top + pw.scrollTop - pw.clientHeight/2 + target.offsetHeight/2;
+    if(typeof pw.scrollTo==='function') pw.scrollTo({top:Math.max(0,nextTop), behavior:'smooth'});
+    else pw.scrollTop=Math.max(0,nextTop);
+  }, delay);
+}
+
+function addDistrict(){
+  districts.push({desc:''});
+  activateSectionContext('s2', '제63조');
+  clearAutoArticleOverride('제63조');
+  renderDistricts();
+  rerenderArticlePreview();
+  if(window.innerWidth<=680) switchTab('right');
+  setTimeout(()=>{
+    const inputs=document.querySelectorAll('.district-input');
+    if(inputs.length) inputs[inputs.length-1].focus();
+  },50);
+}
+
+function removeDistrict(idx){
+  districts.splice(idx,1);
+  activateSectionContext('s2', '제63조');
+  clearAutoArticleOverride('제63조');
+  renderDistricts();
+  rerenderArticlePreview();
+}
+
+function renderDistricts(){
+  const list=document.getElementById('district-list');
+  if(!list) return;
+  const countEl=document.querySelector('#district-section-wrap .district-count');
+  if(countEl) countEl.innerHTML=`현재 <b>${districts.length}</b>개 설정`;
+  if(!districts.length){
+    list.innerHTML=`<div class="district-empty"><strong>아직 선거구가 없습니다</strong><span>오른쪽 미리보기를 선거구별 선출 문구로 바꾸려면 선거구를 추가해 주세요.</span></div>`;
+    return;
+  }
+  list.innerHTML=districts.map((d,i)=>`
+    <div class="district-item">
+      <span class="district-num">제${i+1}선거구</span>
+      <input class="district-input" placeholder="예) ○층~○층 또는 제○라인" value="${escHtmlPreview(d.desc)}" 
+        oninput="districts[${i}].desc=this.value; activateSectionContext('s2','제63조'); clearAutoArticleOverride('제63조'); rerenderArticlePreview();" />
+      <button class="district-del" onclick="removeDistrict(${i})">삭제</button>
+    </div>`).join('');
+}
+
+function addExtraArt(){
+  const num = (document.getElementById('extra-num').value||'').trim();
+  const text = (document.getElementById('extra-ta').value||'').trim();
+  if(!text){ alert('내용을 입력해주세요.'); return; }
+  extraArts.push({num: num||('제'+(89+extraArts.length)+'조'), text});
+  document.getElementById('extra-num').value='';
+  document.getElementById('extra-ta').value='';
+  renderExtraList();
+  renderPreview();
+}
+
+function removeExtraArt(idx){
+  extraArts.splice(idx,1);
+  renderExtraList();
+  renderPreview();
+}
+
+function renderExtraList(){
+  const list = document.getElementById('extra-list');
+  if(!list) return;
+  if(!extraArts.length){ list.innerHTML=''; return; }
+  list.innerHTML = extraArts.map((a,i)=>`
+    <div class="extra-item">
+      <div class="extra-item-txt"><b>${escHtmlPreview(a.num)}</b> ${escHtmlPreview(a.text.slice(0,60))}${a.text.length>60?'…':''}</div>
+      <button class="extra-del-btn" onclick="removeExtraArt(${i})">삭제</button>
+    </div>`).join('');
+}
+
+function resetAll(){
+  Object.keys(selections).forEach(k=>delete selections[k]);
+  Object.keys(customTexts).forEach(k=>delete customTexts[k]);
+  Object.keys(customHangs).forEach(k=>delete customHangs[k]);
+  Object.keys(customTexts2).forEach(k=>delete customTexts2[k]);
+  Object.keys(customHangs2).forEach(k=>delete customHangs2[k]);
+  Object.keys(articleOverrides).forEach(k=>delete articleOverrides[k]);
+  Object.keys(articleDirty).forEach(k=>delete articleDirty[k]);
+  Object.keys(articleOverrideSource).forEach(k=>delete articleOverrideSource[k]);
+  Object.keys(chapterInsertions).forEach(k=>delete chapterInsertions[k]);
+  extraArts.length=0;
+  renderExtraList();
+  districts.length=0;
+  document.getElementById('building').value='';
+  document.getElementById('addr').value='';
+  lastSelectedSec=null;
+  currentArticleKey=null;
+  rerenderSectionsAndPreview();
+}
+
+function copyText(){
+  const text = stripSelArtifacts(buildKyuryak());
+
+  // 방법1: clipboard API (HTTPS/localhost)
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      showToast();
+    }).catch(()=>{
+      fallbackCopy(text);
+    });
+  } else {
+    // 방법2: execCommand (로컬 파일 file:// 환경)
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showToast();
+  } catch(e) {
+    // 복사 실패 시 텍스트 선택 유지 (사용자가 직접 복사)
+    alert('자동 복사를 지원하지 않는 환경입니다.\n텍스트가 선택되어 있으니 Ctrl+C(또는 Cmd+C)로 복사하세요.');
+  }
+  document.body.removeChild(ta);
+}
+
+function showToast(){
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+let currentTab='left';
+function switchTab(tab){
+  currentTab=tab;
+  const tL=document.getElementById('tabLeft');
+  const tR=document.getElementById('tabRight');
+  if(tL) tL.classList.toggle('active', tab==='left');
+  if(tR) tR.classList.toggle('active', tab==='right');
+  // 모바일에서만 패널 전환
+  if(window.innerWidth<=680){
+    const L=document.getElementById('panelLeft');
+    const R=document.getElementById('panelRight');
+    if(tab==='left'){
+      L.classList.remove('panel-hidden'); R.classList.add('panel-hidden');
+    } else {
+      R.classList.remove('panel-hidden'); L.classList.add('panel-hidden');
+      scrollToSelected();
+    }
+  }
+}
+
+const LEGAL_NOTICE_MESSAGE='규약작성시 상위법(집합건물의 소유 및 관리에 관한법률)의 단서조항과, 비단서 조항을 참조하여 작성바랍니다.';
+let legalNoticeConfirmed=false;
+function closeLegalNoticeModal(){
+  const modal=document.getElementById('legalNoticeModal');
+  if(modal) modal.hidden=true;
+  document.body.classList.remove('modal-open');
+}
+function activateAfterLegalNotice(){
+  rerenderSectionsAndPreview();
+}
+function requireLegalNoticeAck(){
+  if(legalNoticeConfirmed){
+    closeLegalNoticeModal();
+    return true;
+  }
+  const modal=document.getElementById('legalNoticeModal');
+  const msg=document.getElementById('legalNoticeMessage');
+  const btn=document.getElementById('legalNoticeConfirmBtn');
+  if(msg) msg.textContent=LEGAL_NOTICE_MESSAGE;
+  if(modal) modal.hidden=false;
+  document.body.classList.add('modal-open');
+  if(btn && !btn.dataset.bound){
+    btn.dataset.bound='y';
+    btn.addEventListener('click',()=>{
+      legalNoticeConfirmed=true;
+      closeLegalNoticeModal();
+      activateAfterLegalNotice();
+    });
+  }
+  setTimeout(()=>{ try{ btn && btn.focus(); }catch(e){} }, 0);
+  return false;
+}
+
+function handleBuildingContextInput(){
+  lastSelectedSec='bld';
+  rerenderArticlePreview();
+}
+document.addEventListener('focusin',e=>{
+  const ta=e.target && e.target.closest ? e.target.closest('.article-edit-input, .article-edit-base') : null;
+  if(ta) handleArticleFieldActivate(ta);
+});
+document.addEventListener('click',e=>{
+  const ta=e.target && e.target.closest ? e.target.closest('.article-edit-input, .article-edit-base') : null;
+  if(ta) handleArticleFieldActivate(ta);
+});
+document.addEventListener('input',e=>{
+  const ta=e.target && e.target.closest ? e.target.closest('.article-edit-input') : null;
+  if(ta) applyArticleInputValue(ta);
+});
+document.addEventListener('change',e=>{
+  const ta=e.target && e.target.closest ? e.target.closest('.article-edit-input') : null;
+  if(ta) applyArticleInputValue(ta);
+});
+document.addEventListener('compositionend',e=>{
+  const ta=e.target && e.target.closest ? e.target.closest('.article-edit-input') : null;
+  if(ta) applyArticleInputValue(ta);
+});
+document.getElementById('building').addEventListener('input',handleBuildingContextInput);
+document.getElementById('addr').addEventListener('input',handleBuildingContextInput);
+requireLegalNoticeAck();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
+  <rect width="600" height="800" fill="#f4f7fb"/>
+  <rect x="0" y="0" width="600" height="180" fill="#0f2a4a"/>
+  <text x="50%" y="90" fill="#ffffff" font-family="sans-serif" font-size="34" font-weight="900" text-anchor="middle">HABITUS KOREA</text>
+  <text x="50%" y="135" fill="#4b8bf4" font-family="sans-serif" font-size="20" letter-spacing="4" text-anchor="middle">PROMOTION</text>
+  <text x="50%" y="420" fill="#0f2a4a" font-family="sans-serif" font-size="36" font-weight="700" text-anchor="middle">전자투표 안내</text>
+  <text x="50%" y="470" fill="#5b6573" font-family="sans-serif" font-size="22" text-anchor="middle">참여 방법 안내 포스터</text>
+  <rect x="120" y="620" width="360" height="60" rx="30" fill="#1c5fc4"/>
+  <text x="50%" y="658" fill="#ffffff" font-family="sans-serif" font-size="22" font-weight="700" text-anchor="middle">자세히 보기</text>
+</svg>
