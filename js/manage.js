@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v19 · 2026.06.23 (본사 비번 ace01)';
+  const APP_VERSION = 'v20 · 2026.06.23 (GitHub 저장 활성화)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -23,7 +23,7 @@
   const LOGIN_FLAG = 'ace_logged_in';
   // 비밀번호 로그인 시 GitHub 저장에 쓸 토큰(난독화 문자열). 비우면 로컬 저장만 됨.
   // 값 생성: 브라우저 콘솔에서 obfHelper('your_github_token') 실행 → 결과를 아래에 붙여넣기.
-  const EMBED_TOKEN_OBF = '';
+  const EMBED_TOKEN_OBF = 'BioRWkVQaVEANzoDAXFwYzB3IHsAVE5AEi81BVRoc1VUHDZceEdQTFdzC2dEemNHFwAkSFxcWXIQIAACZgNsZyAUNnR/C1dQFQstd0RkfhQ7BDBoenBDUDt1XEBy';
   function deobf(b64) { try { const s = atob(b64); const k = 'aCe2026!'; let o = ''; for (let i = 0; i < s.length; i++) o += String.fromCharCode(s.charCodeAt(i) ^ k.charCodeAt(i % k.length)); return o; } catch (e) { return ''; } }
   window.obfHelper = function (t) { const k = 'aCe2026!'; let s = ''; for (let i = 0; i < t.length; i++) s += String.fromCharCode(t.charCodeAt(i) ^ k.charCodeAt(i % k.length)); return btoa(s); };
 
