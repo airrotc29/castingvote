@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v41 · 2026.06.23 (과제번호 단계색 · 댓글 간격 정리)';
+  const APP_VERSION = 'v42 · 2026.06.23 (댓글 작성자 라벨 제거)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -804,7 +804,7 @@
     else comments.forEach((c) => {
       const hq = c.role === 'hq';
       const canDel = isAdmin() || r._local;
-      h += `<div class="cmt ${hq ? 'hq' : ''}"><span class="who">${hq ? '본사' : '현장(소장)'}</span><div class="bubble">${esc(c.body)}</div><div class="cmt-meta"><span class="when">${esc(c.date)}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div></div>`;
+      h += `<div class="cmt ${hq ? 'hq' : ''}"><div class="bubble">${esc(c.body)}</div><div class="cmt-meta"><span class="when">${esc(c.date)}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div></div>`;
     });
     h += '</div>';
     // 댓글 작성자 = 로그인한 계정에 따라 고정 (사업소 계정→현장(소장), 본사 계정→본사)
