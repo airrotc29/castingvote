@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v52 · 2026.06.23 (관리위원 섭외 표기)';
+  const APP_VERSION = 'v53 · 2026.06.23 (섭외 표기 일괄)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -75,11 +75,11 @@
     ],
     2: [
       _mk('공통단계', _COMMON),
-      _mk('1단계 (포섭진행 추진위 구성전)', [
+      _mk('1단계 (섭외진행 추진위 구성전)', [
         ['1-1', '규약에따라 관리인, 관리위원장, 관리위원 섭외 진행사항 본사 보고'],
-        ['1-2', '포섭인원에 대한 관리방안 보고 (소유 전유부에 대한 특별 관리 등)'],
+        ['1-2', '섭외인원에 대한 관리방안 보고 (소유 전유부에 대한 특별 관리 등)'],
       ]),
-      _mk('2단계 (포섭완료 추진위 구성 완료)', [
+      _mk('2단계 (섭외완료 추진위 구성 완료)', [
         ['1-1', '규약에따라 관리인, 관리위원장, 관리위원 섭외 완료 본사 보고'],
         ['1-2', '추진위 발촉계획 보고 및 발촉'],
         ['1-3', '추진위 협의 및 활동사항 본사 보고 (회의, 협의 내용 등)'],
@@ -351,9 +351,9 @@
     return '<span class="chip">소장능력 ?</span>';
   }
   function allyChip(v) {
-    if (v === '○') return '<span class="chip yes">우호포섭 ○</span>';
-    if (v === '×') return '<span class="chip no">우호포섭 ×</span>';
-    return '<span class="chip">우호포섭 ?</span>';
+    if (v === '○') return '<span class="chip yes">우호섭외 ○</span>';
+    if (v === '×') return '<span class="chip no">우호섭외 ×</span>';
+    return '<span class="chip">우호섭외 ?</span>';
   }
   function devChip(v) { return v === '우호' ? '<span class="chip yes">시행사 우호</span>' : '<span class="chip">시행사 ?</span>'; }
 
