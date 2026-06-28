@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v49 · 2026.06.23 (사업소명 색 = 단계색 일치)';
+  const APP_VERSION = 'v50 · 2026.06.23 (관리소장 최초 로그인 서약서)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -17,6 +17,7 @@
   // ---------- 로그인 (아이디/비밀번호) ----------
   // 계정은 assets/data/auth.json 에 저장(비밀번호는 SHA-256 해시). 없으면 아래 기본값.
   const AUTH_PATH = 'assets/data/auth.json';
+  const PLEDGES_PATH = 'assets/data/pledges.json'; // 관리소장 서약서 제출 기록
   const DEFAULT_ACCOUNTS = [
     { id: '1', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'sinhwa1', branchName: '신화 1차' },
     { id: '2', role: 'site', pwHash: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', branchId: 'sinhwa2', branchName: '신화 2차' },
@@ -208,6 +209,32 @@
     throw lastErr;
   }
 
+  // ---------- 서약서(pledges.json) ----------
+  async function loadPledges() {
+    try {
+      const o = await fetch(PLEDGES_PATH + '?_cb=' + Date.now(), { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
+      if (o && o.pledges && typeof o.pledges === 'object') return o.pledges;
+    } catch (e) {}
+    return {};
+  }
+  async function getPledgesObj() {
+    const data = await getContent(PLEDGES_PATH);
+    if (!data) return { obj: { pledges: {} }, sha: null };
+    let obj = {}; try { obj = JSON.parse(b64ToUtf8(data.content)); } catch (e) { obj = {}; }
+    if (!obj || typeof obj !== 'object' || typeof obj.pledges !== 'object' || !obj.pledges) obj = { pledges: {} };
+    return { obj, sha: data.sha };
+  }
+  async function mutatePledges(mutator, message) {
+    let lastErr;
+    for (let i = 0; i < 4; i++) {
+      const { obj, sha } = await getPledgesObj();
+      const next = mutator(obj);
+      try { await putContent(PLEDGES_PATH, utf8ToB64(JSON.stringify(next, null, 2)), message, sha); return next; }
+      catch (e) { lastErr = e; if (String(e.message).includes('(409)')) { await new Promise((r) => setTimeout(r, 700)); continue; } throw e; }
+    }
+    throw lastErr;
+  }
+
   // ---------- 중앙 프록시 ----------
   async function callEndpoint(action, payload) {
     const res = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, payload }) });
@@ -297,7 +324,7 @@
   function openModal(id) { const m = $(id); if (m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } }
   function closeModal(id) { const m = $(id); if (m) { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); if (id === 'reportDetailModal') openReportId = null; if (id === 'reportModal') editReportId = null; } }
   // 입력 폼 모달은 바깥(어두운 배경) 클릭으로 닫지 않음 — 작성 중 내용 유실 방지. ×버튼으로만 닫힘.
-  const NO_BACKDROP_CLOSE = new Set(['reportModal', 'branchAddModal', 'branchEditModal', 'changeCredModal']);
+  const NO_BACKDROP_CLOSE = new Set(['reportModal', 'branchAddModal', 'branchEditModal', 'changeCredModal', 'pledgeModal']);
   document.querySelectorAll('.modal').forEach((m) => {
     m.addEventListener('click', (e) => {
       if (e.target.closest('[data-close]')) { closeModal(m.id); return; }
@@ -938,8 +965,46 @@
     hint($('loginHint'), '', ''); closeModal('loginModal');
     reportFilter = ''; renderReportFilter();
     REPORTS = await loadReports(); renderReports(); renderStatus(); refreshNote(); updateEduForUser();
+    // 관리소장: 최초 로그인 시 서약서 미제출이면 서약서 모달 표시
+    if (acc.role === 'site') {
+      try { const pl = await loadPledges(); if (!pl[acc.id]) openPledge(acc); } catch (e) {}
+    }
   });
-  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); localStorage.removeItem('ace_branch'); setAdmin(false); closeModal('loginModal'); reportFilter = ''; renderReportFilter(); refreshNote(); renderReports(); renderStatus(); eduGroup = 1; updateEduForUser(); });
+  $('logoutBtn').addEventListener('click', () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(LOGIN_FLAG); localStorage.removeItem('ace_acct'); localStorage.removeItem('ace_branch'); pledgeAcct = null; closeModal('pledgeModal'); setAdmin(false); closeModal('loginModal'); reportFilter = ''; renderReportFilter(); refreshNote(); renderReports(); renderStatus(); eduGroup = 1; updateEduForUser(); });
+
+  // ---------- 관리소장 서약서 ----------
+  let pledgeAcct = null;
+  function openPledge(acc) {
+    pledgeAcct = acc;
+    if ($('pledgeBranch')) $('pledgeBranch').textContent = acc.branchName || (BRANCHES.find((b) => b.id === acc.branchId) || {}).name || '';
+    if ($('pledgeName')) $('pledgeName').value = '';
+    if ($('pledgeAgree')) $('pledgeAgree').checked = false;
+    hint($('pledgeHint'), '', '');
+    openModal('pledgeModal');
+  }
+  $('pledgeSubmit') && $('pledgeSubmit').addEventListener('click', async () => {
+    if (!pledgeAcct) { closeModal('pledgeModal'); return; }
+    const name = ($('pledgeName').value || '').trim();
+    const agree = $('pledgeAgree') && $('pledgeAgree').checked;
+    if (!name) { hint($('pledgeHint'), '서약자 성명을 입력해 주세요.', 'error'); return; }
+    if (!agree) { hint($('pledgeHint'), '서약 내용에 동의(체크)해 주세요.', 'error'); return; }
+    if (!hasToken()) { hint($('pledgeHint'), '저장 권한이 없습니다. 다시 로그인해 주세요.', 'error'); return; }
+    const acc = pledgeAcct; const btn = $('pledgeSubmit'); btn.disabled = true;
+    try {
+      hint($('pledgeHint'), '서약서를 제출하는 중…', '');
+      await mutatePledges((o) => {
+        o.pledges[acc.id] = { name, accountId: acc.id, branchId: acc.branchId || '', branchName: acc.branchName || '', date: todayStr(), ts: Date.now() };
+        return o;
+      }, '서약서 제출: ' + (acc.branchName || acc.id));
+      hint($('pledgeHint'), '서약서가 제출되었습니다. 감사합니다!', 'success');
+      setTimeout(() => { closeModal('pledgeModal'); pledgeAcct = null; }, 1100);
+    } catch (e) { hint($('pledgeHint'), '오류: ' + e.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
+  $('pledgeCancel') && $('pledgeCancel').addEventListener('click', () => {
+    pledgeAcct = null; closeModal('pledgeModal');
+    if ($('logoutBtn')) $('logoutBtn').click(); else { localStorage.removeItem(LOGIN_FLAG); setAdmin(false); }
+  });
 
   // ---------- 아이디/비밀번호 변경 ----------
   function curRole() { return localStorage.getItem('ace_role') || ''; }

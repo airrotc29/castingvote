@@ -128,6 +128,30 @@
     </section>
   </div>
 
+  <!-- 관리소장 서약서 모달 (최초 로그인 시) -->
+  <div class="modal" id="pledgeModal" aria-hidden="true">
+    <div class="modal-box">
+      <h2>관리소장 서약서</h2>
+      <p class="login-help">최초 로그인 시 1회 제출합니다. 아래 내용을 확인하고 서약해 주세요.</p>
+      <div class="pledge-doc" id="pledgeDoc">
+        <p>본인은 에이스 종합관리㈜의 지점사업소 <b id="pledgeBranch"></b> 관리소장으로서, 관리단 구성 업무를 수행함에 있어 다음 사항을 성실히 준수할 것을 서약합니다.</p>
+        <ol>
+          <li>관계 법령(집합건물법 등)과 관리규약을 준수하며 정당하고 투명하게 업무를 수행한다.</li>
+          <li>본사의 지침과 보고 체계를 따르고, 진행 상황을 매월 성실히 보고한다.</li>
+          <li>업무상 알게 된 입주자·구분소유자의 개인정보와 회사 기밀을 외부에 유출하지 않는다.</li>
+          <li>우호 인원 포섭 및 추진위 활동 지원 시 부정한 금품 제공 등 불법 행위를 하지 않는다.</li>
+          <li>회사의 명예를 훼손하거나 회사의 이해에 반하는 행위를 하지 않는다.</li>
+        </ol>
+        <p>위 사항을 위반할 경우 그에 따른 책임을 질 것을 서약합니다.</p>
+      </div>
+      <label class="pledge-agree"><input type="checkbox" id="pledgeAgree"> 위 서약 내용을 충분히 읽었으며 이에 동의합니다.</label>
+      <div class="field"><label>서약자 성명 *</label><input type="text" id="pledgeName" placeholder="예: 홍길동" autocomplete="off" /></div>
+      <p class="hint" id="pledgeHint"></p>
+      <button type="button" class="btn block" id="pledgeSubmit">서약서 제출</button>
+      <button type="button" class="btn ghost block" id="pledgeCancel" style="margin-top:8px;">취소 (로그아웃)</button>
+    </div>
+  </div>
+
   <!-- 플로팅 보고 작성 -->
   <button type="button" class="fab" id="fabReport">＋ 보고 작성</button>
 

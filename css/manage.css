@@ -117,6 +117,13 @@ body.admin-on #appGate { display: none; }
 .group-desc { font-size: 11.5px; color: var(--soft); flex: 1; word-break: keep-all; }
 .rf-grouptag { display: inline-block; font-size: 12px; font-weight: 800; color: var(--blue); background: #eaf1fd; border-radius: 7px; padding: 4px 10px; margin: 0 0 6px; }
 
+/* 관리소장 서약서 */
+.pledge-doc { background: #f7f9fc; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; max-height: 40vh; overflow-y: auto; font-size: 13px; line-height: 1.65; color: #303a47; margin-bottom: 14px; }
+.pledge-doc ol { margin: 10px 0; padding-left: 20px; }
+.pledge-doc li { margin-bottom: 7px; word-break: keep-all; }
+.pledge-agree { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; cursor: pointer; word-break: keep-all; }
+.pledge-agree input { margin-top: 2px; width: 17px; height: 17px; flex: none; }
+
 /* 전략 탭 — 관리소장 교육자료 */
 .edu-head { margin-top: 22px; }
 .edu-tabs { display: flex; gap: 7px; margin: 12px 0 4px; }
