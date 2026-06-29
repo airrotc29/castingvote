@@ -309,7 +309,9 @@ body.site-view #scr-status .scr-title { text-align: center; }
 #stageModal { align-items: center; padding: 20px; }
 #stageModal .modal-box { width: 100%; max-width: 360px; margin: auto; border-radius: 16px; padding: 18px 16px; animation: popIn .2s ease; }
 @keyframes popIn { from { transform: scale(.96); opacity: .5; } to { transform: scale(1); opacity: 1; } }
-.modal-close { position: sticky; top: 0; float: right; background: #eef2f7; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 18px; color: var(--soft); line-height: 1; }
+.modal-close { position: sticky; top: 0; float: right; background: var(--red); border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 24px; font-weight: 800; color: #fff; line-height: 1; cursor: pointer; box-shadow: 0 3px 10px rgba(226,72,77,.5); transition: transform .12s ease, box-shadow .12s ease; }
+.modal-close:hover { transform: scale(1.1); box-shadow: 0 5px 16px rgba(226,72,77,.6); }
+.modal-close:active { transform: scale(.96); }
 .modal h2 { font-size: 19px; font-weight: 900; color: var(--navy); padding-right: 36px; word-break: keep-all; }
 
 /* 사업소 상세 */
