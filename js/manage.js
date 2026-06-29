@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v93 · 2026.06.29 (현황-칸반 세로간격 2.5배)';
+  const APP_VERSION = 'v94 · 2026.06.29 (소장 자유의견란 추가)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -900,6 +900,7 @@
     }
     rebuildRmItems(editReport ? editReport.group : undefined);
     if (editReport) { Object.keys(editReport.items || {}).forEach((k) => { const el = $('rm_' + k); if (el) el.value = editReport.items[k]; }); }
+    if ($('rmFree')) $('rmFree').value = (editReport && editReport.freeNote) || '';
     if ($('rmTitle')) $('rmTitle').textContent = editReport ? '업무보고 수정' : '관리단 관련 업무보고';
     $('rmSubmit').textContent = editReport ? '수정 내용 저장' : '본사로 보고 올리기';
     rmFiles = []; renderRmFiles();
@@ -939,7 +940,8 @@
     const group = orig ? (orig.group || b.group) : b.group;
     const items = {}; let any = false;
     stagesForGroup(group).forEach((s) => s.tasks.forEach((t) => { const el = $('rm_' + t.k); const v = el ? el.value.trim() : ''; items[t.k] = v; if (v) any = true; }));
-    if (!any) { hint($('rmHint'), '최소 한 개 이상의 과제를 작성해 주세요.', 'error'); return; }
+    const freeNote = $('rmFree') ? $('rmFree').value.trim() : '';
+    if (!any && !freeNote) { hint($('rmHint'), '최소 한 개 이상의 과제 또는 자유의견을 작성해 주세요.', 'error'); return; }
     const dv = $('rmDate').value;
     const dateStr = dv ? dv.replace(/-/g, '.') : todayStr();
     const month = dv ? dv.slice(0, 7) : '';
@@ -950,7 +952,7 @@
         // ----- 수정 -----
         let attachments = (orig.attachments || []).slice();
         if (rmFiles.length) { hint($('rmHint'), '첨부 파일 업로드 중…', ''); attachments = attachments.concat(await uploadAttachments(orig.id, rmFiles)); }
-        const updated = Object.assign({}, orig, { branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, items, attachments, editTs: Date.now() });
+        const updated = Object.assign({}, orig, { branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, items, freeNote, attachments, editTs: Date.now() });
         hint($('rmHint'), '수정 내용을 저장하는 중…', '');
         const next = await updateReport(updated);
         REPORTS = next ? mergeLocal(next) : await loadReports();
@@ -960,7 +962,7 @@
         setTimeout(() => closeModal('reportModal'), 1000);
         btn.disabled = false; return;
       }
-      const report = { id: uid('r'), branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, occupancy: null, items, ts: Date.now(), comments: [], attachments: [] };
+      const report = { id: uid('r'), branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, occupancy: null, items, freeNote, ts: Date.now(), comments: [], attachments: [] };
       if (rmFiles.length) { hint($('rmHint'), '첨부 파일 업로드 중…', ''); report.attachments = await uploadAttachments(report.id, rmFiles); }
       hint($('rmHint'), '보고를 올리는 중…', '');
       const next = await addReport(report);
@@ -994,6 +996,10 @@
       h += `<div style="font-size:13px;font-weight:900;color:#fff;background:${stageHex(s.name)};border-radius:6px;margin:14px 0 6px;padding:5px 10px;">${esc(s.name)}</div>`;
       filled.forEach((t) => { h += pdfBlock(t.no, t.t, r.items[t.k]); });
     });
+    if (r.freeNote) {
+      h += '<div style="margin-top:14px;font-weight:800;color:#0f2a4a;border-top:1px solid #e2e8f0;padding-top:10px;margin-bottom:6px;">소장 자유의견</div>' +
+        `<div style="font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-all;background:#f4f7fb;border-radius:8px;padding:9px 12px;">${esc(r.freeNote)}</div>`;
+    }
     const cmts = r.comments || [];
     if (cmts.length) {
       h += '<div style="margin-top:14px;font-weight:800;color:#0f2a4a;border-top:1px solid #e2e8f0;padding-top:10px;margin-bottom:6px;">본사 ↔ 현장 소통</div>';
@@ -1059,6 +1065,10 @@
         h += `<a class="rd-attach-item" href="${esc(a.path)}" target="_blank" rel="noopener" download>${esc(a.name)}${a.size ? ` <span class="rdf-sz">${esc(fmtSize(a.size))}</span>` : ''}</a>`;
       });
       h += '</div>';
+    }
+    if (r.freeNote) {
+      h += '<div class="rd-free"><div class="rd-free-h">📝 소장 자유의견</div>' +
+        `<div class="rd-free-body">${esc(r.freeNote)}</div></div>`;
     }
     h += '<div class="thread-head">💬 본사 ↔ 현장 소통</div><div class="cmts">';
     if (!comments.length) h += '<p class="empty" style="padding:14px 0;">아직 댓글이 없습니다.</p>';

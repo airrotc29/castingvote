@@ -528,6 +528,10 @@ body.admin-on:not(.site-view) .fab { display: none !important; }
 .rd-attach-item { display: flex; align-items: center; gap: 6px; background: #eef4ff; border: 1px solid #d6e3fb; border-radius: 8px; padding: 9px 12px; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; word-break: break-all; }
 .rd-attach-item:hover { background: #e2edff; }
 .rd-attach-item .rdf-sz { color: var(--soft); font-size: 11px; font-weight: 500; margin-left: auto; }
+/* 소장 자유의견 (보고 상세) */
+.rd-free { margin: 16px 0 4px; }
+.rd-free-h { font-size: 13px; font-weight: 800; color: #0f2a4a; margin-bottom: 6px; }
+.rd-free-body { font-size: 13px; line-height: 1.65; color: #303a47; white-space: pre-wrap; word-break: break-all; background: #fffaf0; border: 1px solid #f0e3c8; border-left: 4px solid #e0a429; border-radius: 8px; padding: 10px 13px; }
 
 /* 로그인 도움말 */
 .login-help { font-size: 12px; color: var(--soft); line-height: 1.6; margin-bottom: 10px; }
