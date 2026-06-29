@@ -5,9 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>에이스 종합관리 — 지점사업소 관리단 구성</title>
   <meta name="description" content="에이스 종합관리㈜ 지점사업소 관리단 구성 · 사업소 현황 · 소장 월례 보고 · 본사 소통" />
-  <meta name="theme-color" content="#0c2748" />
+  <meta name="theme-color" content="#123a6b" />
   <meta property="og:title" content="에이스 종합관리 — 지점사업소 관리단 구성" />
   <meta property="og:description" content="지점사업소 관리단 구성 현황 · 소장 보고 · 본사 소통" />
+
+  <!-- PWA(바탕화면 앱 설치) -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg" />
+  <link rel="apple-touch-icon" href="assets/icons/icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ACE 관리단" />
+  <script>if ('serviceWorker' in navigator) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

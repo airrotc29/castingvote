@@ -1,0 +1,14 @@
+{
+  "name": "에이스 종합관리 — 지점사업소 관리단 구성",
+  "short_name": "ACE 관리단",
+  "description": "지점사업소 관리단 구성 현황·보고·본사 소통",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c2748",
+  "theme_color": "#123a6b",
+  "icons": [
+    { "src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
