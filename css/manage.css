@@ -60,6 +60,7 @@ button { font-family: inherit; cursor: pointer; }
   #groupWrap .b-name { font-size: 12.5px; line-height: 1.25; white-space: normal; word-break: keep-all; }
   #groupWrap .b-count { margin-left: 0; font-size: 11px; }
   .fab { right: auto; left: 50%; transform: translateX(-50%); }
+  body.site-view .fab.show { top: 50%; bottom: auto; transform: translate(-50%, -50%); }
   #tabbar { left: 50%; right: auto; transform: translateX(-50%); width: 100%; max-width: 1200px; }
 }
 
@@ -488,6 +489,10 @@ body.site-view #scr-status .scr-title { text-align: center; }
 }
 @media (max-width: 592px) { .fab { right: 16px; } }
 .fab.show { display: inline-flex; align-items: center; gap: 6px; }
+/* 소장 로그인 시 '＋ 보고 작성'을 화면 상하 중앙에 배치 */
+body.site-view .fab.show { top: 50%; bottom: auto; transform: translateY(-50%); }
+/* 본사 계정 로그인 시에는 '＋ 보고 작성' 버튼 숨김 */
+body.admin-on:not(.site-view) .fab { display: none !important; }
 
 /* 로그인 도움말 */
 .login-help { font-size: 12px; color: var(--soft); line-height: 1.6; margin-bottom: 10px; }

@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v79 · 2026.06.23 (NEW 계정별 분리)';
+  const APP_VERSION = 'v80 · 2026.06.29 (소장 FAB 중앙 · 본사 숨김)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
