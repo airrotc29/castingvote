@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v87 · 2026.06.29 (보고 박스 단계색 채움)';
+  const APP_VERSION = 'v88 · 2026.06.29 (배지 단계색 통일·활동 글자 검정)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -333,7 +333,7 @@
   function unseenCount() { return REPORTS.filter(isFresh).length; }
   function branchUnseen(bid) { return REPORTS.some((r) => r.branchId === bid && isFresh(r)); }
   function updateTabDot() { const dot = $('reportTabDot'); if (dot) dot.hidden = unseenCount() === 0; }
-  // 배지 HTML/클래스 (NEW vs 수정) — 배경색은 해당 보고의 단계색
+  // 배지 HTML/클래스 (NEW/수정 모두 해당 보고의 단계색으로 통일)
   function freshBadge(r, txtNew) {
     const f = reportFlag(r); if (!f) return '';
     const hex = stageHex(reportStageName(r));
