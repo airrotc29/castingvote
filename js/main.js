@@ -424,6 +424,7 @@ function renderPdfThumbs() {
     if (it.updated) m += '기준: ' + esc(it.updated);
     if (m) html += '<div class="chat-note">' + m + '</div>';
     html += agendasHtml(it.agendas);
+    html += '<button type="button" class="btn btn-outline btn-block admin-only js-prog-edit" data-name="' + esc(it.name).replace(/"/g, '&quot;') + '" style="margin-top:18px;">✏️ 이 진행율 수정</button>';
     modalBody.innerHTML = html;
     modal.classList.add('open');
     modal.setAttribute('aria-hidden', 'false');

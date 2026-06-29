@@ -101,6 +101,7 @@
       </div>
       <div class="admin-toolbar admin-only">
         <button type="button" class="btn btn-primary btn-sm" id="addProgressBtn">+ 진행율 엑셀 올리기</button>
+        <button type="button" class="btn btn-outline btn-sm" id="addProgressManualBtn">+ 직접 입력</button>
       </div>
       <div class="progress-list" id="progressGrid"></div>
       <p class="gallery-empty" id="progressEmpty" hidden>아직 등록된 투표 진행 현황이 없습니다.</p>
@@ -112,6 +113,17 @@
     <div class="amodal-box">
       <button type="button" class="amodal-close" id="progressDetailClose">×</button>
       <div id="progressDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- 투표 진행율 수정 모달 (관리자) -->
+  <div class="amodal" id="progressEditModal" aria-hidden="true">
+    <div class="amodal-box">
+      <button type="button" class="amodal-close" data-close>×</button>
+      <h3>투표 진행율 수정</h3>
+      <div id="progressEditForm"></div>
+      <p class="form-hint" id="progressEditStatus" role="alert"></p>
+      <button type="button" class="btn btn-primary btn-block" id="progressEditSubmit">저장</button>
     </div>
   </div>
 
