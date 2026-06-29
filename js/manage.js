@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v65 · 2026.06.23 (현황 도넛·보고 막대)';
+  const APP_VERSION = 'v66 · 2026.06.23 (KPI 보고완료)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -441,7 +441,7 @@
     acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const recent = acts.slice(0, 7);
     const kpi = (v, l) => `<div class="sp-kpi"><b>${esc(v)}</b><span>${esc(l)}</span></div>`;
-    let h = '<div class="sp-kpis">' + kpi(total, '전체') + kpi(reported, '보고 진행') + kpi(notyet, '미보고') + kpi(monthCnt, '이번 달 보고') + kpi(avg, '평균 단계') + '</div>';
+    let h = '<div class="sp-kpis">' + kpi(total, '전체') + kpi(reported, '보고완료') + kpi(notyet, '미보고') + kpi(monthCnt, '이번 달 보고') + kpi(avg, '평균 단계') + '</div>';
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
