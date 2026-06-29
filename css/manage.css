@@ -221,13 +221,12 @@ body.site-view #scr-status .scr-title { text-align: center; }
 .pledge-agree { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; cursor: pointer; word-break: keep-all; }
 .pledge-agree input { margin-top: 2px; width: 17px; height: 17px; flex: none; }
 /* 서명 패드 */
-.sign-wrap { border: 1px dashed #b9c6da; border-radius: 10px; background: #fbfdff; overflow: hidden; }
-#pledgeSign { display: block; width: 100%; height: 150px; touch-action: none; cursor: crosshair; background:
+.sign-wrap { border: 1px dashed #b9c6da; border-radius: 10px; background: #fbfdff; overflow: hidden; touch-action: none; }
+#pledgeSign { display: block; width: 100%; height: 150px; touch-action: none; -ms-touch-action: none; cursor: crosshair;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; background:
   repeating-linear-gradient(transparent, transparent 148px, #e3eaf3 149px, #e3eaf3 150px); }
 .sign-clear { margin-top: 8px; font-size: 12px; padding: 6px 12px; }
 /* 서약서 현황(본사) */
-.status-actions { margin: 0 0 14px; }
-#pledgeAdminBtn { font-size: 12.5px; padding: 7px 14px; }
 .pl-list { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .pl-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #f7f9fc; border: 1px solid var(--line); border-radius: 10px; padding: 10px 13px; }
 .pl-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }

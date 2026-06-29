@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v83 · 2026.06.29 (서약서 손글씨 서명·본사 열람·PDF)';
+  const APP_VERSION = 'v85 · 2026.06.29 (서명 모바일 터치 · 서약버튼 헤더 이동)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -1093,7 +1093,7 @@
     $('logoutBtn').style.display = on ? 'block' : 'none';
     if ($('changeCredBtn')) $('changeCredBtn').style.display = on ? 'block' : 'none';
     if ($('addBranchBtn')) $('addBranchBtn').style.display = (on && isHQ()) ? 'inline-flex' : 'none';
-    if ($('statusActions')) $('statusActions').style.display = (on && isHQ()) ? '' : 'none';
+    if ($('pledgeAdminBtn')) $('pledgeAdminBtn').style.display = (on && isHQ()) ? 'inline-flex' : 'none';
     if ($('hdrLogoutBtn')) $('hdrLogoutBtn').style.display = on ? 'inline-flex' : 'none';
   }
   $('hdrLogoutBtn') && $('hdrLogoutBtn').addEventListener('click', () => { if (window.confirm('로그아웃 하시겠습니까?')) $('logoutBtn').click(); });
@@ -1198,8 +1198,17 @@
     const canvas = $('pledgeSign'); if (!canvas || signPad) return;
     const ctx = canvas.getContext('2d');
     let drawing = false, last = null, dirty = false;
-    function pos(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) * (canvas.width / r.width), y: (e.clientY - r.top) * (canvas.height / r.height) }; }
-    function start(e) { e.preventDefault(); drawing = true; last = pos(e); }
+    // 좌표 추출 — 마우스/포인터(clientX) + 터치(touches[0]) 모두 지원
+    function pos(e) {
+      const r = canvas.getBoundingClientRect();
+      const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+      const cx = t ? t.clientX : e.clientX, cy = t ? t.clientY : e.clientY;
+      return { x: (cx - r.left) * (canvas.width / r.width), y: (cy - r.top) * (canvas.height / r.height) };
+    }
+    function start(e) {
+      e.preventDefault(); drawing = true; last = pos(e);
+      if (e.pointerId != null && canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (x) {} }
+    }
     function move(e) {
       if (!drawing) return; e.preventDefault();
       const p = pos(e);
@@ -1208,10 +1217,21 @@
       last = p; dirty = true;
     }
     function end() { drawing = false; }
-    canvas.addEventListener('pointerdown', start);
-    canvas.addEventListener('pointermove', move);
-    window.addEventListener('pointerup', end);
-    canvas.addEventListener('pointerleave', end);
+    if (window.PointerEvent) {
+      // 포인터 이벤트(마우스·터치·펜 통합) — 대부분의 PC/스마트폰
+      canvas.addEventListener('pointerdown', start);
+      canvas.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', end);
+      canvas.addEventListener('pointercancel', end);
+    } else {
+      // 폴백: 구형 스마트폰(터치) + 마우스 별도 처리
+      canvas.addEventListener('touchstart', start, { passive: false });
+      canvas.addEventListener('touchmove', move, { passive: false });
+      canvas.addEventListener('touchend', end);
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', end);
+    }
     signPad = {
       clear() { ctx.clearRect(0, 0, canvas.width, canvas.height); dirty = false; },
       isEmpty() { return !dirty; },
