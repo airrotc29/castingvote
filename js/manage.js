@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v66 · 2026.06.23 (KPI 보고완료)';
+  const APP_VERSION = 'v67 · 2026.06.23 (KPI 당월 기준 4종)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -426,7 +426,10 @@
     const reported = visible.filter((b) => branchStage(b) !== null).length;
     const notyet = total - reported;
     const now = new Date(); const ym = now.getFullYear() + '.' + String(now.getMonth() + 1).padStart(2, '0');
-    const monthCnt = REPORTS.filter((r) => ids.has(r.branchId) && String(r.date || '').startsWith(ym)).length;
+    // 당월 보고완료 = 이번 달에 보고한 사업소 수 / 당월 미보고 = 나머지
+    const monthIds = new Set(REPORTS.filter((r) => ids.has(r.branchId) && String(r.date || '').startsWith(ym)).map((r) => r.branchId));
+    const monthDone = monthIds.size;
+    const monthNotyet = total - monthDone;
     let sum = 0, n = 0;
     visible.forEach((b) => { const st = branchStage(b); if (st !== null) { sum += stageOrder(st); n++; } });
     const avg = n ? (sum / n).toFixed(1) : '0';
@@ -441,7 +444,7 @@
     acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const recent = acts.slice(0, 7);
     const kpi = (v, l) => `<div class="sp-kpi"><b>${esc(v)}</b><span>${esc(l)}</span></div>`;
-    let h = '<div class="sp-kpis">' + kpi(total, '전체') + kpi(reported, '보고완료') + kpi(notyet, '미보고') + kpi(monthCnt, '이번 달 보고') + kpi(avg, '평균 단계') + '</div>';
+    let h = '<div class="sp-kpis">' + kpi(total, '전체') + kpi(monthDone, '당월 보고완료') + kpi(monthNotyet, '당월 미보고') + kpi(avg, '평균 단계') + '</div>';
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
