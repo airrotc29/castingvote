@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v72 · 2026.06.23 (활동 클릭 보고상단·댓글하단)';
+  const APP_VERSION = 'v73 · 2026.06.23 (KPI 당월 클릭 팝업)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -445,8 +445,8 @@
     });
     acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const recent = acts.slice(0, 7);
-    const kpi = (v, l) => `<div class="sp-kpi"><b>${esc(v)}</b><span>${esc(l)}</span></div>`;
-    let h = '<div class="sp-kpis">' + kpi(total, '전체') + kpi(monthDone, '당월 보고완료') + kpi(monthNotyet, '당월 미보고') + kpi(avg, '평균 단계') + '</div>';
+    const kpi = (v, l, key) => `<div class="sp-kpi${key ? ' sp-kpi-click' : ''}"${key ? ` data-kpi="${key}"` : ''}><b>${esc(v)}</b><span>${esc(l)}</span></div>`;
+    let h = '<div class="sp-kpis">' + kpi(total, '전체') + kpi(monthDone, '당월 보고완료', 'done') + kpi(monthNotyet, '당월 미보고', 'notyet') + kpi(avg, '평균 단계') + '</div>';
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
@@ -549,16 +549,10 @@
     host.addEventListener('mouseout', (e) => { const row = e.target.closest('.bar-row'); if (row) hideBarTip(); });
     host.addEventListener('click', (e) => { const row = e.target.closest('.bar-row'); if (row) { showBarTip(row); clearTimeout(barTipTimer); barTipTimer = setTimeout(hideBarTip, 3000); return; } const seg = e.target.closest('[data-order]'); if (seg) openStageDetail(seg.getAttribute('data-order')); });
   });
-  // 도넛/범례 단계 클릭 → 해당 단계 사업소를 팝업으로 표시
-  function openStageDetail(order) {
-    order = parseInt(order, 10);
-    const hex = ({ 99: '#94a3b8', 0: '#475569', 1: '#2563eb', 2: '#16a34a', 3: '#ea580c', 4: '#dc2626' })[order] || '#94a3b8';
-    const labelOf = (o) => (o === 0 ? '공통단계' : o === 99 ? '미보고' : (o + '단계'));
-    const lb = lockedBranchId();
-    const visible = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
-    const list = visible.filter((b) => { const st = branchStage(b); return (st === null ? 99 : stageOrder(st)) === order; });
-    let h = `<h2 style="display:flex;align-items:center;gap:9px;"><span style="width:13px;height:13px;border-radius:4px;background:${hex};"></span>${esc(labelOf(order))} <span style="color:var(--soft);font-weight:600;font-size:14px;">· ${list.length}개 사업소</span></h2>`;
-    if (!list.length) h += '<p class="rd-empty">해당 단계의 사업소가 없습니다.</p>';
+  // 사업소 목록 팝업 (공용)
+  function openBranchPopup(title, hex, list) {
+    let h = `<h2 style="display:flex;align-items:center;gap:9px;"><span style="width:13px;height:13px;border-radius:4px;background:${hex};"></span>${esc(title)} <span style="color:var(--soft);font-weight:600;font-size:14px;">· ${list.length}개 사업소</span></h2>`;
+    if (!list.length) h += '<p class="rd-empty">해당 사업소가 없습니다.</p>';
     else {
       h += '<div class="sd-list">';
       list.forEach((b) => {
@@ -571,7 +565,28 @@
     $('stageDetail').querySelectorAll('.sd-item').forEach((it) => it.addEventListener('click', () => { closeModal('stageModal'); openBranch(it.dataset.id); }));
     openModal('stageModal');
   }
+  function visibleBranches() { const lb = lockedBranchId(); return lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES; }
+  function monthReportedIds() {
+    const now = new Date(); const ym = now.getFullYear() + '.' + String(now.getMonth() + 1).padStart(2, '0');
+    return new Set(REPORTS.filter((r) => String(r.date || '').startsWith(ym)).map((r) => r.branchId));
+  }
+  // 도넛/범례 단계 클릭 → 해당 단계 사업소를 팝업으로 표시
+  function openStageDetail(order) {
+    order = parseInt(order, 10);
+    const hex = ({ 99: '#94a3b8', 0: '#475569', 1: '#2563eb', 2: '#16a34a', 3: '#ea580c', 4: '#dc2626' })[order] || '#94a3b8';
+    const labelOf = (o) => (o === 0 ? '공통단계' : o === 99 ? '미보고' : (o + '단계'));
+    const list = visibleBranches().filter((b) => { const st = branchStage(b); return (st === null ? 99 : stageOrder(st)) === order; });
+    openBranchPopup(labelOf(order), hex, list);
+  }
   $('statusPanel') && $('statusPanel').addEventListener('click', (e) => {
+    // KPI(당월 보고완료/미보고) 클릭 → 해당 사업소 팝업
+    const kc = e.target.closest('.sp-kpi-click');
+    if (kc) {
+      const mIds = monthReportedIds(); const vb = visibleBranches();
+      if (kc.dataset.kpi === 'done') openBranchPopup('당월 보고완료', '#16a34a', vb.filter((b) => mIds.has(b.id)));
+      else openBranchPopup('당월 미보고', '#dc2626', vb.filter((b) => !mIds.has(b.id)));
+      return;
+    }
     const it = e.target.closest('.sp-feed-item'); if (!it || !it.dataset.rid) return;
     openReportDetail(it.dataset.rid);
     // 보고 클릭 → 상단(보고 내용) / 댓글 클릭 → 하단(댓글)로 스크롤

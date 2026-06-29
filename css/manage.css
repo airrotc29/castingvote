@@ -142,6 +142,8 @@ body.admin-on #appGate { display: none; }
 #statusPanel { margin: 4px 0 14px; }
 .sp-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 8px; margin-bottom: 12px; }
 .sp-kpi { background: #fff; border: 1px solid #eef1f5; border-radius: 11px; padding: 10px 6px; text-align: center; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+.sp-kpi.sp-kpi-click { cursor: pointer; transition: box-shadow .15s, transform .12s; }
+.sp-kpi.sp-kpi-click:hover { box-shadow: 0 3px 10px rgba(16,24,40,.1); transform: translateY(-1px); }
 .sp-kpi b { display: block; font-size: 19px; font-weight: 900; color: var(--navy); line-height: 1.1; }
 .sp-kpi span { font-size: 10.5px; color: var(--soft); }
 .sp-cols { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
