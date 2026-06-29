@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v74 · 2026.06.23 (계정 메뉴·로그아웃)';
+  const APP_VERSION = 'v75 · 2026.06.23 (소장 현황 인라인·헤더 로그아웃)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -495,6 +495,15 @@
     }
     renderStatusPanel(visible, lb);
 
+    // 사업소 계정(소장): 본인 사업소 현황(보고 이력·전략 정보)을 바로 표시
+    if (lb) {
+      const wrap = $('groupWrap'); const b = visible[0];
+      if (b) { wrap.innerHTML = '<div class="solo-detail">' + branchDetailHtml(b, false) + '</div>'; wireBranchDetail(wrap, b, false); }
+      else wrap.innerHTML = '';
+      updateTabDot();
+      return;
+    }
+
     // 단계별 그룹화 (관리소장이 입력한 과제로 산출한 현재 단계)
     const buckets = {};
     visible.forEach((b) => {
@@ -614,8 +623,8 @@
     return h;
   }
 
-  function openBranch(id) {
-    const b = BRANCHES.find((x) => x.id === id); if (!b) return;
+  function branchDetailHtml(b, withHq) {
+    const id = b.id;
     let h = `<h2>${esc(b.name)} <span class="group-badge g${b.group}" style="font-size:12px;vertical-align:middle;">${b.group}군</span></h2>`;
 
     // 이 사업소의 보고서 — 날짜별(최근순)
@@ -651,27 +660,33 @@
     }
 
     // 본사 담당자 — 전략 정보 수정 + 군 이동 (본사 계정 전용)
-    if (isHQ()) {
+    if (withHq) {
       h += '<button type="button" class="btn ghost block" id="branchEditBtn" style="margin-top:16px;">✏️ 전략 정보 수정 (본사)</button>';
       h += '<div class="d-sec-title" style="margin-top:18px;">본사 — 분류(군) 이동</div>' +
         '<div class="group-move" id="groupMove">' +
           [1, 2, 3].map((g) => `<button type="button" class="gm-btn${b.group === g ? ' active' : ''}" data-g="${g}">${g}군</button>`).join('') +
         '</div><p class="hint" id="groupMoveHint"></p>';
     }
-
-    $('branchDetail').innerHTML = h;
-    if ($('branchEditBtn')) $('branchEditBtn').addEventListener('click', () => openBranchEdit(b.id));
-    // 보고 이력 항목 클릭 → 해당 보고 상세(+댓글)
-    $('branchDetail').querySelectorAll('.bh-item').forEach((it) => {
-      it.addEventListener('click', () => { closeModal('branchModal'); openReportDetail(it.dataset.rid); });
+    return h;
+  }
+  function wireBranchDetail(container, b, isModal) {
+    const eb = container.querySelector('#branchEditBtn');
+    if (eb) eb.addEventListener('click', () => openBranchEdit(b.id));
+    container.querySelectorAll('.bh-item').forEach((it) => {
+      it.addEventListener('click', () => { if (isModal) closeModal('branchModal'); openReportDetail(it.dataset.rid); });
     });
-    const gm = $('groupMove');
+    const gm = container.querySelector('#groupMove');
     if (gm) gm.addEventListener('click', (e) => {
       const btn = e.target.closest('.gm-btn'); if (!btn) return;
       const g = parseInt(btn.dataset.g, 10);
       if (g === b.group) return;
       moveBranchGroup(b.id, g);
     });
+  }
+  function openBranch(id) {
+    const b = BRANCHES.find((x) => x.id === id); if (!b) return;
+    $('branchDetail').innerHTML = branchDetailHtml(b, isHQ());
+    wireBranchDetail($('branchDetail'), b, true);
     openModal('branchModal');
   }
 
@@ -1020,7 +1035,9 @@
     $('logoutBtn').style.display = on ? 'block' : 'none';
     if ($('changeCredBtn')) $('changeCredBtn').style.display = on ? 'block' : 'none';
     if ($('addBranchBtn')) $('addBranchBtn').style.display = (on && isHQ()) ? 'inline-flex' : 'none';
+    if ($('hdrLogoutBtn')) $('hdrLogoutBtn').style.display = on ? 'inline-flex' : 'none';
   }
+  $('hdrLogoutBtn') && $('hdrLogoutBtn').addEventListener('click', () => { if (window.confirm('로그아웃 하시겠습니까?')) $('logoutBtn').click(); });
 
   // ---------- 사업소 추가 (본사 담당자) ----------
   $('addBranchBtn') && $('addBranchBtn').addEventListener('click', () => {

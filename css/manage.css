@@ -88,6 +88,8 @@ body.admin-on #appGate { display: none; }
 .admin-pill.on { background: var(--accent); border-color: var(--accent); color: #3a2600; }
 .hdr-add { font-size: 11px; font-weight: 800; color: #0c2748; background: #fff; border: 1px solid #fff; border-radius: 999px; padding: 5px 11px; }
 .hdr-add:active { opacity: .85; }
+.hdr-logout { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1; color: #fff; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.32); border-radius: 50%; }
+.hdr-logout:active { background: rgba(255,255,255,.28); }
 
 /* 탭 화면 */
 .screen { display: none; padding: 16px 16px 24px; }
@@ -114,6 +116,10 @@ body.admin-on #appGate { display: none; }
 #barTip.show { opacity: 1; }
 #barTip b { display: block; font-size: 12px; color: #ffd27d; margin-bottom: 3px; letter-spacing: -.2px; }
 #barTip span { display: block; font-size: 11.5px; line-height: 1.6; color: #d7e1f0; word-break: keep-all; }
+
+/* 사업소장 — 본인 현황 인라인 표시 */
+.solo-detail { background: #fff; border: 1px solid #eef1f5; border-radius: 14px; padding: 16px 18px 20px; box-shadow: 0 1px 3px rgba(16,24,40,.05); max-width: 760px; }
+.solo-detail h2 { font-size: 18px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
 
 /* 도넛(원형) 차트 — 현황 화면 */
 .donut-box { margin: 4px 2px 18px; }
