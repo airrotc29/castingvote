@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v69 · 2026.06.23 (댓글 미리보기·도넛 팝업)';
+  const APP_VERSION = 'v70 · 2026.06.23 (활동 NEW배지·내용숨김)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -439,8 +439,9 @@
     const acts = [];
     REPORTS.filter((r) => ids.has(r.branchId)).forEach((r) => {
       const firstItem = Object.values(r.items || {}).find((v) => v) || '';
-      acts.push({ ts: r.ts || 0, branch: r.branchName, kind: '보고', id: r.id, body: firstItem });
-      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글', id: r.id, body: c.body }));
+      const nu = isNew(r);
+      acts.push({ ts: r.ts || 0, branch: r.branchName, kind: '보고', id: r.id, body: firstItem, nu: nu });
+      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글', id: r.id, body: c.body, nu: nu }));
     });
     acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const recent = acts.slice(0, 7);
@@ -449,7 +450,7 @@
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
-    else h += '<ul class="sp-feed">' + recent.map((a) => `<li class="sp-feed-item" data-rid="${esc(a.id)}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span><i class="sp-when">${esc(relTime(a.ts))}</i></div>${a.body ? `<div class="sp-msg">${a.kind === '보고' ? esc(a.body) : '“' + esc(a.body) + '”'}</div>` : ''}</li>`).join('') + '</ul>';
+    else h += '<ul class="sp-feed">' + recent.map((a) => `<li class="sp-feed-item${a.nu ? ' is-new' : ''}" data-rid="${esc(a.id)}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${a.nu ? '<span class="new-badge sp-new">NEW</span>' : ''}<i class="sp-when">${esc(relTime(a.ts))}</i></div></li>`).join('') + '</ul>';
     h += '</div>';
     h += '<div class="sp-card"><div class="sp-h">🔔 주의</div>';
     h += `<div class="sp-alert"><span>미보고</span><b>${notyet}</b></div>`;

@@ -153,6 +153,8 @@ body.admin-on #appGate { display: none; }
 .sp-feed li.sp-feed-item { flex-direction: column; align-items: stretch; gap: 3px; cursor: pointer; }
 .sp-feed-item:hover b { text-decoration: underline; }
 .sp-fr { display: flex; align-items: center; gap: 7px; }
+.sp-new { font-size: 9px; font-weight: 900; padding: 1px 6px; margin-left: 2px; box-shadow: none; }
+.sp-feed-item.is-new b { color: var(--red); }
 .sp-msg { margin-left: 14px; font-size: 12px; color: #5b6573; background: #f4f7fb; border-radius: 7px; padding: 4px 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* 단계별 사업소 현황 팝업 */
 .sd-list { display: flex; flex-direction: column; gap: 8px; }
