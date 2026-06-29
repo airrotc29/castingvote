@@ -55,6 +55,7 @@
     <section class="screen active" id="scr-status">
       <h2 class="scr-title">사업소 현황</h2>
       <p class="scr-lead" id="statusLead">12개 지점사업소를 등기율·추진위·시행사 소통 기준으로 1·2·3군으로 분류해 관리합니다. 카드를 누르면 현황·지분율·대응방안을 볼 수 있습니다.</p>
+      <div class="status-actions" id="statusActions" style="display:none;"><button type="button" class="btn ghost" id="pledgeAdminBtn">📜 서약서 현황 보기</button></div>
       <div class="status-top">
         <div class="status-left">
           <div class="stat-cap" id="statCap2">단계별 사업소 현황</div>
@@ -173,6 +174,11 @@
       </div>
       <label class="pledge-agree"><input type="checkbox" id="pledgeAgree"> 위 서약 내용을 충분히 읽었으며 이에 동의합니다.</label>
       <div class="field"><label>서약자 성명 *</label><input type="text" id="pledgeName" placeholder="예: 홍길동" autocomplete="off" /></div>
+      <div class="field">
+        <label>서명 * <span class="hintlabel">— PC는 마우스로, 휴대폰은 손가락으로 서명하세요</span></label>
+        <div class="sign-wrap"><canvas id="pledgeSign" width="600" height="200"></canvas></div>
+        <button type="button" class="btn ghost sign-clear" id="pledgeSignClear">서명 지우기</button>
+      </div>
       <p class="hint" id="pledgeHint"></p>
       <button type="button" class="btn block" id="pledgeSubmit">서약서 제출</button>
       <button type="button" class="btn ghost block" id="pledgeCancel" style="margin-top:8px;">취소 (로그아웃)</button>
@@ -215,6 +221,14 @@
       </div>
       <p class="hint" id="rmHint"></p>
       <button type="button" class="btn block" id="rmSubmit">본사로 보고 올리기</button>
+    </div>
+  </div>
+
+  <!-- 서약서 현황 (본사 담당자) -->
+  <div class="modal" id="pledgeAdminModal" aria-hidden="true">
+    <div class="modal-box">
+      <button type="button" class="modal-close" data-close>×</button>
+      <div id="pledgeAdminBody"></div>
     </div>
   </div>
 

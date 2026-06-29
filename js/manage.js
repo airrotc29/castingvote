@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v82 · 2026.06.29 (보고서 첨부 한글·엑셀·PDF)';
+  const APP_VERSION = 'v83 · 2026.06.29 (서약서 손글씨 서명·본사 열람·PDF)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -1093,6 +1093,7 @@
     $('logoutBtn').style.display = on ? 'block' : 'none';
     if ($('changeCredBtn')) $('changeCredBtn').style.display = on ? 'block' : 'none';
     if ($('addBranchBtn')) $('addBranchBtn').style.display = (on && isHQ()) ? 'inline-flex' : 'none';
+    if ($('statusActions')) $('statusActions').style.display = (on && isHQ()) ? '' : 'none';
     if ($('hdrLogoutBtn')) $('hdrLogoutBtn').style.display = on ? 'inline-flex' : 'none';
   }
   $('hdrLogoutBtn') && $('hdrLogoutBtn').addEventListener('click', () => { if (window.confirm('로그아웃 하시겠습니까?')) $('logoutBtn').click(); });
@@ -1191,26 +1192,55 @@
 
   // ---------- 관리소장 서약서 ----------
   let pledgeAcct = null;
+  // 서명 패드 (PC: 마우스 / 모바일: 손가락 — pointer 이벤트로 모두 지원)
+  let signPad = null;
+  function setupSignPad() {
+    const canvas = $('pledgeSign'); if (!canvas || signPad) return;
+    const ctx = canvas.getContext('2d');
+    let drawing = false, last = null, dirty = false;
+    function pos(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) * (canvas.width / r.width), y: (e.clientY - r.top) * (canvas.height / r.height) }; }
+    function start(e) { e.preventDefault(); drawing = true; last = pos(e); }
+    function move(e) {
+      if (!drawing) return; e.preventDefault();
+      const p = pos(e);
+      ctx.strokeStyle = '#12233f'; ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+      last = p; dirty = true;
+    }
+    function end() { drawing = false; }
+    canvas.addEventListener('pointerdown', start);
+    canvas.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', end);
+    canvas.addEventListener('pointerleave', end);
+    signPad = {
+      clear() { ctx.clearRect(0, 0, canvas.width, canvas.height); dirty = false; },
+      isEmpty() { return !dirty; },
+      dataURL() { return canvas.toDataURL('image/png'); }
+    };
+  }
   function openPledge(acc) {
     pledgeAcct = acc;
     if ($('pledgeBranch')) $('pledgeBranch').textContent = acc.branchName || (BRANCHES.find((b) => b.id === acc.branchId) || {}).name || '';
     if ($('pledgeName')) $('pledgeName').value = '';
     if ($('pledgeAgree')) $('pledgeAgree').checked = false;
+    setupSignPad(); if (signPad) signPad.clear();
     hint($('pledgeHint'), '', '');
     openModal('pledgeModal');
   }
+  $('pledgeSignClear') && $('pledgeSignClear').addEventListener('click', () => { if (signPad) signPad.clear(); });
   $('pledgeSubmit') && $('pledgeSubmit').addEventListener('click', async () => {
     if (!pledgeAcct) { closeModal('pledgeModal'); return; }
     const name = ($('pledgeName').value || '').trim();
     const agree = $('pledgeAgree') && $('pledgeAgree').checked;
     if (!name) { hint($('pledgeHint'), '서약자 성명을 입력해 주세요.', 'error'); return; }
     if (!agree) { hint($('pledgeHint'), '서약 내용에 동의(체크)해 주세요.', 'error'); return; }
+    if (!signPad || signPad.isEmpty()) { hint($('pledgeHint'), '서명란에 직접 서명해 주세요.', 'error'); return; }
     if (!hasToken()) { hint($('pledgeHint'), '저장 권한이 없습니다. 다시 로그인해 주세요.', 'error'); return; }
-    const acc = pledgeAcct; const btn = $('pledgeSubmit'); btn.disabled = true;
+    const acc = pledgeAcct; const sign = signPad.dataURL(); const btn = $('pledgeSubmit'); btn.disabled = true;
     try {
       hint($('pledgeHint'), '서약서를 제출하는 중…', '');
       await mutatePledges((o) => {
-        o.pledges[acc.id] = { name, accountId: acc.id, branchId: acc.branchId || '', branchName: acc.branchName || '', date: todayStr(), ts: Date.now() };
+        o.pledges[acc.id] = { name, accountId: acc.id, branchId: acc.branchId || '', branchName: acc.branchName || '', date: todayStr(), ts: Date.now(), sign };
         return o;
       }, '서약서 제출: ' + (acc.branchName || acc.id));
       hint($('pledgeHint'), '서약서가 제출되었습니다. 감사합니다!', 'success');
@@ -1221,6 +1251,88 @@
   $('pledgeCancel') && $('pledgeCancel').addEventListener('click', () => {
     pledgeAcct = null; closeModal('pledgeModal');
     if ($('logoutBtn')) $('logoutBtn').click(); else { localStorage.removeItem(LOGIN_FLAG); setAdmin(false); }
+  });
+
+  // ---------- 서약서 현황 (본사 담당자) ----------
+  // 서약서 본문(전문) — 화면 보기·PDF 공통
+  function pledgeClauses() {
+    return [
+      '관계 법령(집합건물법 등)과 관리규약을 준수하며 정당하고 투명하게 업무를 수행한다.',
+      '본사의 지침과 보고 체계를 따르고, 진행 상황을 매월 성실히 보고한다.',
+      '업무상 알게 된 입주자·구분소유자의 개인정보와 회사 기밀을 외부에 유출하지 않는다.',
+      '관리단 조성 활동 시 부정한 금품 제공/수수 등 불법 행위를 하지 않는다.',
+      '회사의 명예를 훼손하거나 회사의 이해에 반하는 행위를 하지 않는다.',
+      '상기 내용 포함 관리단 구성에 관한 모든 사항에 대해 본사 이외 제3자(추진위 포함)에게 공유를 금지한다.'
+    ];
+  }
+  function pledgeDocHtml(p) {
+    let h = '<div style="font-family:\'Noto Sans KR\',sans-serif;color:#1f2937;line-height:1.7;">';
+    h += '<div style="text-align:center;border-bottom:2px solid #123a6b;padding-bottom:10px;margin-bottom:16px;">' +
+      '<div style="font-size:12px;color:#1c5fc4;font-weight:700;">에이스종합관리㈜</div>' +
+      '<div style="font-size:24px;font-weight:900;color:#0f2a4a;letter-spacing:4px;">관 리 소 장 서 약 서</div></div>';
+    h += `<p style="font-size:13.5px;">본인은 에이스종합관리㈜의 지점사업소 <b>${esc(p.branchName || '')}</b> 관리소장으로서, 관리단 구성 업무를 수행함에 있어 다음 사항을 성실히 준수할 것을 서약합니다.</p>`;
+    h += '<ol style="font-size:13px;padding-left:20px;">';
+    pledgeClauses().forEach((c) => { h += `<li style="margin:5px 0;">${esc(c)}</li>`; });
+    h += '</ol>';
+    h += '<p style="font-size:13.5px;">위 사항을 위반할 경우에 그에 따른 민·형사상 책임을 질 것을 서약합니다.</p>';
+    h += `<p style="text-align:center;font-size:14px;font-weight:700;margin:22px 0 14px;">${esc(p.date || '')}</p>`;
+    h += '<div style="display:flex;justify-content:flex-end;align-items:flex-end;gap:10px;margin-top:6px;">' +
+      `<div style="text-align:right;"><div style="font-size:13px;color:#5b6573;">서약자(관리소장)</div><div style="font-size:17px;font-weight:800;color:#0f2a4a;">${esc(p.name || '')} <span style="font-size:12px;color:#5b6573;">(서명)</span></div></div>`;
+    if (p.sign) h += `<img src="${esc(p.sign)}" alt="서명" style="width:170px;height:64px;object-fit:contain;border-bottom:1px solid #cbd5e1;" />`;
+    h += '</div></div>';
+    return h;
+  }
+  let pledgeData = {};
+  async function openPledgeAdmin() {
+    if (!isHQ()) { alert('서약서 현황은 본사 담당자만 열람할 수 있습니다.'); return; }
+    const body = $('pledgeAdminBody'); if (!body) return;
+    body.innerHTML = '<h2>📜 서약서 현황</h2><p class="hint">불러오는 중…</p>';
+    openModal('pledgeAdminModal');
+    let pl = {}; try { pl = await loadPledges(); } catch (e) {}
+    pledgeData = pl;
+    const byBranch = {}; Object.keys(pl).forEach((k) => { const p = pl[k]; if (p && p.branchId) byBranch[p.branchId] = p; });
+    const total = BRANCHES.length, done = BRANCHES.filter((b) => byBranch[b.id]).length;
+    let h = `<h2>📜 서약서 현황</h2><p class="login-help">제출 ${done} / 전체 ${total} 곳. 제출된 서약서는 ‘보기’로 서명을 확인하고 PDF로 저장할 수 있습니다.</p>`;
+    h += '<ul class="pl-list">';
+    BRANCHES.forEach((b) => {
+      const p = byBranch[b.id];
+      h += '<li class="pl-row">' +
+        `<div class="pl-info"><span class="pl-bname">${esc(b.name)}</span>` +
+        (p ? `<span class="pl-meta">${esc(p.name)} · ${esc(p.date)}</span>` : '<span class="pl-meta pl-no">미제출</span>') +
+        '</div>' +
+        (p ? `<button type="button" class="btn ghost pl-view" data-pv="${esc(b.id)}">보기</button>` : '<span class="pl-badge-no">미제출</span>') +
+        '</li>';
+    });
+    h += '</ul>';
+    body.innerHTML = h;
+  }
+  function showPledgeDetail(branchId) {
+    const byBranch = {}; Object.keys(pledgeData).forEach((k) => { const p = pledgeData[k]; if (p && p.branchId) byBranch[p.branchId] = p; });
+    const p = byBranch[branchId]; if (!p) return;
+    const body = $('pledgeAdminBody'); if (!body) return;
+    body.innerHTML = '<button type="button" class="btn ghost" id="plBack" style="margin-bottom:12px;">← 목록</button>' +
+      '<div class="pl-detail">' + pledgeDocHtml(p) + '</div>' +
+      '<button type="button" class="btn block" id="plPdfBtn" style="margin-top:14px;">📄 이 서약서 PDF로 저장</button>';
+    $('plBack') && $('plBack').addEventListener('click', openPledgeAdmin);
+    $('plPdfBtn') && $('plPdfBtn').addEventListener('click', () => genPledgePdf(p));
+  }
+  function genPledgePdf(p) {
+    const w = window.open('', '_blank');
+    if (!w) { alert('PDF 저장을 위해 팝업을 허용해 주세요.'); return; }
+    const title = esc((p.branchName || '서약서') + ' 관리소장 서약서');
+    const css = '@page{size:A4;margin:18mm}*{box-sizing:border-box}' +
+      "body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;color:#1f2937;margin:0;padding:24px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}" +
+      '@media print{body{padding:0}}';
+    w.document.open();
+    w.document.write('<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' + title + '</title>' +
+      '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet"><style>' + css + '</style></head><body>' +
+      pledgeDocHtml(p) +
+      '<scr' + 'ipt>window.onload=function(){setTimeout(function(){try{window.focus();window.print();}catch(e){}},500);};<\/scr' + 'ipt></body></html>');
+    w.document.close();
+  }
+  $('pledgeAdminBtn') && $('pledgeAdminBtn').addEventListener('click', openPledgeAdmin);
+  $('pledgeAdminBody') && $('pledgeAdminBody').addEventListener('click', (e) => {
+    const v = e.target.closest('[data-pv]'); if (v) showPledgeDetail(v.dataset.pv);
   });
 
   // ---------- 아이디/비밀번호 변경 ----------
