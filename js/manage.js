@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v94 · 2026.06.29 (소장 자유의견란 추가)';
+  const APP_VERSION = 'v95 · 2026.06.29 (최근 보고 복사 기능)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -901,6 +901,7 @@
     rebuildRmItems(editReport ? editReport.group : undefined);
     if (editReport) { Object.keys(editReport.items || {}).forEach((k) => { const el = $('rm_' + k); if (el) el.value = editReport.items[k]; }); }
     if ($('rmFree')) $('rmFree').value = (editReport && editReport.freeNote) || '';
+    updateCopyLastBtn(!!editReport);
     if ($('rmTitle')) $('rmTitle').textContent = editReport ? '업무보고 수정' : '관리단 관련 업무보고';
     $('rmSubmit').textContent = editReport ? '수정 내용 저장' : '본사로 보고 올리기';
     rmFiles = []; renderRmFiles();
@@ -913,8 +914,27 @@
     hint($('rmHint'), '', '');
     openModal('reportModal');
   }
+  // 최근 보고 복사 버튼: 신규 작성 + 해당 사업소에 이전 보고가 있을 때만 표시
+  function updateCopyLastBtn(isEdit) {
+    const btn = $('rmCopyLast'); if (!btn) return;
+    const bId = $('rmBranch').value;
+    const has = !isEdit && REPORTS.some((r) => r.branchId === bId);
+    btn.style.display = has ? 'inline-flex' : 'none';
+  }
+  function loadLatestReport() {
+    const bId = $('rmBranch').value;
+    const reps = REPORTS.filter((r) => r.branchId === bId);
+    if (!reps.length) { hint($('rmHint'), '불러올 이전 보고가 없습니다.', 'error'); return; }
+    const latest = reps.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
+    if (!$('rmReporter').value.trim()) $('rmReporter').value = latest.reporter || '';
+    // 현재 폼(해당 사업소 군)에 일치하는 과제 칸만 채움
+    Object.keys(latest.items || {}).forEach((k) => { const el = $('rm_' + k); if (el) el.value = latest.items[k]; });
+    if ($('rmFree')) $('rmFree').value = latest.freeNote || '';
+    hint($('rmHint'), '최근 보고(' + latest.date + ') 내용을 불러왔습니다. 수정 후 올려 주세요.', 'success');
+  }
+  $('rmCopyLast') && $('rmCopyLast').addEventListener('click', loadLatestReport);
   $('fabReport').addEventListener('click', () => openReportForm());
-  $('rmBranch') && $('rmBranch').addEventListener('change', () => rebuildRmItems());
+  $('rmBranch') && $('rmBranch').addEventListener('change', () => { rebuildRmItems(); updateCopyLastBtn(!!editReportId); });
   $('rmFileBtn') && $('rmFileBtn').addEventListener('click', () => $('rmFile').click());
   $('rmFile') && $('rmFile').addEventListener('change', () => {
     const picked = Array.from($('rmFile').files || []); const rejected = [];
