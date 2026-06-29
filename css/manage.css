@@ -479,9 +479,9 @@ body.site-view #scr-status .scr-title { text-align: center; }
 }
 .tabbar button {
   background: none; border: none; padding: 9px 4px 8px; color: var(--soft);
-  display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 700;
+  display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 27.5px; font-weight: 700;
 }
-.tabbar button .ic { font-size: 19px; line-height: 1; }
+.tabbar button .ic { font-size: 47.5px; line-height: 1; }
 .tabbar button.active { color: var(--blue); }
 .tabbar button { position: relative; }
 /* 탭 항목 사이 구분선 (현황 | 보고 | 전략) */
