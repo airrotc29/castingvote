@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v90 · 2026.06.29 (서약서 7항 추가)';
+  const APP_VERSION = 'v91 · 2026.06.29 (서약서 7항 로서 교정)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -1311,7 +1311,7 @@
       '관리단 조성 활동 시 부정한 금품 제공/수수 등 불법 행위를 하지 않는다.',
       '회사의 명예를 훼손하거나 회사의 이해에 반하는 행위를 하지 않는다.',
       '상기 내용 포함 관리단 구성에 관한 모든 사항에 대해 본사 이외 제3자(추진위 포함)에게 공유를 금지한다.',
-      '관리소장은 에이스종합관리㈜의 소속 직원으로써 집합건물법 및 민법상 관리인이 될 수 없음을 인지하고 성실히 본연의 직무에 전념한다.'
+      '관리소장은 에이스종합관리㈜의 소속 직원으로서 집합건물법 및 민법상 관리인이 될 수 없음을 인지하고 성실히 본연의 직무에 전념한다.'
     ];
   }
   function pledgeDocHtml(p) {
