@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v58 · 2026.06.23 (컬러밴드+타임라인)';
+  const APP_VERSION = 'v59 · 2026.06.23 (단계 그래프 보고탭 이동)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -391,7 +391,8 @@
     const lb = lockedBranchId();
     if ($('statusLead')) $('statusLead').style.display = lb ? 'none' : '';
     const visible = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
-    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시). 단계별 막대그래프.
+    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시). 단계별 막대그래프(보고 탭).
+    if ($('statCap')) $('statCap').style.display = lb ? 'none' : '';
     if (lb) {
       $('statRow').style.display = 'none';
       $('statRow').innerHTML = '';
