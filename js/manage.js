@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v85 · 2026.06.29 (서명 모바일 터치 · 서약버튼 헤더 이동)';
+  const APP_VERSION = 'v86 · 2026.06.29 (보고 수정 배지·단계색)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -316,11 +316,32 @@
   function seenKey() { return SEEN_KEY + '_' + (localStorage.getItem('ace_acct') || 'anon'); }
   function getSeen() { try { const o = JSON.parse(localStorage.getItem(seenKey()) || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; } catch (e) { return {}; } }
   function setSeen(o) { localStorage.setItem(seenKey(), JSON.stringify(o)); }
-  function isNew(r) { const s = getSeen(); const c = s[r.id]; if (c === undefined) return true; return (r.comments || []).length > c; }
-  function markSeen(r) { const s = getSeen(); s[r.id] = (r.comments || []).length; setSeen(s); }
-  function unseenCount() { return REPORTS.filter(isNew).length; }
-  function branchUnseen(bid) { return REPORTS.some((r) => r.branchId === bid && isNew(r)); }
+  // 본 시점 기록: { c: 본 댓글 수, e: 본 수정시각 }. 옛 형식(숫자=댓글 수)도 호환.
+  function seenOf(r) { const s = getSeen(); const c = s[r.id]; if (c === undefined) return undefined; return (typeof c === 'object' && c) ? { c: c.c || 0, e: c.e || 0 } : { c: c, e: 0 }; }
+  // 'new'(새 보고/새 댓글) | 'edit'(이미 본 보고가 수정됨) | ''(변동 없음)
+  function reportFlag(r) {
+    const sv = seenOf(r);
+    if (sv === undefined) return 'new';
+    if ((r.comments || []).length > sv.c) return 'new';
+    if ((r.editTs || 0) > sv.e) return 'edit';
+    return '';
+  }
+  function isNew(r) { return reportFlag(r) === 'new'; }
+  function isEdited(r) { return reportFlag(r) === 'edit'; }
+  function isFresh(r) { return reportFlag(r) !== ''; }
+  function markSeen(r) { const s = getSeen(); s[r.id] = { c: (r.comments || []).length, e: (r.editTs || 0) }; setSeen(s); }
+  function unseenCount() { return REPORTS.filter(isFresh).length; }
+  function branchUnseen(bid) { return REPORTS.some((r) => r.branchId === bid && isFresh(r)); }
   function updateTabDot() { const dot = $('reportTabDot'); if (dot) dot.hidden = unseenCount() === 0; }
+  // 배지 HTML/클래스 (NEW vs 수정) — 배경색은 해당 보고의 단계색
+  function freshBadge(r, txtNew) {
+    const f = reportFlag(r); if (!f) return '';
+    const hex = stageHex(reportStageName(r));
+    const cls = f === 'new' ? 'new-badge' : 'edit-badge';
+    const txt = f === 'new' ? txtNew : '수정';
+    return `<span class="${cls}" style="background:${hex};box-shadow:0 2px 6px ${hex}66;">${txt}</span>`;
+  }
+  function freshClass(r) { const f = reportFlag(r); return f === 'new' ? ' is-new' : f === 'edit' ? ' is-edit' : ''; }
 
   // ---------- 모달 ----------
   function openModal(id) { const m = $(id); if (m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } }
@@ -387,6 +408,13 @@
   // 단계명 표기: 괄호 부분(예: (추진위 자생))은 작은 글씨로
   function fmtStageName(name) { const m = /^(.*?)\s*(\(.*\))\s*$/.exec(String(name || '')); return m ? `${esc(m[1].trim())} <span class="sb-sub">${esc(m[2])}</span>` : esc(name); }
   function stageHex(name) { const o = stageOrder(name); return ({ 1: '#1c5fc4', 2: '#15803d', 3: '#c2660c', 4: '#b91c1c' })[o] || '#334155'; }
+  // 개별 보고의 단계명(가장 높은 작성 단계) — 배지 색상용
+  function reportStageName(r) {
+    const items = (r && r.items) || {}; let maxSi = -1;
+    Object.keys(items).forEach((k) => { if (!items[k]) return; const m = /^g\d+_(\d+)_/.exec(k); if (m) { const si = parseInt(m[1], 10); if (si > maxSi) maxSi = si; } });
+    if (maxSi < 0) return null;
+    const stages = reportStages(r); return stages[maxSi] ? stages[maxSi].name : null;
+  }
   // 도넛(원형) 차트 HTML — 현황 화면용
   function donutHtml(orders, byOrder, namesByOrder, totalV) {
     const labelOf = (o) => (o === 0 ? '공통' : o === 99 ? '미보고' : (o + '단계'));
@@ -441,9 +469,9 @@
     const acts = [];
     REPORTS.filter((r) => ids.has(r.branchId)).forEach((r) => {
       const firstItem = Object.values(r.items || {}).find((v) => v) || '';
-      const nu = isNew(r);
-      acts.push({ ts: r.ts || 0, branch: r.branchName, kind: '보고', id: r.id, body: firstItem, nu: nu });
-      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글', id: r.id, body: c.body, nu: nu }));
+      const fl = reportFlag(r); const hex = stageHex(reportStageName(r));
+      acts.push({ ts: Math.max(r.ts || 0, r.editTs || 0), branch: r.branchName, kind: '보고', id: r.id, body: firstItem, flag: fl, hex: hex });
+      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글', id: r.id, body: c.body, flag: fl === 'new' ? 'new' : '', hex: hex }));
     });
     acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const recent = acts.slice(0, 7);
@@ -452,7 +480,7 @@
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
-    else h += '<ul class="sp-feed">' + recent.map((a) => `<li class="sp-feed-item${a.nu ? ' is-new' : ''}" data-rid="${esc(a.id)}" data-kind="${a.kind === '보고' ? 'rep' : 'cmt'}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${a.nu ? '<span class="new-badge sp-new">NEW</span>' : ''}<i class="sp-when">${esc(relTime(a.ts))}</i></div></li>`).join('') + '</ul>';
+    else h += '<ul class="sp-feed">' + recent.map((a) => { const fcls = a.flag === 'new' ? ' is-new' : a.flag === 'edit' ? ' is-edit' : ''; const fbadge = a.flag ? `<span class="${a.flag === 'new' ? 'new-badge sp-new' : 'edit-badge sp-edit'}" style="background:${a.hex};box-shadow:none;">${a.flag === 'new' ? 'NEW' : '수정'}</span>` : ''; return `<li class="sp-feed-item${fcls}" data-rid="${esc(a.id)}" data-kind="${a.kind === '보고' ? 'rep' : 'cmt'}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${fbadge}<i class="sp-when">${esc(relTime(a.ts))}</i></div></li>`; }).join('') + '</ul>';
     h += '</div>';
     h += '<div class="sp-card"><div class="sp-h">🔔 주의</div>';
     h += `<div class="sp-alert"><span>미보고</span><b>${notyet}</b></div>`;
@@ -637,10 +665,9 @@
     else {
       h += '<div class="bh-list">';
       reps.forEach((r, i) => {
-        const isN = isNew(r);
-        h += `<button type="button" class="bh-item${isN ? ' is-new' : ''}" data-rid="${esc(r.id)}">` +
+        h += `<button type="button" class="bh-item${freshClass(r)}" data-rid="${esc(r.id)}">` +
           `<span class="bh-no">${i + 1}</span>` +
-          `<span class="bh-date">${esc(r.date)}${isN ? ' <span class="new-badge">NEW</span>' : ''}</span>` +
+          `<span class="bh-date">${esc(r.date)} ${freshBadge(r, 'NEW')}</span>` +
           `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
           `<span class="bh-cmt">💬 ${(r.comments || []).length}</span>` +
           '</button>';
@@ -794,13 +821,12 @@
     else { empty.hidden = true; }
     items.forEach((r, i) => {
       const cmt = (r.comments || []).length;
-      const isN = isNew(r);
       const card = document.createElement('button');
-      card.type = 'button'; card.className = 'report-card' + (isN ? ' is-new' : ''); card.dataset.id = r.id;
+      card.type = 'button'; card.className = 'report-card' + freshClass(r); card.dataset.id = r.id;
       card.innerHTML =
         `<span class="rc-no">${i + 1}</span>` +
         `<span class="rc-branch">${esc(r.branchName)}</span>` +
-        (isN ? '<span class="new-badge">N</span>' : '') +
+        freshBadge(r, 'N') +
         `<span class="rc-date">${esc(r.date)}</span>` +
         `<span class="rc-cmt">💬 ${cmt}</span>` +
         '<span class="rc-open">›</span>';
@@ -923,10 +949,11 @@
         // ----- 수정 -----
         let attachments = (orig.attachments || []).slice();
         if (rmFiles.length) { hint($('rmHint'), '첨부 파일 업로드 중…', ''); attachments = attachments.concat(await uploadAttachments(orig.id, rmFiles)); }
-        const updated = Object.assign({}, orig, { branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, items, attachments });
+        const updated = Object.assign({}, orig, { branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, items, attachments, editTs: Date.now() });
         hint($('rmHint'), '수정 내용을 저장하는 중…', '');
         const next = await updateReport(updated);
         REPORTS = next ? mergeLocal(next) : await loadReports();
+        markSeen(updated); // 수정한 본인에게는 '수정' 표시 안 함 (다른 계정에만 노출)
         renderReports(); renderStatus();
         hint($('rmHint'), '수정되었습니다! (반영까지 1~2분)', 'success');
         setTimeout(() => closeModal('reportModal'), 1000);
