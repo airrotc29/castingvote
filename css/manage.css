@@ -279,6 +279,10 @@ body.admin-on #appGate { display: none; }
   animation: slideUp .25s ease;
 }
 @keyframes slideUp { from { transform: translateY(40px); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+/* 단계 팝업 — 화면 정중앙 + 35% 작게 */
+#stageModal { align-items: center; padding: 20px; }
+#stageModal .modal-box { width: 100%; max-width: 360px; margin: auto; border-radius: 16px; padding: 18px 16px; animation: popIn .2s ease; }
+@keyframes popIn { from { transform: scale(.96); opacity: .5; } to { transform: scale(1); opacity: 1; } }
 .modal-close { position: sticky; top: 0; float: right; background: #eef2f7; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 18px; color: var(--soft); line-height: 1; }
 .modal h2 { font-size: 19px; font-weight: 900; color: var(--navy); padding-right: 36px; word-break: keep-all; }
 
