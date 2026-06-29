@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v97 · 2026.06.29 (닫기 버튼 강조)';
+  const APP_VERSION = 'v98 · 2026.06.29 (시각 괄호·작게)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -124,6 +124,18 @@
   function timeOf(ts) { if (!ts) return ''; const d = new Date(ts); return `${_p2(d.getHours())}:${_p2(d.getMinutes())}:${_p2(d.getSeconds())}`; }
   function fullDT(ts) { if (!ts) return ''; const d = new Date(ts); return `${d.getFullYear()}.${_p2(d.getMonth() + 1)}.${_p2(d.getDate())} ${timeOf(ts)}`; }
   function dtStr(dateStr, ts) { const t = timeOf(ts); return t ? ((dateStr || '') + ' ' + t).trim() : (dateStr || ''); }
+  // 표시용 HTML: 날짜 + (시:분:초)를 작게 괄호로. dateStr 없으면 ts에서 날짜 도출
+  function dtHtml(dateStr, ts) {
+    let base = dateStr;
+    if (!base && ts) { const d = new Date(ts); base = `${d.getFullYear()}.${_p2(d.getMonth() + 1)}.${_p2(d.getDate())}`; }
+    const t = timeOf(ts);
+    return esc(base || '') + (t ? ` <span class="dt-time">(${t})</span>` : '');
+  }
+  // PDF 등 클래스 미적용 환경용 (인라인 스타일)
+  function dtHtmlInline(dateStr, ts) {
+    const t = timeOf(ts);
+    return esc(dateStr || '') + (t ? ` <span style="font-size:.82em;color:#94a3b8;">(${t})</span>` : '');
+  }
   async function sha256hex(s) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
     return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -485,7 +497,7 @@
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
-    else h += '<ul class="sp-feed">' + recent.map((a) => { const fcls = a.flag === 'new' ? ' is-new' : a.flag === 'edit' ? ' is-edit' : ''; const fbadge = a.flag === 'new' ? '<span class="new-badge sp-new">NEW</span>' : a.flag === 'edit' ? '<span class="edit-badge sp-edit">수정</span>' : ''; return `<li class="sp-feed-item${fcls}" data-rid="${esc(a.id)}" data-kind="${a.kind === '보고' ? 'rep' : 'cmt'}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${fbadge}<i class="sp-when">${esc(fullDT(a.ts))}</i></div></li>`; }).join('') + '</ul>';
+    else h += '<ul class="sp-feed">' + recent.map((a) => { const fcls = a.flag === 'new' ? ' is-new' : a.flag === 'edit' ? ' is-edit' : ''; const fbadge = a.flag === 'new' ? '<span class="new-badge sp-new">NEW</span>' : a.flag === 'edit' ? '<span class="edit-badge sp-edit">수정</span>' : ''; return `<li class="sp-feed-item${fcls}" data-rid="${esc(a.id)}" data-kind="${a.kind === '보고' ? 'rep' : 'cmt'}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${fbadge}<i class="sp-when">${dtHtml('', a.ts)}</i></div></li>`; }).join('') + '</ul>';
     h += '</div>';
     h += '<div class="sp-card"><div class="sp-h">🔔 주의</div>';
     h += `<div class="sp-alert"><span>미보고</span><b>${notyet}</b></div>`;
@@ -672,7 +684,7 @@
       reps.forEach((r, i) => {
         h += `<button type="button" class="bh-item${freshClass(r)}" data-rid="${esc(r.id)}" style="${stageFillStyle(r)}">` +
           `<span class="bh-no" style="${stageNoStyle(r)}">${i + 1}</span>` +
-          `<span class="bh-date">${esc(dtStr(r.date, r.ts))} ${freshBadge(r, 'NEW')}</span>` +
+          `<span class="bh-date">${dtHtml(r.date, r.ts)} ${freshBadge(r, 'NEW')}</span>` +
           `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
           `<span class="bh-cmt">💬 ${(r.comments || []).length}</span>` +
           '</button>';
@@ -833,7 +845,7 @@
         `<span class="rc-no" style="${stageNoStyle(r)}">${i + 1}</span>` +
         `<span class="rc-branch">${esc(r.branchName)}</span>` +
         freshBadge(r, 'N') +
-        `<span class="rc-date">${esc(dtStr(r.date, r.ts))}</span>` +
+        `<span class="rc-date">${dtHtml(r.date, r.ts)}</span>` +
         `<span class="rc-cmt">💬 ${cmt}</span>` +
         '<span class="rc-open">›</span>';
       list.appendChild(card);
@@ -1012,7 +1024,7 @@
     h += '<div style="border-bottom:2px solid #123a6b;padding-bottom:8px;margin-bottom:14px;">' +
       '<div style="font-size:12px;color:#1c5fc4;font-weight:700;">에이스종합관리㈜ · 지점사업소 관리단 구성</div>' +
       `<div style="font-size:22px;font-weight:900;color:#0f2a4a;">${esc(r.branchName)} 업무보고</div>` +
-      `<div style="font-size:12px;color:#5b6573;margin-top:4px;">보고자 ${esc(r.reporter)} · ${esc(dtStr(r.date, r.ts))}</div>` +
+      `<div style="font-size:12px;color:#5b6573;margin-top:4px;">보고자 ${esc(r.reporter)} · ${dtHtmlInline(r.date, r.ts)}</div>` +
       '</div>';
     if (r.occupancy) h += pdfBlock('0', '입주현황', `입주 ${r.occupancy.occupied}호실 / 전체 ${r.occupancy.total}호실 · 입주율 ${r.occupancy.rate}%`);
     reportStages(r).forEach((s) => {
@@ -1032,7 +1044,7 @@
         const hq = c.role === 'hq';
         h += `<div style="margin:6px 0;padding:8px 12px;border-radius:8px;background:${hq ? '#e8f0fe' : '#fff8e1'};">` +
           `<b style="font-size:11px;color:${hq ? '#1c5fc4' : '#9a7b00'};">${hq ? '본사' : '현장(소장)'}</b> ` +
-          `<span style="font-size:11px;color:#999;">${esc(dtStr(c.date, c.ts))}</span>` +
+          `<span style="font-size:11px;color:#999;">${dtHtmlInline(c.date, c.ts)}</span>` +
           `<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-all;">${esc(c.body)}</div></div>`;
       });
     }
@@ -1069,7 +1081,7 @@
     updateTabDot();
     const comments = r.comments || [];
     let h = `<h2>${esc(r.branchName)} 업무보고</h2>`;
-    h += `<div class="rc-meta" style="margin:6px 0 10px;">보고자 ${esc(r.reporter)} · ${esc(dtStr(r.date, r.ts))}${r._local ? ' · <span style="color:var(--accent);font-weight:700;">이 기기에만 저장됨</span>' : ''}</div>`;
+    h += `<div class="rc-meta" style="margin:6px 0 10px;">보고자 ${esc(r.reporter)} · ${dtHtml(r.date, r.ts)}${r._local ? ' · <span style="color:var(--accent);font-weight:700;">이 기기에만 저장됨</span>' : ''}</div>`;
     h += '<button type="button" class="btn block" id="pdfBtn" style="margin-bottom:14px;">📄 이 보고서 PDF로 저장</button>';
     if (r.occupancy) {
       h += `<div class="r-block"><div class="bt"><span class="num zero">0</span>입주현황</div><div class="bd">입주 ${esc(r.occupancy.occupied)}호실 / 전체 ${esc(r.occupancy.total)}호실 · <b>입주율 ${esc(r.occupancy.rate)}%</b></div></div>`;
@@ -1100,7 +1112,7 @@
     else comments.forEach((c) => {
       const hq = c.role === 'hq';
       const canDel = isAdmin() || r._local;
-      h += `<div class="cmt ${hq ? 'hq' : ''}"><div class="bubble">${esc(c.body)}</div><div class="cmt-meta"><span class="when">${esc(dtStr(c.date, c.ts))}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div></div>`;
+      h += `<div class="cmt ${hq ? 'hq' : ''}"><div class="bubble">${esc(c.body)}</div><div class="cmt-meta"><span class="when">${dtHtml(c.date, c.ts)}</span>${canDel ? `<button type="button" class="cdel" data-cdel="${esc(c.id)}">삭제</button>` : ''}</div></div>`;
     });
     h += '</div>';
     // 댓글 작성자 = 로그인한 계정에 따라 고정 (사업소 계정→현장(소장), 본사 계정→본사)

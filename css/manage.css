@@ -535,6 +535,9 @@ body.admin-on:not(.site-view) .fab { display: none !important; }
 .rd-free-h { font-size: 13px; font-weight: 800; color: #0f2a4a; margin-bottom: 6px; }
 .rd-free-body { font-size: 13px; line-height: 1.65; color: #303a47; white-space: pre-wrap; word-break: break-all; background: #fffaf0; border: 1px solid #f0e3c8; border-left: 4px solid #e0a429; border-radius: 8px; padding: 10px 13px; }
 
+/* 날짜 옆 시:분:초 (작게·괄호) */
+.dt-time { font-size: .82em; color: #94a3b8; font-weight: 500; }
+
 /* 로그인 도움말 */
 .login-help { font-size: 12px; color: var(--soft); line-height: 1.6; margin-bottom: 10px; }
 /* 토큰 입력칸: 비밀번호 타입이 아니라 CSS로만 가림 → 브라우저 '암호 저장' 팝업 방지 */
