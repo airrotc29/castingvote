@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v55 · 2026.06.23 (PWA 바탕화면 설치)';
+  const APP_VERSION = 'v56 · 2026.06.23 (단계 타임라인 디자인)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -428,11 +428,11 @@
 
     const wrap = $('groupWrap'); wrap.innerHTML = '';
     ordered.forEach((bk) => {
-      const block = document.createElement('div'); block.className = 'group-block'; block.dataset.order = bk.order;
+      const block = document.createElement('div'); block.className = 'group-block tl-item'; block.dataset.order = bk.order;
       // 단계별 색상: 공통=slate, 1=파랑, 2=녹색, 3=주황, 4=적색, 미보고=회색
       let cls = 'stage-none';
       if (bk.name !== '미보고') { const o = bk.order; cls = (o >= 1 && o <= 4) ? ('stage-s' + o) : 'stage-s0'; }
-      block.innerHTML = `<div class="group-head"><span class="stage-badge ${cls}"><span class="sb-name">${fmtStageName(bk.name)}</span><span class="sb-count">${bk.list.length}</span></span></div>`;
+      block.innerHTML = `<span class="tl-node ${cls}"></span><div class="group-head"><span class="stage-badge ${cls}"><span class="sb-name">${fmtStageName(bk.name)}</span><span class="sb-count">${bk.list.length}</span></span></div>`;
       bk.list.forEach((b) => {
         const cnt = REPORTS.filter((r) => r.branchId === b.id).length;
         const newB = branchUnseen(b.id);

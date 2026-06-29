@@ -82,32 +82,30 @@ body.admin-on #appGate { display: none; }
 #barTip b { display: block; font-size: 12px; color: #ffd27d; margin-bottom: 3px; letter-spacing: -.2px; }
 #barTip span { display: block; font-size: 11.5px; line-height: 1.6; color: #d7e1f0; word-break: keep-all; }
 
-/* 단계 그룹 — 세련된 미니멀 */
-.group-block { margin-bottom: 26px; }
-.group-head { margin: 0 2px 12px; }
-.stage-badge { display: flex; align-items: center; gap: 9px; width: 100%; box-sizing: border-box; font-size: 18px; font-weight: 800; color: var(--navy); letter-spacing: .1px; background: transparent; border: 0; padding: 1px 1px 10px; text-align: left; line-height: 1.3; border-bottom: 1.5px solid var(--line); }
-.stage-badge::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: #c7cfdb; box-shadow: 0 0 0 3px rgba(199,207,219,.22); }
-.stage-badge .sb-name { flex: 1; word-break: keep-all; text-align: left; }
-.stage-badge .sb-name .sb-sub { font-size: 0.6em; font-weight: 700; color: inherit; opacity: .9; }
-/* 단계 글자(괄호 포함) 색을 단계 색(동그라미)과 일치 */
+/* 단계 그룹 — 타임라인 (시안 A) */
+.group-block.tl-item { position: relative; padding-left: 26px; margin-bottom: 16px; }
+.group-block.tl-item::before { content: ''; position: absolute; left: 8px; top: 22px; bottom: -16px; width: 2px; background: #dce3eb; }
+.group-block.tl-item:last-child::before { display: none; }
+.tl-node { position: absolute; left: 1px; top: 4px; width: 15px; height: 15px; border-radius: 50%; background: #94a3b8; box-shadow: 0 0 0 4px var(--bg); }
+.tl-node.stage-s0 { background: #475569; }
+.tl-node.stage-s1 { background: #2563eb; }
+.tl-node.stage-s2 { background: #16a34a; }
+.tl-node.stage-s3 { background: #ea580c; }
+.tl-node.stage-s4 { background: #dc2626; }
+.tl-node.stage-none { background: #94a3b8; }
+.group-head { margin: 0 0 8px; }
+.stage-badge { display: flex; align-items: baseline; gap: 7px; width: 100%; box-sizing: border-box; font-size: 18px; font-weight: 800; color: var(--navy); letter-spacing: .1px; background: transparent; border: 0; padding: 0; text-align: left; line-height: 1.2; }
+.stage-badge .sb-name { flex: 0 1 auto; word-break: keep-all; text-align: left; }
+.stage-badge .sb-name .sb-sub { font-size: 0.55em; font-weight: 700; color: inherit; opacity: .72; }
+/* 단계 글자(괄호 포함) 색을 단계 색(노드)과 일치 */
 .stage-badge.stage-s0 .sb-name { color: #475569; }
 .stage-badge.stage-s1 .sb-name { color: #2563eb; }
 .stage-badge.stage-s2 .sb-name { color: #16a34a; }
 .stage-badge.stage-s3 .sb-name { color: #ea580c; }
 .stage-badge.stage-s4 .sb-name { color: #dc2626; }
 .stage-badge.stage-none .sb-name { color: #94a3b8; }
-.stage-badge .sb-count { flex: none; font-size: 10.5px; font-weight: 800; color: var(--soft); background: transparent; border-radius: 0; padding: 0; white-space: nowrap; }
+.stage-badge .sb-count { margin-left: auto; flex: none; font-size: 11px; font-weight: 700; color: var(--soft); white-space: nowrap; }
 .stage-badge .sb-count::after { content: ' 개'; font-weight: 600; opacity: .7; }
-.stage-badge.stage-s1::before { box-shadow: 0 0 0 3px rgba(37,99,235,.16); }
-.stage-badge.stage-s2::before { box-shadow: 0 0 0 3px rgba(22,163,74,.16); }
-.stage-badge.stage-s3::before { box-shadow: 0 0 0 3px rgba(234,88,12,.16); }
-.stage-badge.stage-s4::before { box-shadow: 0 0 0 3px rgba(220,38,38,.16); }
-.stage-badge.stage-s0::before { background: #475569; }
-.stage-badge.stage-s1::before { background: #2563eb; }
-.stage-badge.stage-s2::before { background: #16a34a; }
-.stage-badge.stage-s3::before { background: #ea580c; }
-.stage-badge.stage-s4::before { background: #dc2626; }
-.stage-badge.stage-none::before { background: #94a3b8; }
 .stage-badge.stage-s1 .sb-count { color: #1d4ed8; }
 .stage-badge.stage-s2 .sb-count { color: #15803d; }
 .stage-badge.stage-s3 .sb-count { color: #c2410c; }
