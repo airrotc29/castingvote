@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v98 · 2026.06.29 (시각 괄호·작게)';
+  const APP_VERSION = 'v99 · 2026.06.29 (서약서 제목 변경)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -1365,7 +1365,7 @@
     let h = '<div style="font-family:\'Noto Sans KR\',sans-serif;color:#1f2937;line-height:1.7;">';
     h += '<div style="text-align:center;border-bottom:2px solid #123a6b;padding-bottom:10px;margin-bottom:16px;">' +
       '<div style="font-size:12px;color:#1c5fc4;font-weight:700;">에이스종합관리㈜</div>' +
-      '<div style="font-size:24px;font-weight:900;color:#0f2a4a;letter-spacing:4px;">관 리 소 장 서 약 서</div></div>';
+      '<div style="font-size:24px;font-weight:900;color:#0f2a4a;letter-spacing:6px;">서 약 서</div></div>';
     h += `<p style="font-size:13.5px;">본인은 에이스종합관리㈜의 지점사업소 <b>${esc(p.branchName || '')}</b> 관리소장으로서, 관리단 구성 업무를 수행함에 있어 다음 사항을 성실히 준수할 것을 서약합니다.</p>`;
     h += '<ol style="font-size:13px;padding-left:20px;">';
     pledgeClauses().forEach((c) => { h += `<li style="margin:5px 0;">${esc(c)}</li>`; });
@@ -1415,7 +1415,7 @@
   function genPledgePdf(p) {
     const w = window.open('', '_blank');
     if (!w) { alert('PDF 저장을 위해 팝업을 허용해 주세요.'); return; }
-    const title = esc((p.branchName || '서약서') + ' 관리소장 서약서');
+    const title = esc((p.branchName || '') + ' 서약서');
     const css = '@page{size:A4;margin:18mm}*{box-sizing:border-box}' +
       "body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;color:#1f2937;margin:0;padding:24px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}" +
       '@media print{body{padding:0}}';
