@@ -1,11 +1,11 @@
-// ===== 에이스 종합관리 — 지점사업소 관리단 구성 전략 앱 =====
+// ===== 에이스종합관리 — 지점사업소 관리단 구성 전략 앱 =====
 // 사업소 현황 대시보드 + 소장 월례 업무보고 + 본사 소통(댓글) + 소장 평가/전략 안내
 // 보고/댓글 저장은 3단계: ① 중앙 엔드포인트(프록시) ② 본사 토큰(GitHub) ③ 로컬+메일 폴백
 (function () {
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v61 · 2026.06.23 (현황 그래프 추가·카드 글자맞춤)';
+  const APP_VERSION = 'v62 · 2026.06.23 (회사명 에이스종합관리㈜ 통일)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -760,7 +760,7 @@
   function reportPdfHtml(r) {
     let h = '<div style="font-family:\'Noto Sans KR\',sans-serif;color:#1f2937;width:100%;box-sizing:border-box;">';
     h += '<div style="border-bottom:2px solid #123a6b;padding-bottom:8px;margin-bottom:14px;">' +
-      '<div style="font-size:12px;color:#1c5fc4;font-weight:700;">에이스 종합관리㈜ · 지점사업소 관리단 구성</div>' +
+      '<div style="font-size:12px;color:#1c5fc4;font-weight:700;">에이스종합관리㈜ · 지점사업소 관리단 구성</div>' +
       `<div style="font-size:22px;font-weight:900;color:#0f2a4a;">${esc(r.branchName)} 업무보고</div>` +
       `<div style="font-size:12px;color:#5b6573;margin-top:4px;">보고자 ${esc(r.reporter)} · ${esc(r.date)}</div>` +
       '</div>';
