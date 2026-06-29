@@ -40,7 +40,8 @@ button { font-family: inherit; cursor: pointer; }
   /* 현황 상단: 그래프(좌) + 우측 패널 2단 (좌측을 우측 높이에 맞춰 늘림) */
   .status-top { display: flex; gap: 22px; align-items: stretch; }
   .status-left { flex: none; width: 520px; display: flex; flex-direction: column; }
-  .status-left .bar-chart { flex: 1 1 auto; justify-content: space-between; }
+  .status-left .donut-box { flex: 1 1 auto; display: flex; margin-bottom: 0; }
+  .status-left .donut-wrap { flex: 1; }
   #statusPanel { flex: 1; min-width: 0; margin: 0; }
   #statusPanel .sp-cols { flex-direction: row; }
   /* 현황 = 칸반 보드 (단계별 세로 컬럼) */
@@ -113,6 +114,21 @@ body.admin-on #appGate { display: none; }
 #barTip.show { opacity: 1; }
 #barTip b { display: block; font-size: 12px; color: #ffd27d; margin-bottom: 3px; letter-spacing: -.2px; }
 #barTip span { display: block; font-size: 11.5px; line-height: 1.6; color: #d7e1f0; word-break: keep-all; }
+
+/* 도넛(원형) 차트 — 현황 화면 */
+.donut-box { margin: 4px 2px 18px; }
+.donut-wrap { display: flex; align-items: center; gap: 16px; background: #fff; border: 1px solid #eef1f5; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+.donut-chart { flex: none; }
+.donut-svg { display: block; }
+.donut-num { font-size: 30px; font-weight: 900; fill: var(--navy); }
+.donut-sub { font-size: 12px; fill: var(--soft); }
+.donut-legend { list-style: none; margin: 0; padding: 0; flex: 1; min-width: 0; }
+.donut-legend li { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 9px; }
+.donut-legend li:last-child { margin-bottom: 0; }
+.donut-legend b { font-weight: 700; color: var(--navy); }
+.dl-dot { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+.dl-v { margin-left: auto; font-style: normal; font-weight: 800; color: var(--navy); }
+.dl-p { font-style: normal; color: var(--soft); font-size: 11px; width: 34px; text-align: right; }
 
 /* 현황 우측 패널 — KPI + 최근 활동 + 주의 */
 .status-top { margin-bottom: 6px; }

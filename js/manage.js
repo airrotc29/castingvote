@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v64 · 2026.06.23 (현황 그래프 높이 맞춤)';
+  const APP_VERSION = 'v65 · 2026.06.23 (현황 도넛·보고 막대)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -385,6 +385,25 @@
   // 단계명 표기: 괄호 부분(예: (추진위 자생))은 작은 글씨로
   function fmtStageName(name) { const m = /^(.*?)\s*(\(.*\))\s*$/.exec(String(name || '')); return m ? `${esc(m[1].trim())} <span class="sb-sub">${esc(m[2])}</span>` : esc(name); }
   function stageHex(name) { const o = stageOrder(name); return ({ 1: '#1c5fc4', 2: '#15803d', 3: '#c2660c', 4: '#b91c1c' })[o] || '#334155'; }
+  // 도넛(원형) 차트 HTML — 현황 화면용
+  function donutHtml(orders, byOrder, namesByOrder, totalV) {
+    const labelOf = (o) => (o === 0 ? '공통' : o === 99 ? '미보고' : (o + '단계'));
+    const hexOf = (o) => ({ 99: '#94a3b8', 0: '#475569', 1: '#2563eb', 2: '#16a34a', 3: '#ea580c', 4: '#dc2626' })[o] || '#94a3b8';
+    const r = 60, C = 2 * Math.PI * r, sw = 22; let off = 0;
+    const segs = orders.filter((o) => (byOrder[o] || 0) > 0).map((o) => {
+      const v = byOrder[o] || 0; const len = v / totalV * C;
+      const c = `<circle cx="80" cy="80" r="${r}" fill="none" stroke="${hexOf(o)}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;
+      off += len; return c;
+    }).join('');
+    const svg = `<svg class="donut-svg" viewBox="0 0 160 160" width="150" height="150"><g transform="rotate(-90 80 80)"><circle cx="80" cy="80" r="${r}" fill="none" stroke="#eef1f5" stroke-width="${sw}"/>${segs}</g>` +
+      `<text x="80" y="76" text-anchor="middle" class="donut-num">${totalV}</text><text x="80" y="97" text-anchor="middle" class="donut-sub">사업소</text></svg>`;
+    const legend = orders.map((o) => {
+      const v = byOrder[o] || 0; const pct = Math.round((v / totalV) * 100);
+      const names = (namesByOrder[o] || []).join(', ');
+      return `<li title="${esc(labelOf(o))} (${v}·${pct}%): ${esc(names || '없음')}"><span class="dl-dot" style="background:${hexOf(o)}"></span><b>${esc(labelOf(o))}</b><i class="dl-v">${v}</i><i class="dl-p">${pct}%</i></li>`;
+    }).join('');
+    return `<div class="donut-wrap"><div class="donut-chart">${svg}</div><ul class="donut-legend">${legend}</ul></div>`;
+  }
   function relTime(ts) {
     if (!ts) return '';
     const now = Date.now(); const diff = now - ts; const day = 86400000;
@@ -465,7 +484,9 @@
           `<div class="bar-track"><div class="bar-fill ${colorOf(o)}" style="width:${w}%"></div></div>` +
           `<span class="bar-val">${c}<i class="bar-pct">(${pct}%)</i></span></div>`;
       }).join('');
-      ROWS.forEach((id) => { const el = $(id); if (el) { el.style.display = ''; el.className = 'bar-chart'; el.innerHTML = barsHtml; } });
+      // 보고 탭: 막대그래프 유지 / 현황: 도넛(원형)
+      const sr = $('statRow'); if (sr) { sr.style.display = ''; sr.className = 'bar-chart'; sr.innerHTML = barsHtml; }
+      const sr2 = $('statRow2'); if (sr2) { sr2.style.display = ''; sr2.className = 'donut-box'; sr2.innerHTML = donutHtml(orders, byOrder, namesByOrder, totalV); }
     }
     renderStatusPanel(visible, lb);
 
