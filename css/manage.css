@@ -37,9 +37,10 @@ button { font-family: inherit; cursor: pointer; }
   .screen { padding: 22px 28px 96px; }
   /* 읽기형 화면(보고·전략)은 가운데 폭 제한 */
   #scr-report, #scr-strategy { max-width: 760px; margin-left: auto; margin-right: auto; }
-  /* 현황 상단: 그래프(좌) + 우측 패널 2단 */
-  .status-top { display: flex; gap: 22px; align-items: flex-start; }
-  .status-left { flex: none; width: 520px; }
+  /* 현황 상단: 그래프(좌) + 우측 패널 2단 (좌측을 우측 높이에 맞춰 늘림) */
+  .status-top { display: flex; gap: 22px; align-items: stretch; }
+  .status-left { flex: none; width: 520px; display: flex; flex-direction: column; }
+  .status-left .bar-chart { flex: 1 1 auto; justify-content: space-between; }
   #statusPanel { flex: 1; min-width: 0; margin: 0; }
   #statusPanel .sp-cols { flex-direction: row; }
   /* 현황 = 칸반 보드 (단계별 세로 컬럼) */
