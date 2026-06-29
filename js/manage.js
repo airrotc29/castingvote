@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v60 · 2026.06.23 (PC 칸반 보드)';
+  const APP_VERSION = 'v61 · 2026.06.23 (현황 그래프 추가·카드 글자맞춤)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -391,13 +391,12 @@
     const lb = lockedBranchId();
     if ($('statusLead')) $('statusLead').style.display = lb ? 'none' : '';
     const visible = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
-    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시). 단계별 막대그래프(보고 탭).
-    if ($('statCap')) $('statCap').style.display = lb ? 'none' : '';
+    // 요약 통계 — 사업소 계정 로그인 시에는 숨김(본사만 표시). 단계별 막대그래프(현황+보고 양쪽).
+    const CAPS = ['statCap', 'statCap2'], ROWS = ['statRow', 'statRow2'];
+    CAPS.forEach((id) => { if ($(id)) $(id).style.display = lb ? 'none' : ''; });
     if (lb) {
-      $('statRow').style.display = 'none';
-      $('statRow').innerHTML = '';
+      ROWS.forEach((id) => { const el = $(id); if (el) { el.style.display = 'none'; el.innerHTML = ''; } });
     } else {
-      const el = $('statRow'); el.style.display = ''; el.className = 'bar-chart';
       const byOrder = {}, namesByOrder = {};
       visible.forEach((b) => { const o = stageOrder(branchStage(b)); byOrder[o] = (byOrder[o] || 0) + 1; (namesByOrder[o] = namesByOrder[o] || []).push(b.name); });
       const labelOf = (o) => (o === 0 ? '공통' : o === 99 ? '미보고' : (o + '단계'));
@@ -406,7 +405,7 @@
       const orders = [].concat(byOrder[99] ? [99] : [], byOrder[0] ? [0] : [], [1, 2, 3, 4]);
       const max = Math.max(1, ...orders.map((o) => byOrder[o] || 0));
       const totalV = visible.length || 1;
-      el.innerHTML = orders.map((o) => {
+      const barsHtml = orders.map((o) => {
         const c = byOrder[o] || 0; const w = Math.round((c / max) * 100);
         const pct = Math.round((c / totalV) * 100);
         const names = (namesByOrder[o] || []).join(', ');
@@ -415,6 +414,7 @@
           `<div class="bar-track"><div class="bar-fill ${colorOf(o)}" style="width:${w}%"></div></div>` +
           `<span class="bar-val">${c}<i class="bar-pct">(${pct}%)</i></span></div>`;
       }).join('');
+      ROWS.forEach((id) => { const el = $(id); if (el) { el.style.display = ''; el.className = 'bar-chart'; el.innerHTML = barsHtml; } });
     }
 
     // 단계별 그룹화 (관리소장이 입력한 과제로 산출한 현재 단계)
@@ -465,9 +465,12 @@
   }
   function hideBarTip() { const tip = $('barTip'); if (tip) tip.classList.remove('show'); }
   let barTipTimer = null;
-  $('statRow').addEventListener('mouseover', (e) => { const row = e.target.closest('.bar-row'); if (row) showBarTip(row); });
-  $('statRow').addEventListener('mouseout', (e) => { const row = e.target.closest('.bar-row'); if (row) hideBarTip(); });
-  $('statRow').addEventListener('click', (e) => { const row = e.target.closest('.bar-row'); if (!row) return; showBarTip(row); clearTimeout(barTipTimer); barTipTimer = setTimeout(hideBarTip, 3000); });
+  ['statRow', 'statRow2'].forEach((id) => {
+    const host = $(id); if (!host) return;
+    host.addEventListener('mouseover', (e) => { const row = e.target.closest('.bar-row'); if (row) showBarTip(row); });
+    host.addEventListener('mouseout', (e) => { const row = e.target.closest('.bar-row'); if (row) hideBarTip(); });
+    host.addEventListener('click', (e) => { const row = e.target.closest('.bar-row'); if (!row) return; showBarTip(row); clearTimeout(barTipTimer); barTipTimer = setTimeout(hideBarTip, 3000); });
+  });
   $('groupWrap').addEventListener('click', (e) => {
     const card = e.target.closest('.b-card'); if (!card) return;
     openBranch(card.dataset.id);

@@ -37,6 +37,8 @@ button { font-family: inherit; cursor: pointer; }
   .screen { padding: 22px 28px 96px; }
   /* 읽기형 화면(보고·전략)은 가운데 폭 제한 */
   #scr-report, #scr-strategy { max-width: 760px; margin-left: auto; margin-right: auto; }
+  /* 현황 상단 단계 그래프는 적당 폭으로 */
+  #scr-status .stat-cap, #scr-status #statRow2 { max-width: 600px; }
   /* 현황 = 칸반 보드 (단계별 세로 컬럼) */
   #groupWrap { display: flex; gap: 14px; align-items: flex-start; }
   #groupWrap .group-block.tl-item { flex: 1 1 0; min-width: 0; padding-left: 0; margin-bottom: 0; }
@@ -48,7 +50,10 @@ button { font-family: inherit; cursor: pointer; }
   #groupWrap .stage-badge .sb-name .sb-sub { display: block; font-size: 0.72em; margin-top: 2px; opacity: .9; }
   #groupWrap .stage-badge .sb-count { margin-left: auto; }
   #groupWrap .b-card { padding: 11px 13px; margin-bottom: 8px; }
-  #groupWrap .b-name { font-size: 13px; }
+  /* 좁은 컬럼: 사업소명 줄바꿈 + 보고건수는 아래 줄로 — 글상자 안에 맞춤 */
+  #groupWrap .b-card .b-top { flex-direction: column; align-items: flex-start; gap: 3px; }
+  #groupWrap .b-name { font-size: 12.5px; line-height: 1.25; white-space: normal; word-break: keep-all; }
+  #groupWrap .b-count { margin-left: 0; font-size: 11px; }
   .fab { right: 28px; }
   #tabbar { left: 50%; right: auto; transform: translateX(-50%); width: 100%; max-width: 1200px; }
 }
