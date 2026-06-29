@@ -42,7 +42,7 @@ button { font-family: inherit; cursor: pointer; }
   .status-left { flex: none; width: 520px; display: flex; flex-direction: column; }
   .status-left .donut-box { flex: 1 1 auto; display: flex; margin-bottom: 0; }
   .status-left .donut-wrap { flex: 1; }
-  #statusPanel { flex: 1; min-width: 0; margin: 0; display: flex; flex-direction: column; }
+  .status-top #statusPanel { flex: 1; min-width: 0; margin: 0; display: flex; flex-direction: column; }
   #statusPanel .sp-cols { flex-direction: row; flex: 1 1 auto; }
   /* 현황 = 칸반 보드 (단계별 세로 컬럼) */
   #groupWrap { display: flex; gap: 14px; align-items: flex-start; }
