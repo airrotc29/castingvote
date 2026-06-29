@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v81 · 2026.06.29 (보고서 작성 · 중앙)';
+  const APP_VERSION = 'v82 · 2026.06.29 (보고서 첨부 한글·엑셀·PDF)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -813,6 +813,28 @@
 
   // ---------- 보고 작성 ----------
   let editReportId = null; // 수정 중인 보고 id (없으면 신규 작성)
+  // 첨부 문서 (한글·엑셀·PDF) — 보고서 작성 폼 안에서 첨부
+  const ATTACH_EXT = ['hwp', 'hwpx', 'xls', 'xlsx', 'pdf'];
+  let rmFiles = []; // 이번에 새로 선택한 File 목록
+  function extOf(n) { const m = /\.([^.]+)$/.exec(n || ''); return m ? m[1].toLowerCase() : ''; }
+  function fmtSize(n) { if (!n) return ''; if (n < 1024) return n + 'B'; if (n < 1048576) return Math.round(n / 1024) + 'KB'; return (n / 1048576).toFixed(1) + 'MB'; }
+  function renderRmFiles() {
+    const ul = $('rmFileList'); if (!ul) return;
+    ul.innerHTML = rmFiles.map((f, i) => `<li class="rm-file"><span class="rmf-name">📎 ${esc(f.name)} <span class="rmf-sz">(${fmtSize(f.size)})</span></span><button type="button" class="rmf-del" data-rmf="${i}">삭제</button></li>`).join('');
+  }
+  async function uploadAttachments(reportId, files) {
+    const out = [];
+    for (const f of files) {
+      const bytes = new Uint8Array(await f.arrayBuffer());
+      let bin = ''; const CH = 0x8000;
+      for (let i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+      const safe = (f.name || 'file').replace(/[^\w.\-가-힣]+/g, '_');
+      const path = 'assets/uploads/' + reportId + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5) + '_' + safe;
+      await putContent(path, btoa(bin), '보고 첨부: ' + f.name);
+      out.push({ name: f.name, path: path, size: f.size });
+    }
+    return out;
+  }
   // 선택한 사업소의 군에 맞는 단계별 과제 입력칸 생성 (groupOverride: 수정 시 원 보고의 군 유지)
   function rebuildRmItems(groupOverride) {
     const b = BRANCHES.find((x) => x.id === $('rmBranch').value);
@@ -853,11 +875,33 @@
     if (editReport) { Object.keys(editReport.items || {}).forEach((k) => { const el = $('rm_' + k); if (el) el.value = editReport.items[k]; }); }
     if ($('rmTitle')) $('rmTitle').textContent = editReport ? '업무보고 수정' : '관리단 관련 업무보고';
     $('rmSubmit').textContent = editReport ? '수정 내용 저장' : '본사로 보고 올리기';
+    rmFiles = []; renderRmFiles();
+    const existing = (editReport && editReport.attachments) || [];
+    if ($('rmAttachField')) {
+      const note = existing.length ? `<p class="hint" style="margin:4px 0 0;">기존 첨부: ${existing.map((a) => esc(a.name)).join(', ')} (유지됨)</p>` : '';
+      const old = $('rmAttachField').querySelector('.rm-existing'); if (old) old.remove();
+      if (note) { const d = document.createElement('div'); d.className = 'rm-existing'; d.innerHTML = note; $('rmAttachField').appendChild(d); }
+    }
     hint($('rmHint'), '', '');
     openModal('reportModal');
   }
   $('fabReport').addEventListener('click', () => openReportForm());
   $('rmBranch') && $('rmBranch').addEventListener('change', () => rebuildRmItems());
+  $('rmFileBtn') && $('rmFileBtn').addEventListener('click', () => $('rmFile').click());
+  $('rmFile') && $('rmFile').addEventListener('change', () => {
+    const picked = Array.from($('rmFile').files || []); const rejected = [];
+    picked.forEach((f) => {
+      if (!ATTACH_EXT.includes(extOf(f.name))) { rejected.push(f.name); return; }
+      if (f.size > 20 * 1048576) { rejected.push(f.name + ' (20MB 초과)'); return; }
+      if (!rmFiles.some((x) => x.name === f.name && x.size === f.size)) rmFiles.push(f);
+    });
+    $('rmFile').value = ''; renderRmFiles();
+    hint($('rmHint'), rejected.length ? ('첨부 불가: ' + rejected.join(', ') + ' — 한글·엑셀·PDF, 20MB 이하만 가능합니다.') : '', rejected.length ? 'error' : '');
+  });
+  $('rmFileList') && $('rmFileList').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-rmf]'); if (!b) return;
+    rmFiles.splice(Number(b.dataset.rmf), 1); renderRmFiles();
+  });
 
   $('rmSubmit').addEventListener('click', async () => {
     const bId = $('rmBranch').value;
@@ -872,11 +916,14 @@
     const dv = $('rmDate').value;
     const dateStr = dv ? dv.replace(/-/g, '.') : todayStr();
     const month = dv ? dv.slice(0, 7) : '';
+    if (rmFiles.length && !hasToken()) { hint($('rmHint'), '파일 첨부는 로그인 후에만 업로드할 수 있습니다. 로그인 후 다시 시도해 주세요.', 'error'); return; }
     const btn = $('rmSubmit'); btn.disabled = true;
     try {
       if (orig) {
         // ----- 수정 -----
-        const updated = Object.assign({}, orig, { branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, items });
+        let attachments = (orig.attachments || []).slice();
+        if (rmFiles.length) { hint($('rmHint'), '첨부 파일 업로드 중…', ''); attachments = attachments.concat(await uploadAttachments(orig.id, rmFiles)); }
+        const updated = Object.assign({}, orig, { branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, items, attachments });
         hint($('rmHint'), '수정 내용을 저장하는 중…', '');
         const next = await updateReport(updated);
         REPORTS = next ? mergeLocal(next) : await loadReports();
@@ -885,7 +932,8 @@
         setTimeout(() => closeModal('reportModal'), 1000);
         btn.disabled = false; return;
       }
-      const report = { id: uid('r'), branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, occupancy: null, items, ts: Date.now(), comments: [] };
+      const report = { id: uid('r'), branchId: b.id, branchName: b.name, group, reporter, date: dateStr, month, occupancy: null, items, ts: Date.now(), comments: [], attachments: [] };
+      if (rmFiles.length) { hint($('rmHint'), '첨부 파일 업로드 중…', ''); report.attachments = await uploadAttachments(report.id, rmFiles); }
       hint($('rmHint'), '보고를 올리는 중…', '');
       const next = await addReport(report);
       REPORTS = next ? mergeLocal(next) : await loadReports();
@@ -977,6 +1025,13 @@
       });
     });
 
+    if (r.attachments && r.attachments.length) {
+      h += '<div class="rd-attach"><div class="rd-attach-h">📎 첨부 문서</div>';
+      r.attachments.forEach((a) => {
+        h += `<a class="rd-attach-item" href="${esc(a.path)}" target="_blank" rel="noopener" download>${esc(a.name)}${a.size ? ` <span class="rdf-sz">${esc(fmtSize(a.size))}</span>` : ''}</a>`;
+      });
+      h += '</div>';
+    }
     h += '<div class="thread-head">💬 본사 ↔ 현장 소통</div><div class="cmts">';
     if (!comments.length) h += '<p class="empty" style="padding:14px 0;">아직 댓글이 없습니다.</p>';
     else comments.forEach((c) => {

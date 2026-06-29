@@ -494,6 +494,18 @@ body.site-view .fab.show { top: 50%; bottom: auto; left: 50%; right: auto; trans
 /* 본사 계정 로그인 시에는 '＋ 보고 작성' 버튼 숨김 */
 body.admin-on:not(.site-view) .fab { display: none !important; }
 
+/* 보고서 첨부 문서 */
+.rm-files { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.rm-file { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #f4f7fb; border: 1px solid #e6ecf4; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; }
+.rm-file .rmf-name { word-break: break-all; color: #1f2937; }
+.rm-file .rmf-sz { color: var(--soft); font-size: 11px; }
+.rm-file .rmf-del { flex: none; border: none; background: none; color: var(--red); font-size: 11.5px; font-weight: 700; cursor: pointer; padding: 2px 4px; }
+.rd-attach { margin: 14px 0 4px; }
+.rd-attach-h { font-size: 13px; font-weight: 800; color: #0f2a4a; margin-bottom: 6px; }
+.rd-attach-item { display: flex; align-items: center; gap: 6px; background: #eef4ff; border: 1px solid #d6e3fb; border-radius: 8px; padding: 9px 12px; margin-bottom: 6px; font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; word-break: break-all; }
+.rd-attach-item:hover { background: #e2edff; }
+.rd-attach-item .rdf-sz { color: var(--soft); font-size: 11px; font-weight: 500; margin-left: auto; }
+
 /* 로그인 도움말 */
 .login-help { font-size: 12px; color: var(--soft); line-height: 1.6; margin-bottom: 10px; }
 /* 토큰 입력칸: 비밀번호 타입이 아니라 CSS로만 가림 → 브라우저 '암호 저장' 팝업 방지 */

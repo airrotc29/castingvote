@@ -207,6 +207,12 @@
       <div class="field"><label>보고자(관리소장) *</label><input type="text" id="rmReporter" placeholder="예: 소장 김관리" autocomplete="off" /></div>
       <div class="field"><label>보고일</label><input type="date" id="rmDate" /></div>
       <div id="rmItems"></div>
+      <div class="field" id="rmAttachField">
+        <label>첨부 문서 <span class="hintlabel">— 한글(hwp·hwpx)·엑셀(xls·xlsx)·PDF만, 20MB 이하</span></label>
+        <input type="file" id="rmFile" accept=".hwp,.hwpx,.xls,.xlsx,.pdf,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/haansofthwp,application/x-hwp,application/x-hwpx" multiple hidden />
+        <button type="button" class="btn ghost block" id="rmFileBtn">📎 파일 첨부 (한글·엑셀·PDF)</button>
+        <ul class="rm-files" id="rmFileList"></ul>
+      </div>
       <p class="hint" id="rmHint"></p>
       <button type="button" class="btn block" id="rmSubmit">본사로 보고 올리기</button>
     </div>
