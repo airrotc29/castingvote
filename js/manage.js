@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v59 · 2026.06.23 (단계 그래프 보고탭 이동)';
+  const APP_VERSION = 'v60 · 2026.06.23 (PC 칸반 보드)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
