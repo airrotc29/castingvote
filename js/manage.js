@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v86 · 2026.06.29 (보고 수정 배지·단계색)';
+  const APP_VERSION = 'v87 · 2026.06.29 (보고 박스 단계색 채움)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -342,6 +342,9 @@
     return `<span class="${cls}" style="background:${hex};box-shadow:0 2px 6px ${hex}66;">${txt}</span>`;
   }
   function freshClass(r) { const f = reportFlag(r); return f === 'new' ? ' is-new' : f === 'edit' ? ' is-edit' : ''; }
+  // 보고 박스 채움색(단계색) — 연한 배경 + 단계색 테두리
+  function stageFillStyle(r) { const hex = stageHex(reportStageName(r)); return `background:${hex}1f;border-color:${hex}80;`; }
+  function stageNoStyle(r) { const hex = stageHex(reportStageName(r)); return `background:${hex};`; }
 
   // ---------- 모달 ----------
   function openModal(id) { const m = $(id); if (m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } }
@@ -665,8 +668,8 @@
     else {
       h += '<div class="bh-list">';
       reps.forEach((r, i) => {
-        h += `<button type="button" class="bh-item${freshClass(r)}" data-rid="${esc(r.id)}">` +
-          `<span class="bh-no">${i + 1}</span>` +
+        h += `<button type="button" class="bh-item${freshClass(r)}" data-rid="${esc(r.id)}" style="${stageFillStyle(r)}">` +
+          `<span class="bh-no" style="${stageNoStyle(r)}">${i + 1}</span>` +
           `<span class="bh-date">${esc(r.date)} ${freshBadge(r, 'NEW')}</span>` +
           `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
           `<span class="bh-cmt">💬 ${(r.comments || []).length}</span>` +
@@ -823,8 +826,9 @@
       const cmt = (r.comments || []).length;
       const card = document.createElement('button');
       card.type = 'button'; card.className = 'report-card' + freshClass(r); card.dataset.id = r.id;
+      card.setAttribute('style', stageFillStyle(r));
       card.innerHTML =
-        `<span class="rc-no">${i + 1}</span>` +
+        `<span class="rc-no" style="${stageNoStyle(r)}">${i + 1}</span>` +
         `<span class="rc-branch">${esc(r.branchName)}</span>` +
         freshBadge(r, 'N') +
         `<span class="rc-date">${esc(r.date)}</span>` +
