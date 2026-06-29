@@ -484,6 +484,8 @@ body.site-view #scr-status .scr-title { text-align: center; }
 .tabbar button .ic { font-size: 19px; line-height: 1; }
 .tabbar button.active { color: var(--blue); }
 .tabbar button { position: relative; }
+/* 탭 항목 사이 구분선 (현황 | 보고 | 전략) */
+.tabbar button + button::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 1px; background: var(--line); }
 
 /* 새 보고/새 댓글 표시 (시인성 강화) */
 @keyframes acePulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
