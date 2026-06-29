@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v73 · 2026.06.23 (KPI 당월 클릭 팝업)';
+  const APP_VERSION = 'v74 · 2026.06.23 (계정 메뉴·로그아웃)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -1076,7 +1076,16 @@
     } catch (e) { hint($('baHint'), '오류: ' + e.message, 'error'); }
     finally { btn.disabled = false; }
   });
-  function openLogin() { if ($('loginPw')) $('loginPw').value = ''; if ($('loginId')) $('loginId').value = ''; hint($('loginHint'), '', ''); openModal('loginModal'); }
+  function openLogin() {
+    const on = isAdmin();
+    if ($('loginTitle')) $('loginTitle').textContent = on ? ('계정 · ' + (curAcct() || '')) : '로그인';
+    ['loginHelp', 'loginIdField', 'loginPwField', 'loginHint', 'loginSubmit'].forEach((id) => { const el = $(id); if (el) el.style.display = on ? 'none' : ''; });
+    if ($('changeCredBtn')) $('changeCredBtn').style.display = on ? 'block' : 'none';
+    if ($('logoutBtn')) $('logoutBtn').style.display = on ? 'block' : 'none';
+    if (!on) { if ($('loginPw')) $('loginPw').value = ''; if ($('loginId')) $('loginId').value = ''; }
+    hint($('loginHint'), '', '');
+    openModal('loginModal');
+  }
   $('adminPill').addEventListener('click', openLogin);
   $('gateLoginBtn') && $('gateLoginBtn').addEventListener('click', openLogin);
   $('loginSubmit').addEventListener('click', async () => {
