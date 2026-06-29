@@ -647,4 +647,115 @@
       });
     } catch (e) { box.textContent = '목록 오류: ' + e.message; }
   }
+
+  // ---------- 투표 진행율 직접 수정 ----------
+  function pesc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  let peEditingName = null;
+
+  function peText(id, label, val) {
+    return '<label class="pe-label">' + label + '<input id="' + id + '" type="text" value="' + pesc(val) + '" /></label>';
+  }
+  function peNum(id, label, val) {
+    return '<label class="pe-label">' + label + '<input id="' + id + '" type="number" step="any" value="' + (val == null ? '' : val) + '" /></label>';
+  }
+  function peOptRow(o) {
+    o = o || {};
+    return '<div class="pe-opt">' +
+      '<input class="pe-o-label" type="text" value="' + pesc(o.label || '') + '" placeholder="항목(찬성/반대/미투표)" />' +
+      '<input class="pe-o-count" type="number" step="any" value="' + (o.count == null ? '' : o.count) + '" placeholder="명" />' +
+      '<input class="pe-o-pct" type="number" step="any" value="' + (o.pct == null ? '' : o.pct) + '" placeholder="%" />' +
+      '<button type="button" class="pe-o-del" title="항목 삭제">×</button>' +
+      '</div>';
+  }
+  function peAgendaBlock(a) {
+    a = a || {};
+    var opts = (a.options || []).map(peOptRow).join('');
+    return '<div class="pe-ag">' +
+      '<div class="pe-ag-head"><input class="pe-ag-title" type="text" value="' + pesc(a.title || '') + '" placeholder="안건명" /><button type="button" class="pe-ag-del">삭제</button></div>' +
+      '<div class="pe-opts">' + opts + '</div>' +
+      '<button type="button" class="btn btn-sm btn-outline pe-add-opt">+ 항목</button>' +
+      '</div>';
+  }
+  function buildProgressForm(it) {
+    var h = '';
+    h += peText('peName', '건물명', it.name || '');
+    h += peText('peVoteTitle', '투표명', it.voteTitle || '');
+    h += '<div class="pe-row">' + peNum('peVoted', '참여수(명)', it.voted) + peNum('peTotal', '전체수(명)', it.total) + '</div>';
+    h += '<div class="pe-row">' + peText('peStatus', '상태', it.status || '') + peText('peUpdated', '기준시각', it.updated || '') + '</div>';
+    h += '<div class="pe-section-label">안건별 집계</div>';
+    h += '<div id="peAgendas">' + (it.agendas || []).map(peAgendaBlock).join('') + '</div>';
+    h += '<button type="button" class="btn btn-sm btn-outline" id="peAddAgenda">+ 안건 추가</button>';
+    $('progressEditForm').innerHTML = h;
+  }
+
+  async function openProgressEdit(name) {
+    try {
+      var data = await loadJson('assets/data/progress.json');
+      var it = name ? (data.items.find(function (x) { return nameKey(x.name) === nameKey(name); }) || { name: name }) : { agendas: [] };
+      peEditingName = name || null;
+      buildProgressForm(it);
+      hint($('progressEditStatus'), '', '');
+      closeModal('progressDetail');
+      openModal('progressEditModal');
+    } catch (e) { alert('불러오기 오류: ' + e.message); }
+  }
+
+  // 세부 모달의 '수정' 버튼
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.js-prog-edit');
+    if (!b || !document.body.classList.contains('admin-on')) return;
+    openProgressEdit(b.dataset.name);
+  });
+  // 직접 입력(신규)
+  $('addProgressManualBtn') && $('addProgressManualBtn').addEventListener('click', function () { openProgressEdit(null); });
+
+  // 폼 내부 추가/삭제(이벤트 위임)
+  $('progressEditForm') && $('progressEditForm').addEventListener('click', function (e) {
+    if (e.target.closest('.pe-ag-del')) { e.target.closest('.pe-ag').remove(); return; }
+    if (e.target.closest('.pe-o-del')) { e.target.closest('.pe-opt').remove(); return; }
+    if (e.target.closest('.pe-add-opt')) { e.target.closest('.pe-ag').querySelector('.pe-opts').insertAdjacentHTML('beforeend', peOptRow({})); return; }
+    if (e.target.id === 'peAddAgenda') {
+      $('peAgendas').insertAdjacentHTML('beforeend', peAgendaBlock({ title: '', options: [{ label: '찬성' }, { label: '반대' }, { label: '미투표' }] }));
+    }
+  });
+
+  $('progressEditSubmit') && $('progressEditSubmit').addEventListener('click', async function () {
+    var name = $('peName').value.trim();
+    if (!name) { hint($('progressEditStatus'), '건물명을 입력해 주세요.', 'error'); return; }
+    var voted = $('peVoted').value !== '' ? Number($('peVoted').value) : null;
+    var total = $('peTotal').value !== '' ? Number($('peTotal').value) : null;
+    var entry = {
+      name: name,
+      voteTitle: $('peVoteTitle').value.trim(),
+      voted: voted, total: total,
+      rate: (total ? Math.round(voted / total * 1000) / 10 : null),
+      status: $('peStatus').value.trim(),
+      updated: $('peUpdated').value.trim(),
+      agendas: [],
+    };
+    Array.prototype.forEach.call(document.querySelectorAll('#peAgendas .pe-ag'), function (ag, i) {
+      var title = ag.querySelector('.pe-ag-title').value.trim();
+      var options = [];
+      Array.prototype.forEach.call(ag.querySelectorAll('.pe-opt'), function (row) {
+        var label = row.querySelector('.pe-o-label').value.trim();
+        if (!label) return;
+        var c = row.querySelector('.pe-o-count').value;
+        var p = row.querySelector('.pe-o-pct').value;
+        options.push({ label: label, count: c !== '' ? Number(c) : null, pct: p !== '' ? Number(p) : null });
+      });
+      if (title || options.length) entry.agendas.push({ no: i + 1, title: title, options: options });
+    });
+    var btn = $('progressEditSubmit'); btn.disabled = true;
+    try {
+      var orig = peEditingName || entry.name;
+      var next = await mutateJson('assets/data/progress.json', function (items) {
+        var idx = items.findIndex(function (x) { return nameKey(x.name) === nameKey(orig); });
+        if (idx >= 0) items[idx] = entry; else items.push(entry);
+        return items;
+      }, '진행율 수정: ' + entry.name);
+      hint($('progressEditStatus'), '저장됐습니다! (반영까지 1~2분)', 'success');
+      if (window.HK.renderProgress) window.HK.renderProgress(next);
+    } catch (e) { hint($('progressEditStatus'), '오류: ' + e.message, 'error'); }
+    finally { btn.disabled = false; }
+  });
 })();
