@@ -492,16 +492,16 @@ body.site-view #scr-status .scr-title { text-align: center; }
 @keyframes aceGlow { 0% { box-shadow: 0 0 0 0 rgba(226,72,77,.6); } 70%, 100% { box-shadow: 0 0 0 9px rgba(226,72,77,0); } }
 .tab-dot { position: absolute; top: 5px; left: calc(50% + 9px); width: 11px; height: 11px; border-radius: 50%; background: var(--red); animation: acePulse 1s ease-in-out infinite, aceGlow 1.4s ease-out infinite; }
 .newdot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--red); margin-left: 7px; vertical-align: middle; animation: acePulse 1s ease-in-out infinite, aceGlow 1.4s ease-out infinite; }
-.new-badge { display: inline-block; font-size: 11px; font-weight: 900; color: #fff; background: var(--red); border-radius: 999px; padding: 2px 9px; margin-left: 5px; letter-spacing: .5px; box-shadow: 0 2px 6px rgba(226,72,77,.45); animation: acePulse 1.1s ease-in-out infinite; }
+.new-badge { display: inline-block; font-size: 11px; font-weight: 900; color: #fff; background: #2563eb; border-radius: 999px; padding: 2px 9px; margin-left: 5px; letter-spacing: .5px; box-shadow: 0 2px 6px rgba(37,99,235,.4); animation: acePulse 1.1s ease-in-out infinite; }
 /* 새 항목 카드 강조 */
-.report-card.is-new, .bh-item.is-new { border-color: var(--red) !important; box-shadow: 0 0 0 2px rgba(226,72,77,.18); background: #fff7f6; }
+.report-card.is-new, .bh-item.is-new { border-color: #d6dae0 !important; box-shadow: 0 0 0 2px rgba(120,130,145,.12); background: #f3f4f6; }
 .b-card.is-new { border-left-color: var(--red) !important; box-shadow: 0 0 0 2px rgba(226,72,77,.16); }
 .b-card.is-new .b-name { color: var(--red); }
 /* 수정됨 표시 (NEW와 구분 — 주황) */
-.edit-badge { display: inline-block; font-size: 11px; font-weight: 900; color: #fff; background: #f08c1d; border-radius: 999px; padding: 2px 9px; margin-left: 5px; letter-spacing: .3px; box-shadow: 0 2px 6px rgba(240,140,29,.42); animation: acePulse 1.1s ease-in-out infinite; }
+.edit-badge { display: inline-block; font-size: 11px; font-weight: 900; color: #fff; background: #16a34a; border-radius: 999px; padding: 2px 9px; margin-left: 5px; letter-spacing: .3px; box-shadow: 0 2px 6px rgba(22,163,74,.4); animation: acePulse 1.1s ease-in-out infinite; }
 .sp-edit { font-size: 9px; font-weight: 900; padding: 1px 6px; margin-left: 2px; box-shadow: none; }
 .sp-feed-item.is-edit b { color: #111; }
-.report-card.is-edit, .bh-item.is-edit { border-color: #f0a93d !important; box-shadow: 0 0 0 2px rgba(240,140,29,.16); background: #fffaf1; }
+.report-card.is-edit, .bh-item.is-edit { border-color: #d6dae0 !important; box-shadow: 0 0 0 2px rgba(120,130,145,.12); background: #f3f4f6; }
 
 /* 플로팅 보고 버튼 */
 .fab {

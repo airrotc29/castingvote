@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v88 · 2026.06.29 (배지 단계색 통일·활동 글자 검정)';
+  const APP_VERSION = 'v89 · 2026.06.29 (보고 박스·배지 연회색 통일)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -333,18 +333,15 @@
   function unseenCount() { return REPORTS.filter(isFresh).length; }
   function branchUnseen(bid) { return REPORTS.some((r) => r.branchId === bid && isFresh(r)); }
   function updateTabDot() { const dot = $('reportTabDot'); if (dot) dot.hidden = unseenCount() === 0; }
-  // 배지 HTML/클래스 (NEW/수정 모두 해당 보고의 단계색으로 통일)
+  // 배지 (NEW=청색 / 수정=녹색, 글자 흰색 — 색은 CSS 클래스에서)
   function freshBadge(r, txtNew) {
     const f = reportFlag(r); if (!f) return '';
-    const hex = stageHex(reportStageName(r));
-    const cls = f === 'new' ? 'new-badge' : 'edit-badge';
-    const txt = f === 'new' ? txtNew : '수정';
-    return `<span class="${cls}" style="background:${hex};box-shadow:0 2px 6px ${hex}66;">${txt}</span>`;
+    return f === 'new' ? `<span class="new-badge">${txtNew}</span>` : '<span class="edit-badge">수정</span>';
   }
   function freshClass(r) { const f = reportFlag(r); return f === 'new' ? ' is-new' : f === 'edit' ? ' is-edit' : ''; }
-  // 보고 박스 채움색(단계색) — 연한 배경 + 단계색 테두리
-  function stageFillStyle(r) { const hex = stageHex(reportStageName(r)); return `background:${hex}1f;border-color:${hex}80;`; }
-  function stageNoStyle(r) { const hex = stageHex(reportStageName(r)); return `background:${hex};`; }
+  // 보고 박스 채움색 — 연회색으로 통일
+  function stageFillStyle(r) { return 'background:#f3f4f6;border-color:#e2e5ea;'; }
+  function stageNoStyle(r) { return 'background:#cbd1d9;color:#374151;'; }
 
   // ---------- 모달 ----------
   function openModal(id) { const m = $(id); if (m) { m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); } }
@@ -483,7 +480,7 @@
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
-    else h += '<ul class="sp-feed">' + recent.map((a) => { const fcls = a.flag === 'new' ? ' is-new' : a.flag === 'edit' ? ' is-edit' : ''; const fbadge = a.flag ? `<span class="${a.flag === 'new' ? 'new-badge sp-new' : 'edit-badge sp-edit'}" style="background:${a.hex};box-shadow:none;">${a.flag === 'new' ? 'NEW' : '수정'}</span>` : ''; return `<li class="sp-feed-item${fcls}" data-rid="${esc(a.id)}" data-kind="${a.kind === '보고' ? 'rep' : 'cmt'}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${fbadge}<i class="sp-when">${esc(relTime(a.ts))}</i></div></li>`; }).join('') + '</ul>';
+    else h += '<ul class="sp-feed">' + recent.map((a) => { const fcls = a.flag === 'new' ? ' is-new' : a.flag === 'edit' ? ' is-edit' : ''; const fbadge = a.flag === 'new' ? '<span class="new-badge sp-new">NEW</span>' : a.flag === 'edit' ? '<span class="edit-badge sp-edit">수정</span>' : ''; return `<li class="sp-feed-item${fcls}" data-rid="${esc(a.id)}" data-kind="${a.kind === '보고' ? 'rep' : 'cmt'}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${fbadge}<i class="sp-when">${esc(relTime(a.ts))}</i></div></li>`; }).join('') + '</ul>';
     h += '</div>';
     h += '<div class="sp-card"><div class="sp-h">🔔 주의</div>';
     h += `<div class="sp-alert"><span>미보고</span><b>${notyet}</b></div>`;
