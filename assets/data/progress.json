@@ -199,5 +199,160 @@
         ]
       }
     ]
+  },
+  {
+    "name": "콜럼버스2",
+    "voteTitle": "임시의장 선임의 건 외 5건",
+    "voted": 95,
+    "total": 119,
+    "rate": 79.8,
+    "status": "완료",
+    "updated": "2026. 06. 30. 08:05:36",
+    "agendas": [
+      {
+        "no": 1,
+        "title": "제1호 임시의장 선임 건: 김0식(502호)",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 95,
+            "pct": 79.8,
+            "areaPct": 81.1
+          },
+          {
+            "label": "반대",
+            "count": 0,
+            "pct": 0,
+            "areaPct": 0
+          },
+          {
+            "label": "미투표",
+            "count": 24,
+            "pct": 20.2,
+            "areaPct": 18.9
+          }
+        ]
+      },
+      {
+        "no": 2,
+        "title": "제2호 관리인, 관리위원 선임 건",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 92,
+            "pct": 77.3,
+            "areaPct": 78.6
+          },
+          {
+            "label": "반대",
+            "count": 3,
+            "pct": 2.5,
+            "areaPct": 2.6
+          },
+          {
+            "label": "미투표",
+            "count": 24,
+            "pct": 20.2,
+            "areaPct": 18.9
+          }
+        ]
+      },
+      {
+        "no": 3,
+        "title": "제3호 관리규약 제정 및 추인의 건",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 95,
+            "pct": 79.8,
+            "areaPct": 81.1
+          },
+          {
+            "label": "반대",
+            "count": 0,
+            "pct": 0,
+            "areaPct": 0
+          },
+          {
+            "label": "미투표",
+            "count": 24,
+            "pct": 20.2,
+            "areaPct": 18.9
+          }
+        ]
+      },
+      {
+        "no": 4,
+        "title": "제4호 관리단 재산 부당이득반환청구권 행사 등 관련 소 제기 등 민,형사상 법적 조치의 건",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 95,
+            "pct": 79.8,
+            "areaPct": 81.1
+          },
+          {
+            "label": "반대",
+            "count": 0,
+            "pct": 0,
+            "areaPct": 0
+          },
+          {
+            "label": "미투표",
+            "count": 24,
+            "pct": 20.2,
+            "areaPct": 18.9
+          }
+        ]
+      },
+      {
+        "no": 5,
+        "title": "제5호 하자보수청구권, 하자담보추급권 행사 등 관련 소 제기의 건",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 95,
+            "pct": 79.8,
+            "areaPct": 81.1
+          },
+          {
+            "label": "반대",
+            "count": 0,
+            "pct": 0,
+            "areaPct": 0
+          },
+          {
+            "label": "미투표",
+            "count": 24,
+            "pct": 20.2,
+            "areaPct": 18.9
+          }
+        ]
+      },
+      {
+        "no": 6,
+        "title": "제6호 외부회계감사를 위한 세무사 또는 공인회계사 감사업무 위임 동의의 건",
+        "options": [
+          {
+            "label": "찬성",
+            "count": 95,
+            "pct": 79.8,
+            "areaPct": 81.1
+          },
+          {
+            "label": "반대",
+            "count": 0,
+            "pct": 0,
+            "areaPct": 0
+          },
+          {
+            "label": "미투표",
+            "count": 24,
+            "pct": 20.2,
+            "areaPct": 18.9
+          }
+        ]
+      }
+    ]
   }
 ]
