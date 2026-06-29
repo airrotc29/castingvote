@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v67 · 2026.06.23 (KPI 당월 기준 4종)';
+  const APP_VERSION = 'v68 · 2026.06.23 (활동·도넛 클릭 링크)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -392,7 +392,7 @@
     const r = 60, C = 2 * Math.PI * r, sw = 22; let off = 0;
     const segs = orders.filter((o) => (byOrder[o] || 0) > 0).map((o) => {
       const v = byOrder[o] || 0; const len = v / totalV * C;
-      const c = `<circle cx="80" cy="80" r="${r}" fill="none" stroke="${hexOf(o)}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;
+      const c = `<circle class="donut-seg" data-order="${o}" cx="80" cy="80" r="${r}" fill="none" stroke="${hexOf(o)}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;
       off += len; return c;
     }).join('');
     const svg = `<svg class="donut-svg" viewBox="0 0 160 160" width="150" height="150"><g transform="rotate(-90 80 80)"><circle cx="80" cy="80" r="${r}" fill="none" stroke="#eef1f5" stroke-width="${sw}"/>${segs}</g>` +
@@ -400,7 +400,7 @@
     const legend = orders.map((o) => {
       const v = byOrder[o] || 0; const pct = Math.round((v / totalV) * 100);
       const names = (namesByOrder[o] || []).join(', ');
-      return `<li title="${esc(labelOf(o))} (${v}·${pct}%): ${esc(names || '없음')}"><span class="dl-dot" style="background:${hexOf(o)}"></span><b>${esc(labelOf(o))}</b><i class="dl-v">${v}</i><i class="dl-p">${pct}%</i></li>`;
+      return `<li class="dl-item" data-order="${o}" title="${esc(labelOf(o))} (${v}·${pct}%): ${esc(names || '없음')}"><span class="dl-dot" style="background:${hexOf(o)}"></span><b>${esc(labelOf(o))}</b><i class="dl-v">${v}</i><i class="dl-p">${pct}%</i></li>`;
     }).join('');
     return `<div class="donut-wrap"><div class="donut-chart">${svg}</div><ul class="donut-legend">${legend}</ul></div>`;
   }
@@ -438,8 +438,8 @@
     const stale = visible.filter((b) => { const reps = REPORTS.filter((r) => r.branchId === b.id); if (!reps.length) return false; const last = Math.max.apply(null, reps.map((r) => r.ts || 0)); return last && (nowMs - last) > STALE; }).map((b) => b.name);
     const acts = [];
     REPORTS.filter((r) => ids.has(r.branchId)).forEach((r) => {
-      acts.push({ ts: r.ts || 0, branch: r.branchName, kind: '보고' });
-      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글' }));
+      acts.push({ ts: r.ts || 0, branch: r.branchName, kind: '보고', id: r.id });
+      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글', id: r.id }));
     });
     acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const recent = acts.slice(0, 7);
@@ -448,7 +448,7 @@
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
-    else h += '<ul class="sp-feed">' + recent.map((a) => `<li><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span><i class="sp-when">${esc(relTime(a.ts))}</i></li>`).join('') + '</ul>';
+    else h += '<ul class="sp-feed">' + recent.map((a) => `<li class="sp-feed-item" data-rid="${esc(a.id)}"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span><i class="sp-when">${esc(relTime(a.ts))}</i></li>`).join('') + '</ul>';
     h += '</div>';
     h += '<div class="sp-card"><div class="sp-h">🔔 주의</div>';
     h += `<div class="sp-alert"><span>미보고</span><b>${notyet}</b></div>`;
@@ -545,7 +545,18 @@
     const host = $(id); if (!host) return;
     host.addEventListener('mouseover', (e) => { const row = e.target.closest('.bar-row'); if (row) showBarTip(row); });
     host.addEventListener('mouseout', (e) => { const row = e.target.closest('.bar-row'); if (row) hideBarTip(); });
-    host.addEventListener('click', (e) => { const row = e.target.closest('.bar-row'); if (!row) return; showBarTip(row); clearTimeout(barTipTimer); barTipTimer = setTimeout(hideBarTip, 3000); });
+    host.addEventListener('click', (e) => { const row = e.target.closest('.bar-row'); if (row) { showBarTip(row); clearTimeout(barTipTimer); barTipTimer = setTimeout(hideBarTip, 3000); return; } const seg = e.target.closest('[data-order]'); if (seg) gotoStage(seg.getAttribute('data-order')); });
+  });
+  // 도넛/막대/범례 단계 클릭 → 해당 단계 사업소로 스크롤+강조 / 최근활동 클릭 → 보고 상세
+  function gotoStage(order) {
+    const blk = document.querySelector('.group-block[data-order="' + order + '"]');
+    if (!blk) return;
+    blk.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    blk.classList.remove('flash'); void blk.offsetWidth; blk.classList.add('flash');
+    setTimeout(() => blk.classList.remove('flash'), 1500);
+  }
+  $('statusPanel') && $('statusPanel').addEventListener('click', (e) => {
+    const it = e.target.closest('.sp-feed-item'); if (it && it.dataset.rid) openReportDetail(it.dataset.rid);
   });
   $('groupWrap').addEventListener('click', (e) => {
     const card = e.target.closest('.b-card'); if (!card) return;
