@@ -88,9 +88,9 @@ body.admin-on #appGate { display: none; }
 
 /* 단계 그룹 — 타임라인 (시안 A) */
 .group-block.tl-item { position: relative; padding-left: 26px; margin-bottom: 16px; }
-.group-block.tl-item::before { content: ''; position: absolute; left: 8px; top: 22px; bottom: -16px; width: 2px; background: #dce3eb; }
+.group-block.tl-item::before { content: ''; position: absolute; left: 8px; top: 31px; bottom: -16px; width: 2px; background: #dce3eb; }
 .group-block.tl-item:last-child::before { display: none; }
-.tl-node { position: absolute; left: 1px; top: 4px; width: 15px; height: 15px; border-radius: 50%; background: #94a3b8; box-shadow: 0 0 0 4px var(--bg); }
+.tl-node { position: absolute; left: 1px; top: 12px; width: 16px; height: 16px; border-radius: 50%; background: #94a3b8; box-shadow: 0 0 0 4px var(--bg); }
 .tl-node.stage-s0 { background: #475569; }
 .tl-node.stage-s1 { background: #2563eb; }
 .tl-node.stage-s2 { background: #16a34a; }
@@ -98,18 +98,16 @@ body.admin-on #appGate { display: none; }
 .tl-node.stage-s4 { background: #dc2626; }
 .tl-node.stage-none { background: #94a3b8; }
 .group-head { margin: 0 0 8px; }
-.stage-badge { display: flex; align-items: baseline; gap: 7px; width: 100%; box-sizing: border-box; font-size: 18px; font-weight: 800; color: var(--navy); letter-spacing: .1px; background: transparent; border: 0; padding: 0; text-align: left; line-height: 1.2; }
+/* 단계 헤더 = 솔리드 컬러 밴드 (시안 B) */
+.stage-badge { display: flex; align-items: center; gap: 7px; width: 100%; box-sizing: border-box; font-size: 16px; font-weight: 800; color: #fff; border: 0; border-radius: 11px; padding: 10px 14px; text-align: left; line-height: 1.25; box-shadow: 0 3px 8px rgba(12,39,72,.13); background: linear-gradient(135deg, #475569, #334155); }
 .stage-badge .sb-name { flex: 0 1 auto; word-break: keep-all; text-align: left; }
-.stage-badge .sb-name .sb-sub { font-size: 0.55em; font-weight: 700; color: inherit; opacity: .72; }
-/* 단계 글자(괄호 포함) 색을 단계 색(노드)과 일치 */
-.stage-badge.stage-s0 .sb-name { color: #475569; }
-.stage-badge.stage-s1 .sb-name { color: #2563eb; }
-.stage-badge.stage-s2 .sb-name { color: #16a34a; }
-.stage-badge.stage-s3 .sb-name { color: #ea580c; }
-.stage-badge.stage-s4 .sb-name { color: #dc2626; }
-.stage-badge.stage-none .sb-name { color: #94a3b8; }
-.stage-badge .sb-count { margin-left: auto; flex: none; font-size: 11px; font-weight: 700; color: var(--soft); white-space: nowrap; }
-.stage-badge .sb-count::after { content: ' 개'; font-weight: 600; opacity: .7; }
+.stage-badge .sb-name .sb-sub { font-size: 0.62em; font-weight: 700; color: inherit; opacity: .9; }
+.stage-badge.stage-s1 { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+.stage-badge.stage-s2 { background: linear-gradient(135deg, #16a34a, #15803d); }
+.stage-badge.stage-s3 { background: linear-gradient(135deg, #ea580c, #c2410c); }
+.stage-badge.stage-s4 { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+.stage-badge.stage-none { background: linear-gradient(135deg, #94a3b8, #64748b); }
+.stage-badge .sb-count { margin-left: auto; flex: none; font-size: 11px; font-weight: 800; color: #fff; background: rgba(255,255,255,.25); border-radius: 20px; padding: 2px 10px; white-space: nowrap; }
 .stage-badge.stage-s1 .sb-count { color: #1d4ed8; }
 .stage-badge.stage-s2 .sb-count { color: #15803d; }
 .stage-badge.stage-s3 .sb-count { color: #c2410c; }
