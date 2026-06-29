@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v101 · 2026.06.29 (보고 번호 최신=마지막)';
+  const APP_VERSION = 'v102 · 2026.06.29 (보고이력 5개+전체보기)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -694,9 +694,11 @@
     h += `<div class="d-sec-title">보고 이력 <span style="color:var(--soft);font-weight:600;">· ${reps.length}건 (최근순)</span></div>`;
     if (!reps.length) h += '<p class="rd-empty">아직 등록된 보고가 없습니다. 아래에서 첫 보고를 작성해 주세요.</p>';
     else {
+      const BH_LIMIT = 5;
       h += '<div class="bh-list">';
       reps.forEach((r, i) => {
-        h += `<button type="button" class="bh-item${freshClass(r)}" data-rid="${esc(r.id)}" style="${stageFillStyle(r)}">` +
+        const extra = i >= BH_LIMIT ? ' bh-extra' : '';
+        h += `<button type="button" class="bh-item${freshClass(r)}${extra}" data-rid="${esc(r.id)}" style="${stageFillStyle(r)}">` +
           `<span class="bh-no" style="${stageNoStyle(r)}">${reps.length - i}</span>` +
           `<span class="bh-date">${dtHtml(r.date, r.ts)} ${freshBadge(r, 'NEW')}</span>` +
           `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
@@ -704,6 +706,7 @@
           '</button>';
       });
       h += '</div>';
+      if (reps.length > BH_LIMIT) h += `<button type="button" class="btn ghost block bh-more-btn" data-bhmore>＋ 전체 ${reps.length}건 보기</button>`;
     }
 
     // 사업소 전략 정보 (있을 때만)
@@ -735,6 +738,11 @@
     if (eb) eb.addEventListener('click', () => openBranchEdit(b.id));
     container.querySelectorAll('.bh-item').forEach((it) => {
       it.addEventListener('click', () => { if (isModal) closeModal('branchModal'); openReportDetail(it.dataset.rid); });
+    });
+    const moreBtn = container.querySelector('[data-bhmore]');
+    if (moreBtn) moreBtn.addEventListener('click', () => {
+      container.querySelectorAll('.bh-item.bh-extra').forEach((it) => it.classList.remove('bh-extra'));
+      moreBtn.remove();
     });
     const gm = container.querySelector('#groupMove');
     if (gm) gm.addEventListener('click', (e) => {

@@ -537,6 +537,9 @@ body.admin-on:not(.site-view) .fab { display: none !important; }
 
 /* 날짜 옆 시:분:초 (작게·괄호) */
 .dt-time { font-size: .82em; color: #94a3b8; font-weight: 500; }
+/* 보고 이력 더보기 (기본 5개) */
+.bh-item.bh-extra { display: none; }
+.bh-more-btn { margin-top: 8px; font-size: 12.5px; }
 
 /* 로그인 도움말 */
 .login-help { font-size: 12px; color: var(--soft); line-height: 1.6; margin-bottom: 10px; }
