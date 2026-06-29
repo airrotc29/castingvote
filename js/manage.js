@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v99 · 2026.06.29 (서약서 제목 변경)';
+  const APP_VERSION = 'v100 · 2026.06.29 (삭제 시 첨부 동시삭제)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -159,6 +159,16 @@
     }
     return res.json();
   }
+  // 파일 삭제 (첨부 등) — best effort
+  async function deleteContent(path, message) {
+    const data = await getContent(path);
+    if (!data || !data.sha) return; // 이미 없음
+    await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${path}`, { method: 'DELETE', headers: headers(), body: JSON.stringify({ message: message || ('파일 삭제: ' + path), sha: data.sha, branch: BRANCH }) });
+  }
+  async function deleteAttachments(report) {
+    const atts = (report && report.attachments) || [];
+    for (const a of atts) { if (a && a.path) { try { await deleteContent(a.path, '첨부 삭제: ' + (a.name || a.path)); } catch (e) {} } }
+  }
   async function loadReportsJson() {
     const data = await getContent(REPORTS_PATH);
     if (!data) return { items: [], sha: null };
@@ -302,7 +312,11 @@
   }
   async function deleteReport(report) {
     if (report._local) { const local = getLocal(); local.reports = local.reports.filter((r) => r.id !== report.id); setLocal(local); return null; }
-    if (hasToken()) return mutateReports((items) => items.filter((r) => r.id !== report.id), '보고 삭제');
+    if (hasToken()) {
+      const next = await mutateReports((items) => items.filter((r) => r.id !== report.id), '보고 삭제');
+      await deleteAttachments(report); // 첨부 파일도 저장소에서 함께 삭제
+      return next;
+    }
     if (hasEndpoint()) return callEndpoint('deleteReport', { reportId: report.id });
     throw new Error('삭제 권한이 없습니다 (로그인 필요).');
   }
