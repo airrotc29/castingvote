@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v71 · 2026.06.23 (단계 팝업 중앙·축소)';
+  const APP_VERSION = 'v72 · 2026.06.23 (활동 클릭 보고상단·댓글하단)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -450,7 +450,7 @@
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
-    else h += '<ul class="sp-feed">' + recent.map((a) => `<li class="sp-feed-item${a.nu ? ' is-new' : ''}" data-rid="${esc(a.id)}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${a.nu ? '<span class="new-badge sp-new">NEW</span>' : ''}<i class="sp-when">${esc(relTime(a.ts))}</i></div></li>`).join('') + '</ul>';
+    else h += '<ul class="sp-feed">' + recent.map((a) => `<li class="sp-feed-item${a.nu ? ' is-new' : ''}" data-rid="${esc(a.id)}" data-kind="${a.kind === '보고' ? 'rep' : 'cmt'}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span>${a.nu ? '<span class="new-badge sp-new">NEW</span>' : ''}<i class="sp-when">${esc(relTime(a.ts))}</i></div></li>`).join('') + '</ul>';
     h += '</div>';
     h += '<div class="sp-card"><div class="sp-h">🔔 주의</div>';
     h += `<div class="sp-alert"><span>미보고</span><b>${notyet}</b></div>`;
@@ -572,7 +572,18 @@
     openModal('stageModal');
   }
   $('statusPanel') && $('statusPanel').addEventListener('click', (e) => {
-    const it = e.target.closest('.sp-feed-item'); if (it && it.dataset.rid) openReportDetail(it.dataset.rid);
+    const it = e.target.closest('.sp-feed-item'); if (!it || !it.dataset.rid) return;
+    openReportDetail(it.dataset.rid);
+    // 보고 클릭 → 상단(보고 내용) / 댓글 클릭 → 하단(댓글)로 스크롤
+    const box = document.querySelector('#reportDetailModal .modal-box');
+    if (!box) return;
+    setTimeout(() => {
+      if (it.dataset.kind === 'cmt') {
+        const cm = $('reportDetail') && $('reportDetail').querySelector('.thread-head');
+        if (cm && cm.scrollIntoView) cm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        else box.scrollTop = box.scrollHeight;
+      } else { box.scrollTop = 0; }
+    }, 80);
   });
   $('groupWrap').addEventListener('click', (e) => {
     const card = e.target.closest('.b-card'); if (!card) return;
