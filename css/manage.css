@@ -37,8 +37,11 @@ button { font-family: inherit; cursor: pointer; }
   .screen { padding: 22px 28px 96px; }
   /* 읽기형 화면(보고·전략)은 가운데 폭 제한 */
   #scr-report, #scr-strategy { max-width: 760px; margin-left: auto; margin-right: auto; }
-  /* 현황 상단 단계 그래프는 적당 폭으로 */
-  #scr-status .stat-cap, #scr-status #statRow2 { max-width: 600px; }
+  /* 현황 상단: 그래프(좌) + 우측 패널 2단 */
+  .status-top { display: flex; gap: 22px; align-items: flex-start; }
+  .status-left { flex: none; width: 520px; }
+  #statusPanel { flex: 1; min-width: 0; margin: 0; }
+  #statusPanel .sp-cols { flex-direction: row; }
   /* 현황 = 칸반 보드 (단계별 세로 컬럼) */
   #groupWrap { display: flex; gap: 14px; align-items: flex-start; }
   #groupWrap .group-block.tl-item { flex: 1 1 0; min-width: 0; padding-left: 0; margin-bottom: 0; }
@@ -109,6 +112,30 @@ body.admin-on #appGate { display: none; }
 #barTip.show { opacity: 1; }
 #barTip b { display: block; font-size: 12px; color: #ffd27d; margin-bottom: 3px; letter-spacing: -.2px; }
 #barTip span { display: block; font-size: 11.5px; line-height: 1.6; color: #d7e1f0; word-break: keep-all; }
+
+/* 현황 우측 패널 — KPI + 최근 활동 + 주의 */
+.status-top { margin-bottom: 6px; }
+#statusPanel { margin: 4px 0 14px; }
+.sp-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 8px; margin-bottom: 12px; }
+.sp-kpi { background: #fff; border: 1px solid #eef1f5; border-radius: 11px; padding: 10px 6px; text-align: center; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+.sp-kpi b { display: block; font-size: 19px; font-weight: 900; color: var(--navy); line-height: 1.1; }
+.sp-kpi span { font-size: 10.5px; color: var(--soft); }
+.sp-cols { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.sp-card { flex: 1; background: #fff; border: 1px solid #eef1f5; border-radius: 13px; padding: 12px 14px; box-shadow: 0 1px 2px rgba(16,24,40,.04); min-width: 0; }
+.sp-h { font-size: 12.5px; font-weight: 800; color: var(--navy); margin-bottom: 9px; }
+.sp-feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sp-feed li { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #303a47; }
+.sp-feed li b { font-weight: 700; color: var(--navy); }
+.sp-kind { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.sp-kind.k-rep { background: #2563eb; }
+.sp-kind.k-cmt { background: #d8a800; }
+.sp-act { color: var(--soft); }
+.sp-when { margin-left: auto; font-size: 11px; color: var(--soft); font-style: normal; white-space: nowrap; }
+.sp-empty { font-size: 12px; color: var(--soft); }
+.sp-alert { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; border-radius: 8px; padding: 7px 11px; font-size: 12.5px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.sp-alert.warn { background: #fdeaea; color: #b91c1c; }
+.sp-alert b { font-size: 14px; font-weight: 900; }
+.sp-names { font-size: 11px; color: var(--soft); line-height: 1.5; margin: 0 2px 10px; word-break: keep-all; }
 
 /* 단계 그룹 — 타임라인 (시안 A) */
 .group-block.tl-item { position: relative; padding-left: 26px; margin-bottom: 16px; }

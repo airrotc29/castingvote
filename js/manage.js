@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v62 · 2026.06.23 (회사명 에이스종합관리㈜ 통일)';
+  const APP_VERSION = 'v63 · 2026.06.23 (현황 우측 패널: KPI·활동·알림)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -385,6 +385,57 @@
   // 단계명 표기: 괄호 부분(예: (추진위 자생))은 작은 글씨로
   function fmtStageName(name) { const m = /^(.*?)\s*(\(.*\))\s*$/.exec(String(name || '')); return m ? `${esc(m[1].trim())} <span class="sb-sub">${esc(m[2])}</span>` : esc(name); }
   function stageHex(name) { const o = stageOrder(name); return ({ 1: '#1c5fc4', 2: '#15803d', 3: '#c2660c', 4: '#b91c1c' })[o] || '#334155'; }
+  function relTime(ts) {
+    if (!ts) return '';
+    const now = Date.now(); const diff = now - ts; const day = 86400000;
+    if (diff < 0) return '방금';
+    try { if (new Date(ts).toDateString() === new Date(now).toDateString()) return '오늘'; } catch (e) {}
+    const d = Math.floor(diff / day);
+    if (d <= 0) return '오늘';
+    if (d === 1) return '어제';
+    if (d < 7) return d + '일 전';
+    if (d < 30) return Math.floor(d / 7) + '주 전';
+    return Math.floor(d / 30) + '개월 전';
+  }
+  // 현황 우측 패널: 요약 KPI + 최근 활동 + 주의 알림 (본사 전용)
+  function renderStatusPanel(visible, lb) {
+    const el = $('statusPanel'); if (!el) return;
+    if (lb) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    el.style.display = '';
+    const ids = new Set(visible.map((b) => b.id));
+    const total = visible.length;
+    const reported = visible.filter((b) => branchStage(b) !== null).length;
+    const notyet = total - reported;
+    const now = new Date(); const ym = now.getFullYear() + '.' + String(now.getMonth() + 1).padStart(2, '0');
+    const monthCnt = REPORTS.filter((r) => ids.has(r.branchId) && String(r.date || '').startsWith(ym)).length;
+    let sum = 0, n = 0;
+    visible.forEach((b) => { const st = branchStage(b); if (st !== null) { sum += stageOrder(st); n++; } });
+    const avg = n ? (sum / n).toFixed(1) : '0';
+    const notyetNames = visible.filter((b) => branchStage(b) === null).map((b) => b.name);
+    const STALE = 30 * 86400000; const nowMs = Date.now();
+    const stale = visible.filter((b) => { const reps = REPORTS.filter((r) => r.branchId === b.id); if (!reps.length) return false; const last = Math.max.apply(null, reps.map((r) => r.ts || 0)); return last && (nowMs - last) > STALE; }).map((b) => b.name);
+    const acts = [];
+    REPORTS.filter((r) => ids.has(r.branchId)).forEach((r) => {
+      acts.push({ ts: r.ts || 0, branch: r.branchName, kind: '보고' });
+      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글' }));
+    });
+    acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    const recent = acts.slice(0, 7);
+    const kpi = (v, l) => `<div class="sp-kpi"><b>${esc(v)}</b><span>${esc(l)}</span></div>`;
+    let h = '<div class="sp-kpis">' + kpi(total, '전체') + kpi(reported, '보고 진행') + kpi(notyet, '미보고') + kpi(monthCnt, '이번 달 보고') + kpi(avg, '평균 단계') + '</div>';
+    h += '<div class="sp-cols">';
+    h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
+    if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
+    else h += '<ul class="sp-feed">' + recent.map((a) => `<li><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span><i class="sp-when">${esc(relTime(a.ts))}</i></li>`).join('') + '</ul>';
+    h += '</div>';
+    h += '<div class="sp-card"><div class="sp-h">🔔 주의</div>';
+    h += `<div class="sp-alert"><span>미보고</span><b>${notyet}</b></div>`;
+    if (notyetNames.length) h += `<div class="sp-names">${esc(notyetNames.join(', '))}</div>`;
+    h += `<div class="sp-alert ${stale.length ? 'warn' : ''}"><span>30일+ 정체</span><b>${stale.length}</b></div>`;
+    if (stale.length) h += `<div class="sp-names">${esc(stale.join(', '))}</div>`;
+    h += '</div></div>';
+    el.innerHTML = h;
+  }
 
   function renderStatus() {
     // 사업소 계정은 본인 사업소만 표시. 본사는 전체.
@@ -416,6 +467,7 @@
       }).join('');
       ROWS.forEach((id) => { const el = $(id); if (el) { el.style.display = ''; el.className = 'bar-chart'; el.innerHTML = barsHtml; } });
     }
+    renderStatusPanel(visible, lb);
 
     // 단계별 그룹화 (관리소장이 입력한 과제로 산출한 현재 단계)
     const buckets = {};
