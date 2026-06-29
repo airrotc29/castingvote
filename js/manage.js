@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v100 · 2026.06.29 (삭제 시 첨부 동시삭제)';
+  const APP_VERSION = 'v101 · 2026.06.29 (보고 번호 최신=마지막)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -697,7 +697,7 @@
       h += '<div class="bh-list">';
       reps.forEach((r, i) => {
         h += `<button type="button" class="bh-item${freshClass(r)}" data-rid="${esc(r.id)}" style="${stageFillStyle(r)}">` +
-          `<span class="bh-no" style="${stageNoStyle(r)}">${i + 1}</span>` +
+          `<span class="bh-no" style="${stageNoStyle(r)}">${reps.length - i}</span>` +
           `<span class="bh-date">${dtHtml(r.date, r.ts)} ${freshBadge(r, 'NEW')}</span>` +
           `<span class="bh-info">${esc(r.reporter)}${r.occupancy ? ` · 입주율 ${esc(r.occupancy.rate)}%` : ''}${r._local ? ' · <i style="color:var(--accent);font-style:normal;">이 기기</i>' : ''}</span>` +
           `<span class="bh-cmt">💬 ${(r.comments || []).length}</span>` +
@@ -846,7 +846,8 @@
     // 사업소 계정은 본인 사업소만, 필터 드롭다운은 숨김. 본사는 전체 + 필터 표시.
     if (filterField) filterField.style.display = lb ? 'none' : '';
     const eff = lb || reportFilter;
-    const items = REPORTS.filter((r) => !eff || r.branchId === eff);
+    // 최근 작성순(위가 최신)으로 표시하되, 번호는 가장 오래된=1, 최신=마지막 번호
+    const items = REPORTS.filter((r) => !eff || r.branchId === eff).slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
     list.innerHTML = '';
     if (!items.length) { empty.hidden = false; }
     else { empty.hidden = true; }
@@ -856,7 +857,7 @@
       card.type = 'button'; card.className = 'report-card' + freshClass(r); card.dataset.id = r.id;
       card.setAttribute('style', stageFillStyle(r));
       card.innerHTML =
-        `<span class="rc-no" style="${stageNoStyle(r)}">${i + 1}</span>` +
+        `<span class="rc-no" style="${stageNoStyle(r)}">${items.length - i}</span>` +
         `<span class="rc-branch">${esc(r.branchName)}</span>` +
         freshBadge(r, 'N') +
         `<span class="rc-date">${dtHtml(r.date, r.ts)}</span>` +
