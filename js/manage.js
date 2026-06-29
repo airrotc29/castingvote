@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v68 · 2026.06.23 (활동·도넛 클릭 링크)';
+  const APP_VERSION = 'v69 · 2026.06.23 (댓글 미리보기·도넛 팝업)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -438,8 +438,9 @@
     const stale = visible.filter((b) => { const reps = REPORTS.filter((r) => r.branchId === b.id); if (!reps.length) return false; const last = Math.max.apply(null, reps.map((r) => r.ts || 0)); return last && (nowMs - last) > STALE; }).map((b) => b.name);
     const acts = [];
     REPORTS.filter((r) => ids.has(r.branchId)).forEach((r) => {
-      acts.push({ ts: r.ts || 0, branch: r.branchName, kind: '보고', id: r.id });
-      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글', id: r.id }));
+      const firstItem = Object.values(r.items || {}).find((v) => v) || '';
+      acts.push({ ts: r.ts || 0, branch: r.branchName, kind: '보고', id: r.id, body: firstItem });
+      (r.comments || []).forEach((c) => acts.push({ ts: c.ts || 0, branch: r.branchName, kind: c.role === 'hq' ? '본사 댓글' : '현장 댓글', id: r.id, body: c.body }));
     });
     acts.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     const recent = acts.slice(0, 7);
@@ -448,7 +449,7 @@
     h += '<div class="sp-cols">';
     h += '<div class="sp-card"><div class="sp-h">🕒 최근 활동</div>';
     if (!recent.length) h += '<p class="sp-empty">최근 활동이 없습니다.</p>';
-    else h += '<ul class="sp-feed">' + recent.map((a) => `<li class="sp-feed-item" data-rid="${esc(a.id)}"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span><i class="sp-when">${esc(relTime(a.ts))}</i></li>`).join('') + '</ul>';
+    else h += '<ul class="sp-feed">' + recent.map((a) => `<li class="sp-feed-item" data-rid="${esc(a.id)}"><div class="sp-fr"><span class="sp-kind ${a.kind === '보고' ? 'k-rep' : 'k-cmt'}"></span><b>${esc(a.branch)}</b> <span class="sp-act">${esc(a.kind)}</span><i class="sp-when">${esc(relTime(a.ts))}</i></div>${a.body ? `<div class="sp-msg">${a.kind === '보고' ? esc(a.body) : '“' + esc(a.body) + '”'}</div>` : ''}</li>`).join('') + '</ul>';
     h += '</div>';
     h += '<div class="sp-card"><div class="sp-h">🔔 주의</div>';
     h += `<div class="sp-alert"><span>미보고</span><b>${notyet}</b></div>`;
@@ -545,15 +546,29 @@
     const host = $(id); if (!host) return;
     host.addEventListener('mouseover', (e) => { const row = e.target.closest('.bar-row'); if (row) showBarTip(row); });
     host.addEventListener('mouseout', (e) => { const row = e.target.closest('.bar-row'); if (row) hideBarTip(); });
-    host.addEventListener('click', (e) => { const row = e.target.closest('.bar-row'); if (row) { showBarTip(row); clearTimeout(barTipTimer); barTipTimer = setTimeout(hideBarTip, 3000); return; } const seg = e.target.closest('[data-order]'); if (seg) gotoStage(seg.getAttribute('data-order')); });
+    host.addEventListener('click', (e) => { const row = e.target.closest('.bar-row'); if (row) { showBarTip(row); clearTimeout(barTipTimer); barTipTimer = setTimeout(hideBarTip, 3000); return; } const seg = e.target.closest('[data-order]'); if (seg) openStageDetail(seg.getAttribute('data-order')); });
   });
-  // 도넛/막대/범례 단계 클릭 → 해당 단계 사업소로 스크롤+강조 / 최근활동 클릭 → 보고 상세
-  function gotoStage(order) {
-    const blk = document.querySelector('.group-block[data-order="' + order + '"]');
-    if (!blk) return;
-    blk.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-    blk.classList.remove('flash'); void blk.offsetWidth; blk.classList.add('flash');
-    setTimeout(() => blk.classList.remove('flash'), 1500);
+  // 도넛/범례 단계 클릭 → 해당 단계 사업소를 팝업으로 표시
+  function openStageDetail(order) {
+    order = parseInt(order, 10);
+    const hex = ({ 99: '#94a3b8', 0: '#475569', 1: '#2563eb', 2: '#16a34a', 3: '#ea580c', 4: '#dc2626' })[order] || '#94a3b8';
+    const labelOf = (o) => (o === 0 ? '공통단계' : o === 99 ? '미보고' : (o + '단계'));
+    const lb = lockedBranchId();
+    const visible = lb ? BRANCHES.filter((b) => b.id === lb) : BRANCHES;
+    const list = visible.filter((b) => { const st = branchStage(b); return (st === null ? 99 : stageOrder(st)) === order; });
+    let h = `<h2 style="display:flex;align-items:center;gap:9px;"><span style="width:13px;height:13px;border-radius:4px;background:${hex};"></span>${esc(labelOf(order))} <span style="color:var(--soft);font-weight:600;font-size:14px;">· ${list.length}개 사업소</span></h2>`;
+    if (!list.length) h += '<p class="rd-empty">해당 단계의 사업소가 없습니다.</p>';
+    else {
+      h += '<div class="sd-list">';
+      list.forEach((b) => {
+        const cnt = REPORTS.filter((r) => r.branchId === b.id).length;
+        h += `<button type="button" class="sd-item" data-id="${esc(b.id)}" style="border-left-color:${hex};"><span class="sd-name">${esc(b.name)}</span><span class="sd-cnt">보고 ${cnt}건 ›</span></button>`;
+      });
+      h += '</div>';
+    }
+    $('stageDetail').innerHTML = h;
+    $('stageDetail').querySelectorAll('.sd-item').forEach((it) => it.addEventListener('click', () => { closeModal('stageModal'); openBranch(it.dataset.id); }));
+    openModal('stageModal');
   }
   $('statusPanel') && $('statusPanel').addEventListener('click', (e) => {
     const it = e.target.closest('.sp-feed-item'); if (it && it.dataset.rid) openReportDetail(it.dataset.rid);

@@ -150,8 +150,16 @@ body.admin-on #appGate { display: none; }
 .sp-feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .sp-feed li { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #303a47; }
 .sp-feed li b { font-weight: 700; color: var(--navy); }
-.sp-feed-item { cursor: pointer; }
+.sp-feed li.sp-feed-item { flex-direction: column; align-items: stretch; gap: 3px; cursor: pointer; }
 .sp-feed-item:hover b { text-decoration: underline; }
+.sp-fr { display: flex; align-items: center; gap: 7px; }
+.sp-msg { margin-left: 14px; font-size: 12px; color: #5b6573; background: #f4f7fb; border-radius: 7px; padding: 4px 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 단계별 사업소 현황 팝업 */
+.sd-list { display: flex; flex-direction: column; gap: 8px; }
+.sd-item { width: 100%; text-align: left; display: flex; align-items: center; background: #fff; border: 1px solid var(--line); border-left: 3px solid #cbd5e1; border-radius: 10px; padding: 12px 14px; }
+.sd-item:active { background: var(--bg); }
+.sd-name { font-size: 14px; font-weight: 700; color: var(--navy); }
+.sd-cnt { margin-left: auto; font-size: 12px; color: var(--soft); white-space: nowrap; }
 .sp-kind { width: 7px; height: 7px; border-radius: 50%; flex: none; }
 .sp-kind.k-rep { background: #2563eb; }
 .sp-kind.k-cmt { background: #d8a800; }
