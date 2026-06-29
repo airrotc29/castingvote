@@ -59,7 +59,7 @@ button { font-family: inherit; cursor: pointer; }
   #groupWrap .b-card .b-top { flex-direction: column; align-items: flex-start; gap: 3px; }
   #groupWrap .b-name { font-size: 12.5px; line-height: 1.25; white-space: normal; word-break: keep-all; }
   #groupWrap .b-count { margin-left: 0; font-size: 11px; }
-  .fab { right: 28px; }
+  .fab { right: auto; left: 50%; transform: translateX(-50%); }
   #tabbar { left: 50%; right: auto; transform: translateX(-50%); width: 100%; max-width: 1200px; }
 }
 
