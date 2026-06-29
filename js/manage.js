@@ -5,7 +5,7 @@
   'use strict';
 
   const OWNER = 'airrotc29', REPO = 'branch-communication-webapp', BRANCH = 'main';
-  const APP_VERSION = 'v78 · 2026.06.23 (로그아웃 글자칩)';
+  const APP_VERSION = 'v79 · 2026.06.23 (NEW 계정별 분리)';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ace_admin_token';
   const LOCAL_KEY = 'ace_branch_reports_local';
@@ -312,8 +312,10 @@
   // 새 보고(읽지 않은 보고) 추적 — 반짝임 표시용
   // 새 보고/새 댓글 추적 — {reportId: 마지막으로 본 댓글 수}
   const SEEN_KEY = 'ace_seen_reports';
-  function getSeen() { try { const o = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; } catch (e) { return {}; } }
-  function setSeen(o) { localStorage.setItem(SEEN_KEY, JSON.stringify(o)); }
+  // 읽음 추적은 계정별로 분리 — 같은 기기에서 본사/소장 NEW 표시가 섞이지 않도록
+  function seenKey() { return SEEN_KEY + '_' + (localStorage.getItem('ace_acct') || 'anon'); }
+  function getSeen() { try { const o = JSON.parse(localStorage.getItem(seenKey()) || '{}'); return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}; } catch (e) { return {}; } }
+  function setSeen(o) { localStorage.setItem(seenKey(), JSON.stringify(o)); }
   function isNew(r) { const s = getSeen(); const c = s[r.id]; if (c === undefined) return true; return (r.comments || []).length > c; }
   function markSeen(r) { const s = getSeen(); s[r.id] = (r.comments || []).length; setSeen(s); }
   function unseenCount() { return REPORTS.filter(isNew).length; }
