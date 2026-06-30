@@ -69,73 +69,64 @@
     "agendas": [
       {
         "no": 1,
-        "title": "관리단대표(관리인) 선출의 건 (후보자 정평곤)",
+        "title": "관리단대표(관리인) 선출의 건 (후보자 000)",
         "options": [
           {
             "label": "찬성",
             "count": 42,
-            "pct": 53.8,
-            "areaPct": 59.4
+            "pct": 53.8
           },
           {
             "label": "반대",
             "count": 3,
-            "pct": 3.8,
-            "areaPct": 3.9
+            "pct": 3.8
           },
           {
             "label": "미투표",
             "count": 33,
-            "pct": 42.3,
-            "areaPct": 36.6
+            "pct": 42.3
           }
         ]
       },
       {
         "no": 2,
-        "title": "관리위원 선출의 건 (후보자 김미애)",
+        "title": "관리위원 선출의 건 (후보자 000)",
         "options": [
           {
             "label": "찬성",
             "count": 41,
-            "pct": 52.6,
-            "areaPct": 58.3
+            "pct": 52.6
           },
           {
             "label": "반대",
             "count": 4,
-            "pct": 5.1,
-            "areaPct": 5
+            "pct": 5.1
           },
           {
             "label": "미투표",
             "count": 33,
-            "pct": 42.3,
-            "areaPct": 36.6
+            "pct": 42.3
           }
         ]
       },
       {
         "no": 3,
-        "title": "관리위원 선출의 건 (후보자 김용덕)",
+        "title": "관리위원 선출의 건 (후보자 000)",
         "options": [
           {
             "label": "찬성",
             "count": 43,
-            "pct": 55.1,
-            "areaPct": 60.8
+            "pct": 55.1
           },
           {
             "label": "반대",
             "count": 2,
-            "pct": 2.6,
-            "areaPct": 2.6
+            "pct": 2.6
           },
           {
             "label": "미투표",
             "count": 33,
-            "pct": 42.3,
-            "areaPct": 36.6
+            "pct": 42.3
           }
         ]
       }
