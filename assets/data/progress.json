@@ -152,49 +152,43 @@
     "agendas": [
       {
         "no": 1,
-        "title": "관리단대표(관리인) 선출의 건 (후보자 정평곤)",
+        "title": "관리단대표(관리인) 선출의 건 (후보자 000)",
         "options": [
           {
             "label": "찬성",
             "count": 39,
-            "pct": 54.9,
-            "areaPct": 58.4
+            "pct": 54.9
           },
           {
             "label": "반대",
             "count": 7,
-            "pct": 9.9,
-            "areaPct": 8
+            "pct": 9.9
           },
           {
             "label": "미투표",
             "count": 25,
-            "pct": 35.2,
-            "areaPct": 32.3
+            "pct": 35.2
           }
         ]
       },
       {
         "no": 2,
-        "title": "관리위원 선출의 건 (후보자 김석진)",
+        "title": "관리위원 선출의 건 (후보자000)",
         "options": [
           {
             "label": "찬성",
             "count": 42,
-            "pct": 59.2,
-            "areaPct": 58.6
+            "pct": 59.2
           },
           {
             "label": "반대",
             "count": 4,
-            "pct": 5.6,
-            "areaPct": 7.9
+            "pct": 5.6
           },
           {
             "label": "미투표",
             "count": 25,
-            "pct": 35.2,
-            "areaPct": 32.3
+            "pct": 35.2
           }
         ]
       }
