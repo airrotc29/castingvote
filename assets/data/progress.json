@@ -15,20 +15,17 @@
           {
             "label": "승인",
             "count": 42,
-            "pct": 49.4,
-            "areaPct": 53.1
+            "pct": 49.4
           },
           {
             "label": "불승인",
             "count": 7,
-            "pct": 8.2,
-            "areaPct": 9.7
+            "pct": 8.2
           },
           {
             "label": "미투표",
             "count": 36,
-            "pct": 42.4,
-            "areaPct": 37.2
+            "pct": 42.4
           }
         ]
       },
@@ -39,20 +36,17 @@
           {
             "label": "찬성 (7명으로  증원)",
             "count": 34,
-            "pct": 40,
-            "areaPct": 43.5
+            "pct": 40
           },
           {
             "label": "반대 (5명으로 현재 유지)",
             "count": 15,
-            "pct": 17.6,
-            "areaPct": 19.3
+            "pct": 17.6
           },
           {
             "label": "미투표",
             "count": 36,
-            "pct": 42.4,
-            "areaPct": 37.2
+            "pct": 42.4
           }
         ]
       }
