@@ -2,7 +2,7 @@
 // 토큰 로그인 → 관리자 모드 → 사진/영상/공지/홍보자료를 GitHub API로 직접 커밋
 (function () {
   const OWNER = 'airrotc29';
-  const REPO = '-';
+  const REPO = 'castingvote';
   const BRANCH = 'main';
   const API = 'https://api.github.com';
   const TOKEN_KEY = 'ecv_admin_token';
