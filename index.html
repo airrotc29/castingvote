@@ -63,6 +63,27 @@
     </div>
   </section>
 
+  <!-- ===== 앱 다운로드 배너 ===== -->
+  <section class="app-banner" id="app-download">
+    <div class="container app-banner-inner">
+      <div class="app-banner-text">
+        <span class="app-banner-tag">APP</span>
+        <h2>전자 관리단앱(app) 다운로드</h2>
+        <p>스마트폰에서 '관리단' 앱을 설치하고 토론·공지·안건 확인을 편리하게 이용하세요.</p>
+      </div>
+      <div class="app-banner-btns">
+        <a class="store-btn" href="https://apps.apple.com/kr/app/%EA%B4%80%EB%A6%AC%EB%8B%A8/id6755434083" target="_blank" rel="noopener" aria-label="App Store에서 다운로드">
+          <svg class="store-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.417 2.2-1.253 3.06-.87.9-2.02 1.44-3.07 1.36-.13-1.12.42-2.28 1.19-3.06.83-.86 2.06-1.44 3.13-1.36zm3.32 16.02c-.6 1.36-.89 1.96-1.66 3.16-1.08 1.68-2.6 3.77-4.48 3.79-1.68.02-2.11-1.1-4.39-1.09-2.28.01-2.76 1.11-4.44 1.09-1.88-.02-3.32-1.9-4.4-3.58C-1.4 16.5-1.6 10.66 1.4 7.55c1.02-1.09 2.42-1.78 3.94-1.8 1.71-.03 2.79 1.13 4.2 1.13 1.39 0 2.24-1.13 4.2-1.13 1.35.02 2.78.61 3.8 1.66-3.34 1.83-2.8 6.6.15 8.04z"/></svg>
+          <span class="store-txt"><small>Download on the</small><strong>App Store</strong></span>
+        </a>
+        <a class="store-btn" href="https://play.google.com/store/apps/details?id=com.lksoft.mgmt" target="_blank" rel="noopener" aria-label="Google Play에서 다운로드">
+          <svg class="store-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 1.9c-.3.3-.5.7-.5 1.3v17.6c0 .6.2 1 .5 1.3l.1.1L13.5 12v-.1L3.7 1.8l-.1.1zm13.3 13.4l-2.3-2.3v-.2l2.3-2.3.1.1 2.7 1.6c.8.5.8 1.2 0 1.7l-2.8 1.4zm-1-1.1L5.3 22.6c.3.3.7.3 1.2.1l9.6-5.5-1.2-1zm0-3.4l1.2-1L6.5 1.3C6 1 5.6 1.1 5.3 1.4l10.6 9z"/></svg>
+          <span class="store-txt"><small>GET IT ON</small><strong>Google Play</strong></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== 소개 ===== -->
   <section class="section" id="about">
     <div class="container">
@@ -173,20 +194,6 @@
       </div>
 
       <div class="resources" id="resourceGrid">
-        <article class="resource-item resource-app" id="appCard">
-          <div class="resource-thumb resource-thumb-app">
-            <span class="app-emoji">📱</span>
-            <span class="resource-badge">앱</span>
-          </div>
-          <div class="resource-body">
-            <h3>관리단 앱 다운로드</h3>
-            <p>스마트폰에서 '관리단' 앱을 설치하고 편리하게 이용하세요.</p>
-            <div class="resource-actions app-actions">
-              <a class="btn btn-sm btn-app btn-appstore" href="https://apps.apple.com/kr/app/%EA%B4%80%EB%A6%AC%EB%8B%A8/id6755434083" target="_blank" rel="noopener"> App Store</a>
-              <a class="btn btn-sm btn-app btn-googleplay" href="https://play.google.com/store/apps/details?id=com.lksoft.mgmt" target="_blank" rel="noopener">▶ Google Play</a>
-            </div>
-          </div>
-        </article>
         <article class="resource-item resource-video" id="videoCard">
           <div class="resource-thumb resource-thumb-video" id="videoCardThumb">
             <span class="video-play">▶</span>
@@ -215,21 +222,6 @@
             <div class="resource-actions" style="flex-direction:column;gap:8px;">
               <a class="btn btn-sm btn-primary btn-block" id="consignmentLink" href="assets/resources/habitus-personal-info-consignment.hwp" download>다운로드 ↓</a>
               <button type="button" class="btn btn-sm btn-outline btn-block admin-only" id="consignmentReplace">파일 교체</button>
-            </div>
-          </div>
-        </article>
-
-        <article class="resource-item" data-file="assets/resources/habitus-korea-ci.pdf" data-type="pdf">
-          <div class="resource-thumb">
-            <img src="assets/images/logo.png" alt="HABITUS KOREA 회사 CI" loading="lazy" style="object-fit:contain;padding:24px;background:#fff;" />
-            <span class="resource-badge">CI · PDF</span>
-          </div>
-          <div class="resource-body">
-            <h3>회사 CI (로고)</h3>
-            <p>(주)HABITUS KOREA 공식 로고입니다. 인쇄·홍보용 원본(PDF)을 받으실 수 있습니다.</p>
-            <div class="resource-actions">
-              <button type="button" class="btn btn-sm btn-outline js-preview">미리보기</button>
-              <a class="btn btn-sm btn-primary" href="assets/resources/habitus-korea-ci.pdf" download>다운로드 ↓</a>
             </div>
           </div>
         </article>
@@ -339,6 +331,8 @@
       <label class="amodal-file-label">첨부 파일 (선택 · 다운로드 제공)
         <input type="file" id="postFile" />
       </label>
+      <input type="text" id="postLink" placeholder="다운로드 링크 (선택) - 예: 앱스토어/구글플레이 주소" autocomplete="off" />
+      <input type="text" id="postLinkText" placeholder="링크 버튼 이름 (선택) - 미입력 시 '다운받기'" autocomplete="off" />
       <p class="form-hint" id="postStatus" role="alert"></p>
       <button type="button" class="btn btn-primary btn-block" id="postSubmit">글 올리기</button>
     </div>
