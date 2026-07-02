@@ -962,12 +962,24 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
   .kakao-fab svg { width: 22px; height: 22px; }
 }
 
-/* ===== "카톡 문의" 버튼 말풍선 아이콘 ===== */
+/* ===== "카톡 문의" 버튼 카카오 옐로우 + 말풍선 아이콘 ===== */
+.hero .btn-ghost.js-kakao,
 .btn.js-kakao,
 .nav-cta.js-kakao {
+  background: #FEE500 !important;
+  color: #3C1E1E !important;
+  border-color: #FEE500 !important;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
   gap: 7px;
+}
+.hero .btn-ghost.js-kakao:hover,
+.btn.js-kakao:hover,
+.nav-cta.js-kakao:hover {
+  background: #f5d900 !important;
+  border-color: #f5d900 !important;
+  color: #3C1E1E !important;
 }
 .btn.js-kakao .kk-ico,
 .nav-cta.js-kakao .kk-ico {
