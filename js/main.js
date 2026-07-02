@@ -5,7 +5,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
 (function () {
   // ▼ 카카오톡 채널을 만들면 아래 KAKAO_CHANNEL_URL 에 채팅 주소를 넣으세요.
   //   예) 'http://pf.kakao.com/_채널ID/chat'  (채널이 있으면 바로 채팅창이 열립니다)
-  var KAKAO_CHANNEL_URL = ''; // 채널 채팅 주소 (없으면 아이디 안내로 동작)
+  var KAKAO_CHANNEL_URL = 'http://pf.kakao.com/_SeSPX/chat'; // 채널 채팅 주소 (없으면 아이디 안내로 동작)
   var KAKAO_ID = 'airrotc29@gmail.com'; // 카카오톡 아이디(이메일)
 
   function copyText(text) {
