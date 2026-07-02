@@ -438,8 +438,12 @@ function renderPdfThumbs() {
     return h;
   }
 
+  function progSortKey(it) { return String((it && it.updated) || '').replace(/\D/g, ''); }
+
   function render(items) {
-    var current = Array.isArray(items) ? items : [];
+    var current = (Array.isArray(items) ? items.slice() : []);
+    // 최근 갱신(기준 시각)이 맨 위에 오도록 최신순 정렬
+    current.sort(function (a, b) { return progSortKey(b).localeCompare(progSortKey(a)); });
     grid.innerHTML = '';
     if (current.length === 0) { if (empty) empty.hidden = false; return; }
     if (empty) empty.hidden = true;
