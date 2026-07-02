@@ -174,8 +174,9 @@
     if (window.HK.renderResources) window.HK.renderResources();
   });
 
-  // 저장된 토큰이 있으면 자동 로그인
-  if (TOKEN) verifyToken(TOKEN).then((ok) => { if (ok) setAdminMode(true); });
+  // 접속 시에는 항상 '로그아웃(일반)' 상태로 시작합니다.
+  // (저장된 토큰이 있어도 자동 로그인하지 않고, [관리자] → [로그인] 시에만 관리자 모드가 켜집니다.
+  //  저장된 토큰은 로그인 창에 자동 입력되어 클릭 한 번으로 로그인됩니다.)
 
   // ---------- 사진 올리기 ----------
   let photoFiles = [];
