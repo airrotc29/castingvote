@@ -197,6 +197,13 @@ function renderPdfThumbs() {
       html += `<h3>${hkEsc(p.title)}</h3>`;
       html += `<p class="post-text">${hkEsc(p.body).replace(/\n/g, '<br />')}</p>`;
       if (p.file) html += `<a class="btn btn-sm btn-primary" href="${hkEsc(p.file)}" download>${hkEsc(p.fileName || '첨부파일')} 다운로드 ↓</a>`;
+      if (p.link) html += `<a class="btn btn-sm btn-primary" href="${hkEsc(p.link)}" target="_blank" rel="noopener">${hkEsc(p.linkText || '다운받기')} ↓</a>`;
+      // 앱 출시 글이면 제목/내용에 따라 스토어 다운로드 버튼을 자동으로 옆에 추가
+      var _ac = (p.title || '') + ' ' + (p.body || '');
+      if (/안드로이드|android|구글|google\s*play/i.test(_ac))
+        html += `<a class="btn btn-sm btn-app btn-googleplay" href="https://play.google.com/store/apps/details?id=com.lksoft.mgmt" target="_blank" rel="noopener">▶ Google Play</a>`;
+      if (/애플|apple|아이폰|iphone|\bios\b|앱스토어|app\s*store/i.test(_ac))
+        html += `<a class="btn btn-sm btn-app btn-appstore" href="https://apps.apple.com/kr/app/%EA%B4%80%EB%A6%AC%EB%8B%A8/id6755434083" target="_blank" rel="noopener"> App Store</a>`;
       html += hkDelBtn('post', p.id);
       html += '</div>';
       art.innerHTML = html;
