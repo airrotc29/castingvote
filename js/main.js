@@ -1,6 +1,10 @@
 // ===== 연도 자동 표시 =====
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// ===== 페이지 열 때 항상 맨 위에서 시작 (특히 모바일) =====
+if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
+window.addEventListener('load', function () { window.scrollTo(0, 0); });
+
 // ===== 카카오톡 문의 =====
 (function () {
   // ▼ 카카오톡 채널을 만들면 아래 KAKAO_CHANNEL_URL 에 채팅 주소를 넣으세요.
