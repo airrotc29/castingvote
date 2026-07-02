@@ -342,6 +342,7 @@
     $('postModalTitle').textContent = '공지·소식 글 작성';
     $('postSubmit').textContent = '글 올리기';
     $('postTitle').value = ''; $('postBody').value = ''; $('postImage').value = ''; $('postFile').value = '';
+    $('postLink').value = ''; $('postLinkText').value = '';
     hint($('postStatus'), '', ''); openModal('postModal');
   });
 
@@ -351,6 +352,8 @@
     if (!title || !body) { hint($('postStatus'), '제목과 내용을 입력해 주세요.', 'error'); return; }
     const imgFile = $('postImage').files[0];
     const attFile = $('postFile').files[0];
+    const link = $('postLink').value.trim();
+    const linkText = $('postLinkText').value.trim();
     const btn = $('postSubmit'); btn.disabled = true;
     try {
       let image = null, file = null, fileName = null;
@@ -378,11 +381,12 @@
             image: image || p.image,
             file: file || p.file,
             fileName: fileName || p.fileName,
+            link: link, linkText: linkText,
           };
         }), '공지 글 수정');
         hint($('postStatus'), '글이 수정됐습니다! (반영까지 1~2분)', 'success');
       } else {
-        const post = { id: 'p' + Date.now(), title, body, date: today(), image, file, fileName };
+        const post = { id: 'p' + Date.now(), title, body, date: today(), image, file, fileName, link, linkText };
         next = await mutateJson('assets/data/posts.json', (items) => items.concat([post]), '공지 글 추가');
         hint($('postStatus'), '글이 등록됐습니다! (반영까지 1~2분)', 'success');
       }
@@ -482,6 +486,8 @@
         $('postTitle').value = p ? p.title : '';
         $('postBody').value = p ? p.body : '';
         $('postImage').value = ''; $('postFile').value = '';
+        $('postLink').value = p ? (p.link || '') : '';
+        $('postLinkText').value = p ? (p.linkText || '') : '';
         hint($('postStatus'), p && (p.image || p.file) ? '이미지·첨부는 새로 선택할 때만 교체됩니다.' : '', '');
         openModal('postModal');
       }
