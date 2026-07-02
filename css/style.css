@@ -1005,38 +1005,12 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
 .btn-googleplay { background: #0f9d58 !important; }
 .btn-googleplay:hover { background: #0c854a !important; }
 
-/* ===== 앱 다운로드 배너 ===== */
-.app-banner {
-  background: linear-gradient(135deg, #1a55c4 0%, #0f3a8c 100%);
+/* ===== 히어로 한글 워드마크 ===== */
+.hero-wordmark-ko {
   color: #fff;
-  padding: 40px 0;
-}
-.app-banner-inner {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 28px; flex-wrap: wrap;
-}
-.app-banner-tag {
-  display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 2px;
-  background: rgba(255,255,255,.18); color: #fff; padding: 4px 10px; border-radius: 999px;
-  margin-bottom: 10px;
-}
-.app-banner-text h2 { font-size: clamp(20px, 3vw, 28px); margin: 0 0 6px; color: #fff; }
-.app-banner-text p { margin: 0; color: rgba(255,255,255,.85); font-size: 15px; }
-.app-banner-btns { display: flex; gap: 12px; flex-wrap: wrap; }
-.store-btn {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: #000; color: #fff; border-radius: 12px;
-  padding: 10px 18px; text-decoration: none;
-  transition: transform .18s ease, box-shadow .2s ease;
-  box-shadow: 0 8px 20px rgba(0,0,0,.25);
-}
-.store-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(0,0,0,.32); }
-.store-ico { width: 26px; height: 26px; fill: #fff; flex: 0 0 auto; }
-.store-txt { display: flex; flex-direction: column; line-height: 1.15; text-align: left; }
-.store-txt small { font-size: 11px; opacity: .85; }
-.store-txt strong { font-size: 17px; font-weight: 700; }
-@media (max-width: 640px) {
-  .app-banner-inner { flex-direction: column; text-align: center; }
-  .app-banner-btns { justify-content: center; width: 100%; }
-  .store-btn { flex: 1 1 auto; justify-content: center; }
+  font-weight: 800;
+  font-size: clamp(20px, 3.5vw, 34px);
+  letter-spacing: 2px;
+  margin: 2px 0 6px;
+  opacity: .95;
 }
