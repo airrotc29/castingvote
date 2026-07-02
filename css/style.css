@@ -988,3 +988,19 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
   fill: #3C1E1E;
   flex: 0 0 auto;
 }
+
+/* ===== 앱 다운로드 카드 ===== */
+.resource-thumb-app {
+  background: linear-gradient(135deg, #2a6fe6, #0f3a8c);
+  display: flex; align-items: center; justify-content: center;
+}
+.resource-thumb-app .app-emoji { font-size: 54px; }
+.app-actions { display: flex; flex-direction: column; gap: 8px; }
+.btn-app {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  color: #fff !important; font-weight: 700; border: none;
+}
+.btn-appstore { background: #000 !important; }
+.btn-appstore:hover { background: #222 !important; }
+.btn-googleplay { background: #0f9d58 !important; }
+.btn-googleplay:hover { background: #0c854a !important; }
