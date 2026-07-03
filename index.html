@@ -82,30 +82,51 @@
     </div>
   </section>
 
-  <!-- ===== 소개 ===== -->
-  <section class="section" id="about">
+  <!-- ===== 홍보자료 ===== -->
+  <section class="section" id="resources">
     <div class="container">
       <div class="section-head">
-        <span class="section-tag">ABOUT</span>
-        <h2 class="section-title">CASTING VOTE 소개</h2>
-        <p class="section-lead">함께 만들어가는 투명한 의사결정, 그 중심에 CASTING VOTE가 있습니다.</p>
+        <span class="section-tag">RESOURCES</span>
+        <h2 class="section-title">홍보자료</h2>
+        <p class="section-lead">CASTING VOTE 홍보자료를 미리 보고, 필요한 파일을 다운로드하세요.</p>
       </div>
-      <div class="cards">
-        <a href="#resources" class="card">
-          <div class="card-icon">🗳️</div>
-          <h3>투명한 전자투표</h3>
-          <p>안전하고 신뢰할 수 있는 전자투표 시스템을 통해 누구나 손쉽게 참여할 수 있습니다.</p>
-        </a>
-        <a href="#gallery" class="card">
-          <div class="card-icon">📸</div>
-          <h3>현장 소식</h3>
-          <p>다양한 현장 활동과 행사 사진을 통해 생생한 현장 소식을 전해드립니다.</p>
-        </a>
-        <a href="#" class="card js-kakao">
-          <div class="card-icon">💬</div>
-          <h3>열린 소통</h3>
-          <p>궁금한 점이나 제안 사항은 언제든지 온라인 문의를 통해 전달해 주세요.</p>
-        </a>
+      <div class="admin-toolbar admin-only">
+        <button type="button" class="btn btn-primary btn-sm" id="addResourceBtn">+ 자료 추가</button>
+        <button type="button" class="btn btn-outline btn-sm" id="addVideoBtn">+ 영상 추가</button>
+      </div>
+
+      <div class="resources" id="resourceGrid">
+        <article class="resource-item resource-video" id="videoCard">
+          <div class="resource-thumb resource-thumb-video" id="videoCardThumb">
+            <span class="video-play">▶</span>
+            <span class="resource-badge">영상</span>
+          </div>
+          <div class="resource-body">
+            <h3>투표 영상</h3>
+            <p id="videoCardDesc">전자투표 안내 및 현장 영상을 확인하세요.</p>
+            <div class="resource-actions">
+              <button type="button" class="btn btn-sm btn-primary btn-block js-video-open">영상 보기 ▶</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 관리자가 추가한 자료(동적)는 이 위치에 삽입됩니다 -->
+        <div id="resDynAnchor" hidden></div>
+
+        <article class="resource-item resource-doc" id="consignmentCard">
+          <div class="resource-thumb resource-thumb-doc">
+            <span class="doc-ext" id="consignmentExt">HWP</span>
+            <span class="resource-badge">문서</span>
+          </div>
+          <div class="resource-body">
+            <h3>개인정보처리 위탁계약서</h3>
+            <p>표준 개인정보처리위탁 계약서(위탁서) 양식입니다.</p>
+            <div class="resource-actions" style="flex-direction:column;gap:8px;">
+              <a class="btn btn-sm btn-primary btn-block" id="consignmentLink" href="assets/resources/habitus-personal-info-consignment.hwp" download>다운로드 ↓</a>
+              <button type="button" class="btn btn-sm btn-outline btn-block admin-only" id="consignmentReplace">파일 교체</button>
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -178,51 +199,30 @@
     </div>
   </section>
 
-  <!-- ===== 홍보자료 ===== -->
-  <section class="section" id="resources">
+  <!-- ===== 소개 ===== -->
+  <section class="section" id="about">
     <div class="container">
       <div class="section-head">
-        <span class="section-tag">RESOURCES</span>
-        <h2 class="section-title">홍보자료</h2>
-        <p class="section-lead">CASTING VOTE 홍보자료를 미리 보고, 필요한 파일을 다운로드하세요.</p>
+        <span class="section-tag">ABOUT</span>
+        <h2 class="section-title">CASTING VOTE 소개</h2>
+        <p class="section-lead">함께 만들어가는 투명한 의사결정, 그 중심에 CASTING VOTE가 있습니다.</p>
       </div>
-      <div class="admin-toolbar admin-only">
-        <button type="button" class="btn btn-primary btn-sm" id="addResourceBtn">+ 자료 추가</button>
-        <button type="button" class="btn btn-outline btn-sm" id="addVideoBtn">+ 영상 추가</button>
-      </div>
-
-      <div class="resources" id="resourceGrid">
-        <article class="resource-item resource-video" id="videoCard">
-          <div class="resource-thumb resource-thumb-video" id="videoCardThumb">
-            <span class="video-play">▶</span>
-            <span class="resource-badge">영상</span>
-          </div>
-          <div class="resource-body">
-            <h3>투표 영상</h3>
-            <p id="videoCardDesc">전자투표 안내 및 현장 영상을 확인하세요.</p>
-            <div class="resource-actions">
-              <button type="button" class="btn btn-sm btn-primary btn-block js-video-open">영상 보기 ▶</button>
-            </div>
-          </div>
-        </article>
-
-        <!-- 관리자가 추가한 자료(동적)는 이 위치에 삽입됩니다 -->
-        <div id="resDynAnchor" hidden></div>
-
-        <article class="resource-item resource-doc" id="consignmentCard">
-          <div class="resource-thumb resource-thumb-doc">
-            <span class="doc-ext" id="consignmentExt">HWP</span>
-            <span class="resource-badge">문서</span>
-          </div>
-          <div class="resource-body">
-            <h3>개인정보처리 위탁계약서</h3>
-            <p>표준 개인정보처리위탁 계약서(위탁서) 양식입니다.</p>
-            <div class="resource-actions" style="flex-direction:column;gap:8px;">
-              <a class="btn btn-sm btn-primary btn-block" id="consignmentLink" href="assets/resources/habitus-personal-info-consignment.hwp" download>다운로드 ↓</a>
-              <button type="button" class="btn btn-sm btn-outline btn-block admin-only" id="consignmentReplace">파일 교체</button>
-            </div>
-          </div>
-        </article>
+      <div class="cards">
+        <a href="#resources" class="card">
+          <div class="card-icon">🗳️</div>
+          <h3>투명한 전자투표</h3>
+          <p>안전하고 신뢰할 수 있는 전자투표 시스템을 통해 누구나 손쉽게 참여할 수 있습니다.</p>
+        </a>
+        <a href="#gallery" class="card">
+          <div class="card-icon">📸</div>
+          <h3>현장 소식</h3>
+          <p>다양한 현장 활동과 행사 사진을 통해 생생한 현장 소식을 전해드립니다.</p>
+        </a>
+        <a href="#" class="card js-kakao">
+          <div class="card-icon">💬</div>
+          <h3>열린 소통</h3>
+          <p>궁금한 점이나 제안 사항은 언제든지 온라인 문의를 통해 전달해 주세요.</p>
+        </a>
       </div>
     </div>
   </section>
