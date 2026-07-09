@@ -197,7 +197,7 @@ function renderPdfThumbs() {
       html += `<h3>${hkEsc(p.title)}</h3>`;
       html += `<p class="post-text">${hkEsc(p.body).replace(/\n/g, '<br />')}</p>`;
       if (p.file) html += `<a class="btn btn-sm btn-primary" href="${hkEsc(p.file)}" download>${hkEsc(p.fileName || '첨부파일')} 다운로드 ↓</a>`;
-      if (p.link) html += `<a class="btn btn-sm btn-primary" href="${hkEsc(p.link)}" target="_blank" rel="noopener">${hkEsc(p.linkText || '다운받기')} ↓</a>`;
+      if (p.link) html += `<a class="btn btn-sm btn-primary" href="${hkEsc(p.link)}" target="_blank" rel="noopener">${hkEsc(p.linkText || '바로가기')} ↗</a>`;
       // 앱 출시 글이면 제목/내용에 따라 스토어 다운로드 버튼을 자동으로 옆에 추가
       var _ac = (p.title || '') + ' ' + (p.body || '');
       if (/안드로이드|android|구글|google\s*play/i.test(_ac))
