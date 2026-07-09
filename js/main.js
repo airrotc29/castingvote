@@ -197,7 +197,9 @@ function renderPdfThumbs() {
       html += `<h3>${hkEsc(p.title)}</h3>`;
       html += `<p class="post-text">${hkEsc(p.body).replace(/\n/g, '<br />')}</p>`;
       if (p.file) html += `<a class="btn btn-sm btn-primary" href="${hkEsc(p.file)}" download>${hkEsc(p.fileName || '첨부파일')} 다운로드 ↓</a>`;
-      if (p.link) html += `<a class="btn btn-sm btn-primary" href="${hkEsc(p.link)}" target="_blank" rel="noopener">${hkEsc(p.linkText || '바로가기')} ↗</a>`;
+      if (p.link) html += `<a class="link-badge" href="${hkEsc(p.link)}" target="_blank" rel="noopener">` +
+        `<svg class="lb-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h5v2H5v12h12v-5h2v5c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2z"/></svg>` +
+        `<span>${hkEsc(p.linkText || '바로가기')}</span></a>`;
       // 앱 출시 글이면 제목/내용에 따라 스토어 다운로드 버튼을 자동으로 옆에 추가
       var _ac = (p.title || '') + ' ' + (p.body || '');
       if (/안드로이드|android|구글|google\s*play/i.test(_ac))

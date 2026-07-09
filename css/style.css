@@ -1062,3 +1062,16 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
 /* 사용자 버튼이 사라진 빈 액션 영역 여백 제거 (관리자 파일교체는 유지) */
 .resources .resource-item .resource-actions { margin: 0; }
 body:not(.admin-on) .resources .resource-item .resource-actions { display: none; }
+
+/* ===== 게시글 '바로가기' 링크 배지 (스토어 배지와 통일된 검정 디자인) ===== */
+.link-badge {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: #000; color: #fff;
+  border: 1px solid #000; border-radius: 9px;
+  padding: 10px 18px; margin-top: 10px;
+  text-decoration: none; font-weight: 600; font-size: 15px; line-height: 1.1;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.link-badge:hover { opacity: .85; transform: translateY(-1px); color: #fff; }
+.link-badge .lb-ico { width: 18px; height: 18px; flex: 0 0 auto; }
+.post-body .link-badge { margin-right: 8px; }
