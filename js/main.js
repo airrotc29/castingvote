@@ -201,9 +201,18 @@ function renderPdfThumbs() {
       // 앱 출시 글이면 제목/내용에 따라 스토어 다운로드 버튼을 자동으로 옆에 추가
       var _ac = (p.title || '') + ' ' + (p.body || '');
       if (/안드로이드|android|구글|google\s*play/i.test(_ac))
-        html += `<a class="btn btn-sm btn-app btn-googleplay" href="https://play.google.com/store/apps/details?id=com.lksoft.mgmt" target="_blank" rel="noopener">▶ Google Play</a>`;
+        html += `<a class="store-badge" href="https://play.google.com/store/apps/details?id=com.lksoft.mgmt" target="_blank" rel="noopener" aria-label="Google Play에서 다운로드">` +
+          `<svg class="sb-ico" viewBox="0 0 24 24" aria-hidden="true">` +
+            `<path fill="#00A0FF" d="M3.7 1.7c-.3.3-.4.7-.4 1.2v18.2c0 .5.1.9.4 1.2l.1.1 10.2-10.2v-.2L3.8 1.6z"/>` +
+            `<path fill="#00F076" d="M17.6 15.5l-3.5-3.5v-.2l3.5-3.5.1.1 4.1 2.3c1.2.7 1.2 1.8 0 2.5l-4.2 2.3z"/>` +
+            `<path fill="#FF3A44" d="M17.7 15.6L14.1 12 3.7 22.3c.4.5 1.1.5 1.9.1l12.1-6.8z"/>` +
+            `<path fill="#FFCE00" d="M17.7 8.4L5.6 1.6C4.8 1.2 4.1 1.2 3.7 1.7L14.1 12l3.6-3.6z"/>` +
+          `</svg>` +
+          `<span class="sb-txt"><small>GET IT ON</small><strong>Google Play</strong></span></a>`;
       if (/애플|apple|아이폰|iphone|\bios\b|앱스토어|app\s*store/i.test(_ac))
-        html += `<a class="btn btn-sm btn-app btn-appstore" href="https://apps.apple.com/kr/app/%EA%B4%80%EB%A6%AC%EB%8B%A8/id6755434083" target="_blank" rel="noopener"> App Store</a>`;
+        html += `<a class="store-badge" href="https://apps.apple.com/kr/app/%EA%B4%80%EB%A6%AC%EB%8B%A8/id6755434083" target="_blank" rel="noopener" aria-label="App Store에서 다운로드">` +
+          `<svg class="sb-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M16.365 1.43c0 1.14-.417 2.2-1.253 3.06-.87.9-2.02 1.44-3.07 1.36-.13-1.12.42-2.28 1.19-3.06.83-.86 2.06-1.44 3.13-1.36zm3.32 16.02c-.6 1.36-.89 1.96-1.66 3.16-1.08 1.68-2.6 3.77-4.48 3.79-1.68.02-2.11-1.1-4.39-1.09-2.28.01-2.76 1.11-4.44 1.09-1.88-.02-3.32-1.9-4.4-3.58C-1.4 16.5-1.6 10.66 1.4 7.55c1.02-1.09 2.42-1.78 3.94-1.8 1.71-.03 2.79 1.13 4.2 1.13 1.39 0 2.24-1.13 4.2-1.13 1.35.02 2.78.61 3.8 1.66-3.34 1.83-2.8 6.6.15 8.04z"/></svg>` +
+          `<span class="sb-txt"><small>Download on the</small><strong>App Store</strong></span></a>`;
       html += hkDelBtn('post', p.id);
       html += '</div>';
       art.innerHTML = html;

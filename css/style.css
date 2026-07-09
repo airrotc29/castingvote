@@ -1036,3 +1036,20 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
 }
 @media (max-width: 1000px) { .resources { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px)  { .resources { grid-template-columns: 1fr; } }
+
+/* ===== 공식 스토어 다운로드 배지 ===== */
+.store-badge {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: #000; color: #fff;
+  border: 1px solid #000; border-radius: 9px;
+  padding: 8px 15px; margin-top: 10px;
+  text-decoration: none; line-height: 1;
+  transition: opacity .18s ease, transform .18s ease;
+}
+.store-badge:hover { opacity: .85; transform: translateY(-1px); }
+.store-badge .sb-ico { width: 22px; height: 22px; flex: 0 0 auto; }
+.store-badge .sb-txt { display: flex; flex-direction: column; text-align: left; }
+.store-badge .sb-txt small { font-size: 9px; font-weight: 500; letter-spacing: .5px; text-transform: uppercase; opacity: .92; }
+.store-badge .sb-txt strong { font-size: 16px; font-weight: 600; line-height: 1.15; }
+.post-body .store-badge + .store-badge { margin-left: 8px; }
+@media (max-width: 480px) { .post-body .store-badge + .store-badge { margin-left: 0; } }
