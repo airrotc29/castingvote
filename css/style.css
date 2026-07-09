@@ -1022,3 +1022,17 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
   .post-body .btn { display: inline-flex; }
   .post-body .btn + .btn { margin-left: 0; }
 }
+
+/* ===== 홍보자료 한 줄에 3개(요청) ===== */
+.resources { grid-template-columns: repeat(3, 1fr); }
+.resources .resource-item { flex-direction: column; align-items: stretch; }
+.resources .resource-thumb,
+.resources .resource-thumb-doc,
+.resources .resource-thumb-video,
+.resources .resource-thumb-pdf {
+  width: 100%;
+  min-width: 0;
+  height: 150px;
+}
+@media (max-width: 1000px) { .resources { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .resources { grid-template-columns: 1fr; } }
