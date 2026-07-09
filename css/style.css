@@ -1053,3 +1053,12 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
 .store-badge .sb-txt strong { font-size: 16px; font-weight: 600; line-height: 1.15; }
 .post-body .store-badge + .store-badge { margin-left: 8px; }
 @media (max-width: 480px) { .post-body .store-badge + .store-badge { margin-left: 0; } }
+
+/* ===== 홍보자료: 버튼 숨기고 카드 전체 클릭 ===== */
+.resources .resource-item { cursor: pointer; }
+.resources .resource-item .js-video-open,
+.resources .resource-item .js-preview,
+.resources .resource-item .resource-actions a[download] { display: none !important; }
+/* 사용자 버튼이 사라진 빈 액션 영역 여백 제거 (관리자 파일교체는 유지) */
+.resources .resource-item .resource-actions { margin: 0; }
+body:not(.admin-on) .resources .resource-item .resource-actions { display: none; }

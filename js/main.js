@@ -234,6 +234,20 @@ function renderPdfThumbs() {
   if (!grid) return;
   const anchor = document.getElementById('resDynAnchor');
 
+  // 카드 전체를 누르면 바로 다운로드 (영상 카드는 별도 재생 처리, 관리자 버튼은 그대로 동작)
+  grid.addEventListener('click', function (e) {
+    if (e.target.closest('.admin-ctrls, .admin-only, button, #consignmentReplace')) return;
+    const card = e.target.closest('.resource-item');
+    if (!card || card.id === 'videoCard') return;
+    let url = card.getAttribute('data-file');
+    if (!url) { const dl = card.querySelector('a[download]'); if (dl) url = dl.getAttribute('href'); }
+    if (!url) return;
+    e.preventDefault();
+    const a = document.createElement('a');
+    a.href = url; a.setAttribute('download', '');
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+
   function render(items) {
     grid.querySelectorAll('.resource-dynamic').forEach((n) => n.remove());
     const arr = Array.isArray(items) ? items : [];
@@ -401,8 +415,12 @@ function renderPdfThumbs() {
   window.HK.refreshVideos = load;
   window.HK.youtubeId = youtubeId;
 
-  openBtn.addEventListener('click', openModal);
-  card.querySelector('.resource-thumb').addEventListener('click', openModal);
+  if (openBtn) openBtn.addEventListener('click', openModal);
+  // 카드 전체를 누르면 영상 재생 (관리자 버튼 제외)
+  card.addEventListener('click', function (e) {
+    if (e.target.closest('.admin-only, .admin-ctrls, button.admin-only')) return;
+    openModal();
+  });
   closeBtn.addEventListener('click', closeModal);
   modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
