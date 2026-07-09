@@ -345,25 +345,22 @@
     "agendas": [
       {
         "no": 1,
-        "title": "관리인 선출의 건 (후보자 102동 1001호 김미영님)",
+        "title": "관리인 선출의 건 (후보자 10x동 100x호 김0영님)",
         "options": [
           {
             "label": "찬성",
             "count": 65,
-            "pct": 53.7,
-            "areaPct": 55.1
+            "pct": 53.7
           },
           {
             "label": "반대",
             "count": 2,
-            "pct": 1.7,
-            "areaPct": 2.2
+            "pct": 1.7
           },
           {
             "label": "미투표",
             "count": 54,
-            "pct": 44.6,
-            "areaPct": 42.6
+            "pct": 44.6
           }
         ]
       }
