@@ -230,6 +230,38 @@ function renderPdfThumbs() {
   window.HK.renderPosts();
 })();
 
+// ===== 주요 판례 =====
+(function () {
+  var list = document.getElementById('casesList');
+  var empty = document.getElementById('casesEmpty');
+  if (!list) return;
+  function render(items) {
+    list.innerHTML = '';
+    var arr = Array.isArray(items) ? items : [];
+    if (arr.length === 0) { if (empty) empty.hidden = false; return; }
+    if (empty) empty.hidden = true;
+    arr.forEach(function (c, i) {
+      var d = document.createElement('details');
+      d.className = 'case-item';
+      var body = '';
+      if (c.court) body += '<div class="case-court">' + hkEsc(c.court) + '</div>';
+      if (c.judgment) body += '<h4>법원판단</h4><p>' + hkEsc(c.judgment).replace(/\n/g, '<br />') + '</p>';
+      if (c.comment) body += '<h4>판례해설</h4><p>' + hkEsc(c.comment).replace(/\n/g, '<br />') + '</p>';
+      d.innerHTML =
+        '<summary class="case-summary"><span class="case-num">' + (i + 1) + '</span>' +
+        '<span class="case-title">' + hkEsc(c.title) + '</span><span class="case-arrow">▾</span></summary>' +
+        '<div class="case-body">' + body + '</div>';
+      list.appendChild(d);
+    });
+  }
+  window.HK.renderCases = function (items) {
+    if (items) return render(items);
+    fetch('assets/data/cases.json', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : []; }).then(render).catch(function () { render([]); });
+  };
+  window.HK.renderCases();
+})();
+
 // ===== 홍보자료 (관리자가 추가한 동적 자료) =====
 (function () {
   const grid = document.getElementById('resourceGrid');

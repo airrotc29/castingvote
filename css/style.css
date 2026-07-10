@@ -1075,3 +1075,32 @@ body:not(.admin-on) .resources .resource-item .resource-actions { display: none;
 .link-badge:hover { opacity: .85; transform: translateY(-1px); color: #fff; }
 .link-badge .lb-ico { width: 18px; height: 18px; flex: 0 0 auto; }
 .post-body .link-badge { margin-right: 8px; }
+
+/* ===== 주요 판례 (아코디언) ===== */
+.cases-list { display: flex; flex-direction: column; gap: 12px; max-width: 900px; margin: 0 auto; }
+.case-item {
+  background: #fff; border: 1px solid var(--line, #e6ebf2); border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(15,42,74,.06); overflow: hidden;
+}
+.case-summary {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 20px; cursor: pointer; list-style: none;
+  font-weight: 700; color: var(--navy, #12356a); line-height: 1.5;
+}
+.case-summary::-webkit-details-marker { display: none; }
+.case-num {
+  flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--blue, #1c5fc4); color: #fff; font-size: 13px; font-weight: 800;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.case-title { flex: 1; font-size: 15px; }
+.case-arrow { flex: 0 0 auto; color: var(--blue, #1c5fc4); transition: transform .2s ease; }
+.case-item[open] .case-arrow { transform: rotate(180deg); }
+.case-item[open] .case-summary { border-bottom: 1px solid var(--line, #e6ebf2); }
+.case-body { padding: 6px 20px 20px; }
+.case-court { font-size: 13px; color: var(--blue, #1c5fc4); font-weight: 700; margin: 12px 0 4px; }
+.case-body h4 { font-size: 14px; color: var(--navy, #12356a); margin: 16px 0 6px; padding-left: 10px; border-left: 3px solid var(--blue, #1c5fc4); }
+.case-body p { font-size: 14.5px; color: var(--text, #3a4a5e); line-height: 1.75; margin: 0; }
+.cases-source { text-align: center; margin-top: 22px; font-size: 13px; color: var(--text-soft, #7a8aa0); }
+.cases-source a { color: var(--blue, #1c5fc4); }
+@media (max-width: 640px) { .case-summary { padding: 15px 16px; } .case-body { padding: 6px 16px 18px; } .case-title { font-size: 14px; } }
