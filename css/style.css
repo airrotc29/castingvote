@@ -899,13 +899,14 @@ body { color: var(--ink); letter-spacing: -0.1px; background: #fbfcfe; }
     radial-gradient(circle at 85% 85%, rgba(0,0,0,.18), transparent 48%);
 }
 .hero-wordmark {
-  font-size: clamp(40px, 8vw, 88px);
+  font-size: clamp(26px, 6vw, 58px);
   font-weight: 900;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   color: #fff;
-  line-height: 1.05;
-  margin: 0 auto 18px;
+  line-height: 1.15;
+  margin: 0 auto 14px;
   text-shadow: 0 6px 24px rgba(0,0,0,.18);
+  word-break: keep-all;
 }
 .hero-title {
   color: rgba(255,255,255,.92) !important;
